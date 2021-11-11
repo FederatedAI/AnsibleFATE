@@ -4,6 +4,8 @@
 workdir=$(cd $(dirname $0); pwd)
 cd ${workdir}
 
+[ ! -x bin/yq ] && chmod +x bin/*
+
 case $1 in
   "init")
     shift

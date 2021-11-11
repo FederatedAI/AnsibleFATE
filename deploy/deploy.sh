@@ -5,6 +5,7 @@ workdir=$(cd $(dirname $0); pwd)
 base="${workdir}/.."
 cd ${workdir}
 mkdir -p ${base}/logs
+[ ! -x bin/yq ] && chmod +x bin/*
 
 pname=( $( ${workdir}/bin/yq eval '.project' ${base}/build/conf/setup.conf ) )
 
