@@ -1,0 +1,14 @@
+---
+- hosts: guest
+  any_errors_fatal: True
+  vars:
+    jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
+    pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
+    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+    deploy_role: "guest"
+  vars_files:
+    - fate-init
+    - base-init
+    - fate-guest
+  roles:
+  - role: python

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+/bin/bash {{cbase}}/monit/service.sh reload all
+/bin/bash {{cbase}}/monit/service.sh start mysql
+
+#nohup {{cbase}}/mysql/bin/mysqld_safe --defaults-file={{cbase}}/mysql/conf/my.cnf --user=app > {{lbase}}/mysql/boot.log &
+touch {{cbase}}/mysql/.boot
+
+
+

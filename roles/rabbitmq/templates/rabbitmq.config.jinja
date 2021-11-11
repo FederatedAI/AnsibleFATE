@@ -1,0 +1,10 @@
+[
+ {rabbitmq_management,
+  [
+{% if ansible_ssh_host == rabbit.get('host','192.168.0.1') %}
+   {listener, [{port,     {{rabbit.get('mng_port',12345)}}},
+{% endif %}
+                {ip,       "0.0.0.0"},
+                {ssl,      false}]}
+  ]}
+].

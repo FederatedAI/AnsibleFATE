@@ -1,0 +1,123 @@
+- when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+  block:
+  - name: "Copy: eggroll keys (guest)"
+    copy:
+      src: "keys/{{ item.src }}"
+      dest: "{{dbase}}/{{pname}}/keys/{{ item.dest }}"
+    with_items:
+    - { src: 'guest/guest-ca.pem', dest: 'guest-ca.pem' }
+    - { src: 'guest/guest-server.pem', dest: 'guest-server.pem' }
+    - { src: 'guest/guest-server.key', dest: 'guest-server.key' }
+    - { src: 'guest/guest-client-ca.pem', dest: 'guest-client-ca.pem' }
+    - { src: 'guest/guest-client-client.pem', dest: 'guest-client-client.pem' }
+    - { src: 'guest/guest-client-client.key', dest: 'guest-client-client.key' }
+    when: "ssl_roles|length == 2 and 'guest' in ssl_roles and rollsite.get('server_secure', False) == True and rollsite.get('client_secure', False) == True"
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/conf/eggroll.properties(guest)"
+  template: src=eggroll.properties.jinja dest={{pbase}}/{{pname}}/eggroll/conf/eggroll.properties
+  when: "( ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True ) or ( ansible_ssh_host in clustermanager.get('ips',[]) and clustermanager.get('enable', False) == True ) or ( ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True )"
+
+- when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+  block:
+  - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/conf/route_table_tmp.json(guest)"
+    template: src=route_table.json.jinja dest={{pbase}}/{{pname}}/eggroll/conf/route_table_tmp.json
+
+  - name: "new({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/bin/json-replace.sh"
+    template: src=json-replace.sh.jinja dest={{pbase}}/{{pname}}/eggroll/bin/json-replace.sh
+
+  - name: "check({{deploy_mode}}): route table json format"
+    shell: /bin/bash {{pbase}}/{{pname}}/eggroll/bin/json-replace.sh
+    register: json_replace
+
+  - debug: var=json_replace['stdout_lines']
+
+  - name: "output({{deploy_mode}}): check json bad result"
+    fail:
+      msg: "please check json"
+    when: json_replace.stdout.find('check_json_pass') == -1
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-rollsite.conf"
+  template: src=supervisor.d/eggroll.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-rollsite.conf
+  vars:
+    role: rollsite
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-rollsite
+  - restart {{pname}}-rollsite
+  when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-clustermanager.conf"
+  template: src=supervisor.d/eggroll.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-clustermanager.conf
+  vars:
+    role: clustermanager
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-clustermanager
+  - restart {{pname}}-clustermanager
+  when: ansible_ssh_host in clustermanager.get('ips',[]) and clustermanager.get('enable', False) == True
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-nodemanager.conf"
+  template: src=supervisor.d/eggroll.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-nodemanager.conf
+  vars:
+    role: nodemanager
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-nodemanager
+  - restart {{pname}}-nodemanager
+  when: ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True
+
+- name: "flush_handlers"
+  meta: flush_handlers
+
+- name: "wait({{deploy_mode}})): open port {{guest.get('rollsite',{}).get('port',9370)}}(guest)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{guest.get('rollsite',{}).get('port',9370)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_rollsite_guest
+  when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+
+- name: "wait({{deploy_mode}})): open port {{guest.get('rollsite',{}).get('secure_port',9371)}}(guest)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{guest.get('rollsite',{}).get('secure_port',9371)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_rollsite_secure_guest
+  when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True and rollsite.get('server_secure', False) == True and rollsite.get('client_secure', False) == True
+
+- name: "check({{deploy_mode}})): check rollsite service(guest)"
+  debug: msg="******start rollsite successfully******"
+  when: "ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True and waitfor_rollsite_guest.get('state') == 'started' and waitfor_rollsite_secure_guest.get('state') == 'started'"
+
+- name: "wait({{deploy_mode}})): open port {{guest.get('clustermanager',{}).get('port',4670)}}(guest)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{guest.get('clustermanager',{}).get('port',4670)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_clustermanager_guest
+  when: ansible_ssh_host in clustermanager.get('ips',[]) and clustermanager.get('enable', False) == True
+
+- name: "check({{deploy_mode}})): check clustermanager service(guest)"
+  debug: msg="******start clustermanager successfully******"
+  when: "ansible_ssh_host in clustermanager.get('ips',[]) and clustermanager.get('enable', False) == True and waitfor_clustermanager_guest.get('state') == 'started'"
+
+- name: "wait({{deploy_mode}})): open port {{guest.get('nodemanager',{}).get('port',4671)}}(guest)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{guest.get('nodemanager',{}).get('port',4671)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_nodemanager_guest
+  when: ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True
+
+- name: "check({{deploy_mode}})): check nodemanager service(guest)"
+  debug: msg="******start nodemanager successfully******"
+  when: "ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True and waitfor_nodemanager_guest.get('state') == 'started'"
+

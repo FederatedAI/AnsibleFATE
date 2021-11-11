@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+pips=$( {{pbase}}/{{pname}}/{{python['venv']}}/bin/pip list 2>/dev/null | wc -l )
+lines=$( wc -l {{tbase}}/{{pname}}/requirements.txt )
+
+if (( $pip > ${lines[0]} ))
+then
+  echo "fate_pip_check_pass"
+fi  

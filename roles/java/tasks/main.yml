@@ -1,0 +1,23 @@
+
+- name: "mkdir: java directory"
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - "{{pbase}}/{{pname}}/{{java['path']}}"
+  when: deploy_mode in [ 'deploy', 'install' ]
+
+- name: "check: {{jbase}}/bin/java"
+  stat:
+    path: "{{jbase}}/bin/java"
+  register: java_stat
+  when: deploy_mode in [ 'deploy', 'install' ]
+
+- name: "untar: java-{{java['version']}}.tar"
+  unarchive:
+    src: "{{java['name']}}-{{java['version']}}.tar"
+    dest: "{{pbase}}/{{pname}}/{{java['path']}}"
+  when: deploy_mode in [ 'deploy', 'install' ] and java_stat.stat.exists == False
+
+

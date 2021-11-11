@@ -1,0 +1,12 @@
+[program:{{pname}}-{{role_name}}]
+command={{cbase}}/miniconda3/bin/pidproxy {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/run/mysqld.pid {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/bin/mysqld_safe --defaults-file={{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conf/my.cnf --user={{service['owner']}}
+directory={{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}
+user={{service['owner']}}
+autorestart=true
+redirect_stderr=true
+logfile_maxbytes = 50MB
+logfile_backups=10
+stdout_logfile={{lbase}}/{{pname}}/mysql/boot.log
+loglevel=info
+
+

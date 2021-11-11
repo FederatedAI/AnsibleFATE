@@ -1,0 +1,18 @@
+[host]
+localhost
+
+[guest]
+localhost
+
+[guest]
+localhost
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_port=22
+ansible_ssh_user=root
+#ansible_ssh_pass=
+##method: sudo or su
+ansible_become_method=sudo
+ansible_become_user=root
+ansible_become_pass=

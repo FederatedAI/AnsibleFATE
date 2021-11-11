@@ -1,0 +1,110 @@
+---
+- name: "mkdir({{deploy_mode}}): {{tbase}}/{{pname}}"
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - "{{tbase}}/{{pname}}"
+
+- name: "copy({{deploy_mode}}): requirements.txt"
+  copy:
+    src: "{{item}}"
+    dest: "{{tbase}}/{{pname}}/{{item}}"
+  with_items:
+  - requirements.txt
+  - setuptools-50.3.2-py3-none-any.whl
+
+- name: "check({{deploy_mode}}): python"
+  stat: path="{{cbase}}/{{python['dest']}}/bin/python"
+  register: py_reg
+
+
+- name: "check({{deploy_mode}}): miniconda3 package"
+  stat: path="{{tbase}}/{{pname}}/Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+  register: mc_reg
+
+- name: "copy({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+  copy:
+    src: "Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+    dest: "{{tbase}}/{{pname}}/Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+  when: py_reg.stat.exists == False and mc_reg.stat.exists == False
+
+- name: "commit({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+  shell: "/bin/bash ./Miniconda3-{{python['version']}}-Linux-x86_64.sh  -b -p {{cbase}}/{{python['dest']}}"
+  args:
+    chdir: "{{tbase}}/{{pname}}"
+  when: py_reg.stat.exists == False
+
+- name: "check({{deploy_mode}}): pip3 package"
+  stat: path="{{tbase}}/{{pname}}/{{python['pip']}}.tar.gz"
+  register: pp_reg
+
+- name: "copy({{deploy_mode}}): pip packages"
+  copy:
+    src: "{{python['pip']}}.tar.gz"
+    dest: "{{tbase}}/{{pname}}"
+  when: pp_reg.stat.exists == False
+
+- name: "untar({{deploy_mode}}): {{tbase}}/{{pname}}/{{python['pip']}}.tar.gz"
+  unarchive:
+    src: "{{python['pip']}}.tar.gz"
+    dest: "{{tbase}}/{{pname}}"
+  when: pp_reg.stat.exists == False
+
+- name: "check({{deploy_mode}}): {{cbase}}/{{python['dest']}}/bin/virtualenv"
+  stat: path="{{cbase}}/{{python['dest']}}/bin/virtualenv"
+  register: virtualenv_reg
+
+- name: "untar({{deploy_mode}}): {{tbase}}/{{pname}}/virtualenv.tar.gz"
+  unarchive:
+    src: "virtualenv.tar.gz"
+    dest: "{{tbase}}/{{pname}}"
+  when: virtualenv_reg.stat.exists == False
+
+- name: "pip({{deploy_mode}}): install virtualenv"
+  pip:
+    extra_args: "--no-index --find-links={{tbase}}/{{pname}}/"
+    executable: "{{cbase}}/{{python['dest']}}/bin/pip"
+    name: "file://{{tbase}}/{{pname}}/virtualenv-20.0.18-py2.py3-none-any.whl"
+  when: virtualenv_reg.stat.exists == False
+
+- name: "check({{deploy_mode}}): venv exists or not"
+  stat: path="{{pbase}}/{{pname}}/{{python['venv']}}"
+  register: venv_reg
+
+- name: "build({{deploy_mode}}): python virtual env"
+  shell: "{{cbase}}/{{python['dest']}}/bin/virtualenv -p {{cbase}}/{{python['dest']}}/bin/python3  --no-wheel --no-setuptools --no-download {{pbase}}/{{pname}}/{{python['venv']}}"
+  when: venv_reg.stat.exists == False
+
+- name: "check({{deploy_mode}}): venv again"
+  stat: path="{{pbase}}/{{pname}}/{{python['venv']}}"
+  register: venv2_reg
+
+- name: "pip({{deploy_mode}}): venv install must packages"
+  pip:
+    name: "{{python['must']}}"
+    chdir: "{{tbase}}/{{pname}}/"
+    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
+  when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
+
+- name: "pip({{deploy_mode}}): venv install packages"
+  pip:
+    extra_args: "-b {{tbase}}/{{pname}} --no-index --find-links={{tbase}}/{{pname}}/{{python['pip']}}"
+    requirements: "{{tbase}}/{{pname}}/requirements.txt"
+    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
+  when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/tools/check_pip.sh"
+  template: src=check_pip.sh.jinja dest={{pbase}}/{{pname}}/tools/check_pip.sh
+
+- name: "check({{deploy_mode}}): the number of pip packages"
+  shell: "/bin/bash {{pbase}}/{{pname}}/tools/check_pip.sh"
+  register: pip_check
+
+- name: "pip({{deploy_mode}}): venv reinstall packages"
+  pip:
+    extra_args: "-b {{tbase} --no-index --find-links={{tbase}}/{{pname}}/{{python['pip']}}"
+    requirements: "{{tbase}}/{{pname}}/requirements.txt"
+    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
+  when: pip_check.stdout.find("fate_pip_check_pass") != -1

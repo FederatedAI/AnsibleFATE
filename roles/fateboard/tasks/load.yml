@@ -1,0 +1,39 @@
+- when: "ansible_ssh_host in fateboard.get('ips',[]) and fateboard.get('enable', False) == True"
+  block:
+  - name: "update({{deploy_mode}}): {{tbase}}/check.py"
+    template: src=templates/check.py.jinja dest={{tbase}}/check.py
+    vars:
+      admin_user: "{{mysql.get('user','root')}}"
+      admin_passwd: "{{mysql.get('passwd','fate')}}"
+      db_name: "{{fateboard.get('dbname','fate_flow')}}"
+      db_host: "{{db.get('ips',[])[0]}}"
+      db_port: "{{db.get('port',3306)}}"
+
+  - name: "commit({{deploy_mode}}): check.py"
+    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/check.py"
+    register: mysql_load
+
+  - debug: var=mysql_load.get('stdout_lines')
+
+  - name: "update({{deploy_mode}}): {{tbase}}/conn.py"
+    template: src=templates/conn.py.jinja dest={{tbase}}/flow_conn.py
+    vars:
+      admin_user: "{{mysql.get('user','root')}}"
+      admin_passwd: "{{mysql.get('passwd','fate')}}"
+      db_name: "{{fateboard.get('dbname','eggroll_meta')}}"
+      db_host: "{{db.get('ips',[])[0]}}"
+      db_port: "{{db.get('port',3306)}}"
+      db_user: "{{db.get('dbuser','fate')}}"
+      db_passwd: "{{db.get('dbpasswd','fate')}}"
+      rip: "{{fateboard.get('ips',[])[0]}}"
+
+  - name: "commit({{deploy_mode}}): flow_conn.py"
+    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/flow_conn.py"
+    register: mysql_load
+
+  - debug: var=mysql_load.get('stderr_lines')
+  - debug: var=mysql_load.get('stdout_lines')
+
+
+
+

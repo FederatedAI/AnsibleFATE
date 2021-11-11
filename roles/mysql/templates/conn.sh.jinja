@@ -1,0 +1,9 @@
+#!/bin/bash
+
+base="{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}"
+
+stty -echo
+read -p "Enter your mysql password: " passwd
+stty echo
+
+$base/bin/mysql -h {{db['ips'][0]}} -P {{db['port']}} -S $base/run/mysql.sock -u{{db['dbuser']}} -p"$passwd"

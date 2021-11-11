@@ -1,0 +1,226 @@
+- name: "Waring({{deploy_mode}}): hosts args check"
+  fail:
+    msg: "Please setup ansible_become_pass first"
+  when: ansible_become_pass is undefined
+
+ 
+- name: "mkdir({{deploy_mode}}): project base dir"
+  become: yes
+  file:
+    path: "{{pbase}}"
+    state: "directory"
+    owner: "{{ansible_ssh_user}}"
+
+- name: "check({{deploy_mode}}): {{pbase}}"
+  stat:
+    path: "{{pbase}}"
+  register: dst
+
+- name: "Waring({{deploy_mode}}): check owner"
+  fail:
+    msg: "{{pbase}} owner is wrong"
+  when: dst.stat.exists == True and dst.stat.pw_name != ansible_ssh_user
+
+- name: "Waring({{deploy_mode}}): check owner"
+  fail:
+    msg: "{{pbase}} not exists"
+  when: dst.stat.exists == False
+
+- name: "mkdir({{deploy_mode}}): temp base dir"
+  become: yes
+  file:
+    path: "{{tbase}}/{{pname}}"
+    state: "directory"
+    owner: "{{ansible_ssh_user}}"
+
+- name: "check({{deploy_mode}}): {{tbase}}"
+  stat:
+    path: "{{tbase}}"
+  register: tst
+
+- name: "Waring({{deploy_mode}}): check owner"
+  fail:
+    msg: "{{tbase}} owner is wrong"
+  when: tst.stat.exists == True and tst.stat.pw_name != ansible_ssh_user
+
+- name: "Waring({{deploy_mode}}): owner"
+  fail:
+    msg: "{{tbase}} not exists"
+  when: tst.stat.exists == False 
+ 
+
+- name: "mkdir({{deploy_mode}}): log base dir"
+  become: yes
+  file:
+    path: "{{lbase}}"
+    state: "directory"
+    owner: "{{ansible_ssh_user}}"
+
+- name: "check({{deploy_mode}}): {{lbase}}"
+  stat:
+    path: "{{lbase}}"
+  register: lst
+ 
+- name: "Waring({{deploy_mode}}): check owner"
+  fail:
+    msg: "{{lbase}} owner is wrong"
+  when: lst.stat.exists == True and lst.stat.pw_name != ansible_ssh_user
+
+- name: "Waring({{deploy_mode}}): check owner"
+  fail:
+    msg: "{{lbase}} not exist"
+  when: lst.stat.exists == False
+
+ 
+- name: "mkdir({{deploy_mode}}): base dirs"
+  file:
+    path: "{{item}}"
+    state: "directory"
+    owner: "{{ansible_ssh_user}}"
+  with_items:
+  - "{{dbase}}"
+  - "{{bbase}}"
+  - "{{pbase}}/{{pname}}"
+  - "{{lbase}}/{{pname}}/supervisord"
+
+- name: "mkdir({{deploy_mode}}):  common dirs"
+  file:
+    path: "{{pbase}}/{{item}}"
+    state: "directory"
+    owner: "{{ansible_ssh_user}}"
+  with_items:
+  - "{{init['dirs']}}"
+
+- name: "yum({{deploy_mode}}): install dependency packages"
+  yum:
+    name: "{{ packages }}"
+  become: yes
+  vars:
+    packages:
+    - gcc
+    - gcc-c++
+    - make
+    - openssl-devel
+    - gmp-devel
+    - mpfr-devel
+    - libmpc-devel
+    - libaio
+    - numactl
+    - autoconf
+    - automake
+    - libtool
+    - libffi-devel
+    - snappy
+    - snappy-devel
+    - zlib
+    - zlib-devel
+    - bzip2
+    - bzip2-devel
+    - lz4-devel
+    - libasan
+    - lsof
+    - sysstat
+    - telnet
+    - psmisc
+    - iperf3
+    - erlang
+    - python-setuptools
+  when: ansible_distribution == "CentOS"
+
+#- name: "untar({{deploy_mode}}): supervisor-3.4.0.rpm.tar.gz"
+#  unarchive:
+#    src: "supervisor-3.4.0.rpm.tar.gz"
+#    dest: "{{tbase}}/{{pname}}/"
+#  when: ansible_distribution in [ "CentOS" ]
+
+#- name: "install({{deploy_mode}}): supervisor rpm package"
+#  shell: /usr/bin/rpm -i /data/temp/fate/supervisor/*.rpm --nofiledigest --nosignature  --replacepkgs
+#  become: yes
+#  register: install_msg
+#  when: ansible_distribution in [ "CentOS" ]
+
+#- name: "show({{deploy_mode}}): install supervisor"
+#  debug:
+#    var: install_msg
+#  when: ansible_distribution in [ "CentOS" ]
+
+
+#- name: "stop({{deploy_mode}}): origin supervisor service(centos)"
+#  service:
+#    name: supervisord
+#    state: stopped
+#    enabled: no
+#  become: yes
+#  when: ansible_distribution in [ "CentOS" ]
+
+- name: "apt({{deploy_mode}}): install dependency packages"
+  apt:
+    name: "{{ packages }}"
+  become: yes
+  vars:
+    packages:
+    - gcc
+    - g++
+    - make
+    - openssl
+    - libgmp-dev
+    - libmpfr-dev
+    - libmpc-dev
+    - libaio1
+    - libaio-dev
+    - numactl
+    - autoconf
+    - automake
+    - libtool
+    - libffi-dev
+    - libssl1.0.0
+    - libssl-dev
+    - liblz4-1
+    - liblz4-dev
+    - liblz4-1-dbg
+    - liblz4-tool
+    - zlib1g
+    - zlib1g-dbg
+    - zlib1g-dev
+    - lsof
+    - iperf3
+    - erlang
+    - python-setuptools
+  when: ansible_distribution in [ "Ubuntu" ]
+
+- name: "stop({{deploy_mode}}): origin supervisor service(ubuntu)"
+  service:
+    name: supervisor
+    state: stopped
+    enabled: no
+  become: yes
+  when: ansible_distribution in [ "Ubuntu" ]
+
+- name: "check({{deploy_mode}}): libssl.so"
+  stat:
+    path: "/usr/lib/x86_64-linux-gnu/libssl.so.1.0.0"
+  register: ssl_stat
+  when: ansible_distribution in [ "Ubuntu" ]
+
+- name: "link({{deploy_mode}}): libssl.so.10"
+  file:
+    src: "/usr/lib/x86_64-linux-gnu/libssl.so.1.0.0"
+    dest: "/usr/lib/x86_64-linux-gnu/libssl.so.10"
+    state: link
+  when: ansible_distribution in [ "Ubuntu" ] and ssl_stat.stat.exists == False
+
+
+- name: "check({{deploy_mode}}): libcrypto.so"
+  stat:
+    path: "/usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0"
+  register: crypto_stat
+  when: ansible_distribution in [ "Ubuntu" ]
+
+- name: "link({{deploy_mode}}): libcrypto.so.10"
+  file:
+    src: "/usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0"
+    dest: "/usr/lib/x86_64-linux-gnu/libcrypto.so.10"
+    state: link
+  when: ansible_distribution in [ "Ubuntu" ] and  crypto_stat.stat.exists == False 
+
+

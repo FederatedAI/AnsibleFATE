@@ -1,0 +1,21 @@
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}/etc/rabbitmq/rabbitmq.config"
+  template: src=rabbitmq.config.jinja dest={{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}/etc/rabbitmq/rabbitmq.config
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-{{role_name}}.conf"
+  template: src=supervisor.d/{{role_name}}.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-{{role_name}}.conf
+  vars:
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-{{role_name}}
+  - restart {{pname}}-{{role_name}}
+
+- name: "flush_handlers"
+  meta: flush_handlers
+
+- name: "update({{deploy_mode}}): {{tbase}}/{{pname}}/add.sh"
+  template: src=add.sh.jinja dest={{tbase}}/{{pname}}/add.sh
+  when: rabbitmq_stat.stat.exists == False
+
+- name: "commit({{deploy_mode}}): add.sh"
+  shell: "/bin/bash {{tbase}}/{{pname}}/add.sh"
+  when: rabbitmq_stat.stat.exists == False

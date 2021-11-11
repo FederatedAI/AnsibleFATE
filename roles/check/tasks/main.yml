@@ -1,0 +1,81 @@
+
+- name: "Warning({{deploy_mode}}):"
+  fail:
+    msg: "Please setup deploy_mode variable in the file whose name is fate_init first."
+  when: deploy_mode is undefined  or deploy_mode == ""
+
+- name: "mkdir({{deploy_mode}}): base dir"
+  file:
+    path: "{{pbase}}/{{pname}}"
+    state: "directory"
+    owner: "{{ansible_ssh_user}}"
+  when: deploy_mode in [ 'deploy', 'install' ]
+
+- name: "mkdir({{deploy_mode}}): tools dir"
+  file:
+    path: "{{pbase}}/{{pname}}/tools"
+    state: "directory"
+    owner: "{{ansible_ssh_user}}"
+  when: deploy_mode in [ 'deploy', 'install' ]
+
+- name: "untar({{deploy_mode}}): build.tar.gz"
+  unarchive:
+    src: "build.tar.gz"
+    dest: "{{pbase}}/{{pname}}/"
+
+- name: "untar({{deploy_mode}}): deploy.tar.gz"
+  unarchive:
+    src: "deploy.tar.gz"
+    dest: "{{pbase}}/{{pname}}/"
+
+- name: "update({{deploy_mode}}): check.sh"
+  template:
+    src: "check.sh.jinja"
+    dest: "{{pbase}}/{{pname}}/tools/check.sh"
+  when: deploy_mode in [ 'deploy', 'install' ]
+
+- name: "copy({{deploy_mode}}): check.sh"
+  copy:
+    src: "{{item}}" 
+    dest: "{{pbase}}/{{pname}}/tools/{{item}}"
+  with_items:
+  - makeVirtualDisk.sh
+  when: deploy_mode in [ 'deploy', 'install' ]
+
+- name: "copy({{deploy_mode}}): check.sh"
+  copy:
+    src: "{{item}}" 
+    dest: "{{pbase}}/{{pname}}/tools/{{item}}"
+  with_items:
+  - ucheck.sh
+  - makeVirtualDisk.sh
+  when: deploy_mode == "update"
+
+- name: "check({{deploy_mode}}): doing"
+  command: "/bin/bash {{pbase}}/{{pname}}/tools/check.sh"
+  when: deploy_mode in [ 'deploy', 'install' ]
+  register: checkOutputInstall
+
+- name: "check({{deploy_mode}}): doing"
+  command: "/bin/bash {{pbase}}/{{pname}}/tools/ucheck.sh"
+  when: deploy_mode == "update"
+  register: checkOutputUpdate
+
+- name: "output({{deploy_mode}}): check results"
+  debug: msg={{checkOutputInstall.stdout_lines}} 
+  when: deploy_mode in [ 'deploy', 'install' ]
+
+- name: "output({{deploy_mode}}): check results"
+  debug: msg={{checkOutputUpdate.stdout_lines}} 
+  when: deploy_mode == "update"
+
+- name: "Waring({{deploy_mode}}):"
+  fail:
+    msg: "Please fix the above Warning first"
+  when: 'deploy_mode in [ "deploy", "install" ] and "Warning" in checkOutputInstall.stdout and envCheck == True'
+
+- name: "Waring({{deploy_mode}}):"
+  fail:
+    msg: "Please fix the above Warning first"
+  when: 'deploy_mode == "update" and "Warning" in checkOutputUpdate.stdout and envCheck == True'
+

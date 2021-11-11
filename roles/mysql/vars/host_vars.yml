@@ -1,0 +1,13 @@
+---
+deploy_role: "host"
+eggroll: "{{ host.get('eggroll',{}) }}"
+rollsite: "{{ host.get('rollsite',{}) }}"
+clustermanager: "{{ host.get('clustermanager',{}) }}"
+nodemanager: "{{ host.get('nodemanager',{}) }}"
+side: "{{ host.get('side',{}) }}"
+db: "{{ host.get('mysql',{}) }}"
+fateboard: "{{ host.get('fateboard',{}) }}"
+fate_flow: "{{ host.get('fate_flow',{}) }}"
+zk: "{{ host.get('zk',{}) }}"
+servings: "{{ host.get('servings',{}) }}"
+linkis_spark: "{{ host.get('linkis_spark',{}) }}"

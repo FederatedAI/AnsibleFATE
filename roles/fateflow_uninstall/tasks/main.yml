@@ -1,0 +1,50 @@
+- name: Stop fate_flow service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-fateflow
+  ignore_errors: yes
+
+- name: Remove supervisord files
+  file: path={{item}} state=absent
+  with_items:
+  - "{{cbase}}/supervisord/supervisord.d/{{pname}}-fateflow.conf"
+
+- name: Update fate_flow service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-fateflow
+  ignore_errors: yes
+
+- name: Remove fate_flow deployfiles
+  file: path={{item}} state=absent
+  with_items:
+  - "{{pbase}}/{{pname}}/{{pname}}"
+  - "{{pbase}}/{{pname}}/fateflow"
+  - "{{pbase}}/{{pname}}/examples"
+  - "{{pbase}}/{{pname}}/bin"
+  - "{{pbase}}/{{pname}}/conf"
+  - "{{pbase}}/{{pname}}/logs"
+  - "{{pbase}}/{{pname}}/fate.env"
+  - "{{pbase}}/{{pname}}/RELEASE.md"
+  - "{{pbase}}/{{pname}}/{{python['venv']}}"
+
+- name: Check rabbitmq service
+  stat: 
+    path: "{{cbase}}/supervisord/supervisord.d/{{pname}}-rabbitmq.conf"
+  register: rabbitmq_check
+
+- when: rabbitmq_check.stat.exists == True
+  block:
+  - name: Stop rabbitmq service
+    shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-rabbitmq
+    ignore_errors: yes
+
+  - name: Remove supervisord files
+    file: path={{item}} state=absent
+    with_items:
+    - "{{cbase}}/supervisord/supervisord.d/{{pname}}-rabbitmq.conf"
+
+  - name: Update rabbitmq service
+    shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-rabbitmq
+    ignore_errors: yes
+
+  - name: Remove rabbitmq deployfiles
+    file: path={{item}} state=absent
+    with_items:
+    - "{{pbase}}/{{pname}}/{{rabbitmq['path']}}"

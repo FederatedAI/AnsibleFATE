@@ -1,0 +1,26 @@
+- name: Stop mysql service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-mysql
+  ignore_errors: yes
+
+- name: Remove supervisord files
+  file: path={{item}} state=absent
+  with_items:
+  - "{{cbase}}/supervisord/supervisord.d/{{pname}}-mysql.conf"
+
+- name: Update mysql service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-mysql
+  ignore_errors: yes
+
+- name: "backup mysql datafiles"
+  shell: /bin/cp -r {{pbase}}/data/{{pname}}/mysql {{pbase}}/data/{{pname}}/mysql_$(date +%s)
+  ignore_errors: yes
+
+- name: Remove mysql datafiles
+  file: path={{item}} state=absent
+  with_items:
+  - "{{pbase}}/data/{{pname}}/mysql"
+
+- name: Remove mysql deployfiles
+  file: path={{item}} state=absent
+  with_items:
+  - "{{pbase}}/{{pname}}/{{mysql['path']}}"

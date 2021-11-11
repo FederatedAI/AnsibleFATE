@@ -1,0 +1,16 @@
+[program:{{pname}}-{{role_name}}]
+command=/bin/bash {{pbase}}/{{pname}}/{{role_name}}/bin/service.sh starting
+#command={{pybase}}/bin/python {{pbase}}/{{pname}}/python/fate_flow/fate_flow_server.py
+#environment=PYTHONPATH="{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python",JAVA_HOME="{{jbase}}",EGGROLL_HOME="{{pbase}}/{{pname}}/eggroll",PATH="{{pybase}}/bin:${JAVA_HOME}:/bin:$PATH:/bin/:/usr/bin:/usr/sbin"
+environment=PATH="%(ENV_PATH)s",CLASSPATH="$CLASSPATH:$CLASSPATH"
+directory={{pbase}}/{{pname}}/{{role_name}}
+user={{service['owner']}}
+autorestart=true
+redirect_stderr=true
+logfile_maxbytes=50MB
+logfile_backups=10
+stdout_logfile={{lbase}}/{{pname}}/fateflow/info.log
+stderr_logfile={{lbase}}/{{pname}}/fateflow/error.log
+loglevel=info
+
+

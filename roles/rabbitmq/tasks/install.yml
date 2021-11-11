@@ -1,0 +1,41 @@
+- name: "check erlang"
+  shell: "ls /usr/bin/erl && echo 0 || echo 1"
+  register: checkout
+
+- name: "output msg"
+  debug: msg={{checkout.stdout}}
+
+- name: "Output Erlang Check Results"
+  fail:
+    msg: "Please check if Erlang is installed"
+  when: checkout.stdout == "1"
+
+- name: "mkdir({{deploy_mode}}): {{lbase}}/{{pname}}/rabbitmq"
+  file:
+    path: "{{lbase}}/{{pname}}/rabbitmq"
+    state: directory
+    mode: 0755
+
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/{{rabbitmq['path']}}"
+  file:
+    path: "{{pbase}}/{{pname}}/{{rabbitmq['path']}}"
+    state: directory
+    mode: 0755
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}/etc/rabbitmq"
+  stat:
+    path: "{{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}/etc/rabbitmq"
+  register: rabbitmq_stat
+
+- name: "untar({{deploy_mode}}): rabbitmq-server-generic-unix-{{rabbitmq['version']}}.tar"
+  unarchive:
+    src: "rabbitmq-server-generic-unix-{{rabbitmq['version']}}.tar"
+    dest: "{{pbase}}/{{pname}}/{{rabbitmq['path']}}"
+  when: rabbitmq_stat.stat.exists == False
+
+- name: "Copy({{deploy_mode}}): {{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}/etc/rabbitmq/enabled_plugins"
+  copy:
+    src: "enabled_plugins"
+    dest: "{{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}/etc/rabbitmq/enabled_plugins"
+  when: rabbitmq_stat.stat.exists == False
+

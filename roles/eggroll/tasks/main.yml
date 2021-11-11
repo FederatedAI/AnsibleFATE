@@ -1,0 +1,27 @@
+
+- include_tasks: install.yml
+  when: deploy_mode in [ 'deploy', 'install' ]
+
+- include_vars: "host_vars.yml"
+  when: deploy_mode in [ 'deploy', 'config' ] and 'host' in deploy_roles
+
+- include_tasks: load.yml
+  when: "deploy_mode in [ 'deploy', 'config' ] and 'host' in deploy_roles and deploy_role == 'host'"
+
+- include_tasks: host_config.yml
+  when: "deploy_mode in [ 'deploy', 'config' ] and 'host' in deploy_roles and deploy_role == 'host'"
+
+- include_vars: "guest_vars.yml"
+  when: deploy_mode in [ 'deploy', 'config' ] and 'guest' in deploy_roles
+
+- include_tasks: load.yml
+  when: "deploy_mode in [ 'deploy', 'config' ] and 'guest' in deploy_roles and deploy_role == 'guest'"
+
+- include_tasks: guest_config.yml
+  when: "deploy_mode in [ 'deploy', 'config' ] and 'guest' in deploy_roles and deploy_role == 'guest'"
+
+- include_vars: "exchange_vars.yml"
+  when: deploy_mode in [ 'deploy', 'config' ] and 'exchange' in deploy_roles
+
+- include_tasks: exchange_config.yml
+  when: "deploy_mode in [ 'deploy', 'config' ] and 'exchange' in deploy_roles and deploy_role == 'exchange' and ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True"

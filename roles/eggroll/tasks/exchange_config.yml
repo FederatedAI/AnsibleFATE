@@ -1,0 +1,69 @@
+- name: "Copy: eggroll keys (exchange)"
+  copy:
+    src: "keys/{{ item.src }}"
+    dest: "{{dbase}}/{{pname}}/keys/{{ item.dest }}"
+  with_items:
+  - { src: 'exchange/exchange-ca.pem', dest: 'exchange-ca.pem' }
+  - { src: 'exchange/exchange-server.pem', dest: 'exchange-server.pem' }
+  - { src: 'exchange/exchange-server.key', dest: 'exchange-server.key' }
+  - { src: 'exchange/exchange-client-ca.pem', dest: 'exchange-client-ca.pem' }
+  - { src: 'exchange/exchange-client-client.pem', dest: 'exchange-client-client.pem' }
+  - { src: 'exchange/exchange-client-client.key', dest: 'exchange-client-client.key' }
+  when: "ssl_roles|length == 2 and 'exchange' in ssl_roles and rollsite.get('server_secure', False) == True and rollsite.get('client_secure', False) == True"
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/conf/eggroll.properties(exchange)"
+  template: src=eggroll-exchange.properties.jinja dest={{pbase}}/{{pname}}/eggroll/conf/eggroll.properties
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/conf/route_table_tmp.json(exchange)"
+  template: src=route_table.json.jinja dest={{pbase}}/{{pname}}/eggroll/conf/route_table_tmp.json
+
+- name: "new({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/bin/json-replace.sh"
+  template: src=json-replace.sh.jinja dest={{pbase}}/{{pname}}/eggroll/bin/json-replace.sh
+
+- name: "check({{deploy_mode}}): route table json format"
+  shell: /bin/bash {{pbase}}/{{pname}}/eggroll/bin/json-replace.sh
+  register: json_replace
+
+- debug: var=json_replace['stdout_lines']
+
+- name: "output({{deploy_mode}}): check json bad result"
+  fail:
+    msg: "please check json"
+  when: json_replace.stdout.find('check_json_pass') == -1
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-rollsite.conf"
+  template: src=supervisor.d/eggroll.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-rollsite.conf
+  vars:
+    role: rollsite
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-rollsite
+  - restart {{pname}}-rollsite
+
+- name: "flush_handlers"
+  meta: flush_handlers
+
+- name: "wait({{deploy_mode}})): open port {{exchange.get('rollsite',{}).get('port',9370)}}(exchange)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{exchange.get('rollsite',{}).get('port',9370)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_rollsite_exchange
+
+- name: "wait({{deploy_mode}})): open port {{exchange.get('rollsite',{}).get('secure_port',9371)}}(exchange)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{exchange.get('rollsite',{}).get('secure_port',9371)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_rollsite_secure_exchange
+  when: rollsite.get('server_secure', False) == True and rollsite.get('client_secure', False) == True
+
+- name: "check({{deploy_mode}})): check rollsite service(exchange)"
+  debug: msg="******start rollsite successfully******"
+  when: "waitfor_rollsite_exchange.get('state') == 'started' and waitfor_rollsite_secure_exchange.get('state') == 'started'"
+
+

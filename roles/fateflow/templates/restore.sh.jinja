@@ -1,0 +1,19 @@
+#!/bin/bash
+
+now=$( date "+%s" );
+dest=$1
+src=$2
+
+if [ -d $src ]
+then
+  if [ ! -d $dest ]
+  then
+    cp -r $src $dest;
+    echo "cp to $dest ok";
+  else
+    echo "$dest exists";
+  fi
+fi
+
+
+

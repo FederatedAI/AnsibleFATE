@@ -1,0 +1,72 @@
+- name: "mkdir({{deploy_mode}}): {{lbase}}/{{pname}}/eggroll"
+  file:
+    path: "{{lbase}}/{{pname}}/eggroll"
+    state: directory
+    mode: 0755
+
+- name: "mkdir({{deploy_mode}}): {{dbase}}/{{pname}}/{keys,eggroll}"
+  file:
+    path: "{{dbase}}/{{pname}}/{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - keys
+  - eggroll
+
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/bin"
+  file:
+    path: "{{pbase}}/{{pname}}/{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - bin
+  - sql
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/bin/init_env.sh"
+  template: src=init_env.sh.jinja dest={{pbase}}/{{pname}}/bin/init_env.sh
+
+- name: "Copy: jcheck.py {{pbase}}/{{pname}}/tools/jcheck.py"
+  copy:
+    src: "jcheck.py"
+    dest: "{{pbase}}/{{pname}}/tools/jcheck.py"
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/bin/debug"
+  stat:
+    path: "{{pbase}}/{{pname}}/bin/debug"
+  register: eggroll_debug_stat
+
+- name: "untar({{deploy_mode}}): debug.tar.gz"
+  unarchive:
+    src: "debug.tar.gz"
+    dest: "{{pbase}}/{{pname}}/bin"
+  when: eggroll_debug_stat.stat.exists == False  
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}"
+  stat:
+    path: "{{pbase}}/{{pname}}/{{role_name}}/conf/eggroll.properties"
+  register: eggroll_stat
+
+- name: "untar({{deploy_mode}}): eggroll-{{versions['eggroll']}}.tar.gz"
+  unarchive:
+    src: "eggroll-{{versions['eggroll']}}.tar.gz"
+    dest: "{{pbase}}/{{pname}}/"
+  when: eggroll_stat.stat.exists == False  
+
+- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/logs"
+  file:
+    path: "{{pbase}}/{{pname}}/eggroll/logs"
+    state: absent
+  when: eggroll_stat.stat.exists == False 
+
+- name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/eggroll"
+  file:
+    src: "{{lbase}}/{{pname}}/eggroll"
+    dest: "{{pbase}}/{{pname}}/eggroll/logs"
+    state: link
+  when: eggroll_stat.stat.exists == False 
+
+- name: "Copy: fate-eggroll.sh {{pbase}}/{{pname}}/eggroll/bin"
+  copy:
+    src: "eggroll.sh"
+    dest: "{{pbase}}/{{pname}}/eggroll/bin/fate-eggroll.sh"
+

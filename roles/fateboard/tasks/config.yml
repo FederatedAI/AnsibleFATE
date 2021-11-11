@@ -1,0 +1,30 @@
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/conf/application.properties"
+  template: src=application.properties.jinja dest={{pbase}}/{{pname}}/{{role_name}}/conf/application.properties
+  notify:
+    - reload {{pname}}-{{role_name}}
+    - restart {{pname}}-{{role_name}}
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-{{role_name}}.conf"
+  template: src=supervisor.d/{{role_name}}.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-{{role_name}}.conf
+  vars:
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-{{role_name}}
+  - restart {{pname}}-{{role_name}}
+
+- name: "flush_handlers"
+  meta: flush_handlers
+
+- name: "wait({{deploy_mode}})): open port {{fateboard.get('port',8080)}}( {{deploy_role}} )"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{fateboard.get('port',8080)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_fateboard_host
+
+- name: "check({{deploy_mode}})): check fateboard service( {{deploy_role}} )"
+  debug: msg="******start fateboard successfully******"
+  when: "waitfor_fateboard_host.get('state') == 'started'"
+

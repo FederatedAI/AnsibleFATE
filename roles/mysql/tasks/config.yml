@@ -1,0 +1,78 @@
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conn.sh"
+  template:
+    src: conn.sh.jinja
+    dest: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conn.sh"
+    mode: 0755
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/init.sh"
+  template: 
+    src: init.sh.jinja 
+    dest: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/init.sh"
+    mode: 0755
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/chpasswd.sh"
+  template:
+    src: chpasswd.sh.jinja
+    dest: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/chpasswd.sh"
+    mode: 0755
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/sql/grant.sql"
+  template:
+    src: grant.sql.jinja
+    dest: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/sql/grant.sql"
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/load.sh"
+  template:
+    src: load.sh.jinja
+    dest: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/load.sh"
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/.init" 
+  stat:
+    path: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/.init"
+  register: stat_mysql_init
+
+- name: "commit({{deploy_mode}}):   init.sh"
+  shell: /bin/bash {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/init.sh
+  register: mysql_init
+  when: stat_mysql_init.stat.exists == False 
+
+- debug: var=mysql_init.get('stderr_lines')
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conf/my.cnf"
+  template:
+    src: my.cnf.jinja
+    dest: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conf/my.cnf"
+  notify:
+  - reload {{pname}}-{{role_name}}
+  - restart {{pname}}-{{role_name}}
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-{{role_name}}.conf"
+  template: src=supervisor.d/{{role_name}}.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-{{role_name}}.conf
+  vars:
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-{{role_name}}
+  - restart {{pname}}-{{role_name}}
+
+- name: "flush_handlers"
+  meta: flush_handlers
+
+#- name: "start({{deploy_mode}}): mysql"
+#  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-{{role_name}} && /bin/bash {{cbase}}/supervisord/service.sh start {{pname}}-{{role_name}}
+#  register: mysql_start
+
+#- debug: var=mysql_start.get('stderr_lines')
+
+- name: "wait({{deploy_mode}})): open port {{db.get('port',3306)}}({{deploy_role}})"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{db.get('port',3306)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_mysql
+
+- name: "check({{deploy_mode}})): check {{role_name}} service({{deploy_role}})"
+  debug: msg="******start {{role_name}} successfully******"
+  when: "waitfor_mysql.get('state') == 'started'"
+

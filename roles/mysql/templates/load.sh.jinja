@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+base="{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}"
+
+npasswd="$(grep 'A temporary password is generated for' {{lbase}}/{{pname}}/mysql/init.log |sed -n 's#.*root@localhost: \(.*\)#\1#p')"
+npasswd="{{mysql['passwd']}}"
+
+
+$base/bin/mysql -h 127.0.0.1 -P {{db['port']}} -S {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/run/mysql.sock -u{{mysql['user']}} -p"$npasswd" < $base/sql/grant.sql
+touch $base/.load

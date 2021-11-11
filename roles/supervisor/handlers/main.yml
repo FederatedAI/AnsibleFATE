@@ -1,0 +1,3 @@
+- name: stop supervisor
+  shell: ps aux |grep supervisor |grep -v grep |awk '{print $2}' |xargs kill
+  ignore_errors: yes

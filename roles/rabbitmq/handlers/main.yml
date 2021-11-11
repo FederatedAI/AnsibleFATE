@@ -1,0 +1,4 @@
+- name: reload {{pname}}-{{role_name}}
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-{{role_name}}
+- name: restart {{pname}}-{{role_name}}
+  shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-{{role_name}}

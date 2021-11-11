@@ -1,0 +1,16 @@
+[program:{{pname}}-fateboard]
+#command={{jbase}}/bin/java  -Dspring.config.location={{pbase}}/{{pname}}/{{role_name}}/conf/application.properties -DFATE_DEPLOY_PREFIX={{pbase}}/{{pname}}/logs/  -Dssh_config_file={{pbase}}/{{pname}}/{{role_name}}/ssh/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar {{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{versions[role_name]}}.jar  
+command=/bin/bash {{pbase}}/{{pname}}/fateboard/service.sh starting
+#environment=JAVA_HOME="{{jbase}}/",PATH="{{jbase}}/bin:$PATH:/bin/:/usr/bin",CLASSPATH="$CLASSPATH:$CLASSPATH"
+environment=PATH="%(ENV_PATH)s",CLASSPATH="$CLASSPATH:$CLASSPATH"
+directory={{pbase}}/{{pname}}/{{role_name}}
+user={{service['owner']}}
+autorestart=true
+redirect_stderr=true
+logfile_maxbytes=50MB
+logfile_backups=10
+stdout_logfile={{lbase}}/{{pname}}/{{role_name}}/info.log
+stderr_logfile={{lbase}}/{{pname}}/{{role_name}}/error.log
+loglevel=info
+
+
