@@ -8,7 +8,7 @@
 
 ### 1概述
 
-#### 1.1 FATE简介
+#### 1.1 FATE简介s
 
 FATE (Federated AI Technology Enabler) 是微众银行AI部门发起的开源项目，为联邦学习生态系统提供了可靠的安全计算框架。FATE项目使用多方安全计算 (MPC) 以及同态加密 (HE) 技术构建底层安全计算协议，以此支持不同种类的机器学习的安全计算，包括逻辑回归、基于树的算法、深度学习和迁移学习等。
 
@@ -1185,22 +1185,29 @@ ansible_become_pass=
 wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/AnsibleFATE_${version}_release-offline.tar.gz
 tar xzf AnsibleFATE_${version}_release-offline.tar.gz
 cd AnsibleFATE-${version}-release-offline
+
+//version>=1.7.0
 ```
 
 ###### 2.6.1.2下载非离线包
 
-- 方法1
+- 方法1 git获取
   
 ```
 git clone -b ${version} https://github.com/FederatedAI/AnsibleFATE
+cd AnsibleFATE
+
+//${version}表示代码的版本分支
 ```
 
-- 方法2
+- 方法2 下载在线包
 
 ```
 wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/AnsibleFATE_${version}_release-online.tar.gz
 tar xzf AnsibleFATE_${version}_release-online.tar.gz
 cd AnsibleFATE-${version}-release-online
+
+//version>=1.7.0
 ```
 
 说明： 下载非离线包后，在2.6.1.3 和2.6.1.4 中二选一。
@@ -1352,25 +1359,23 @@ lsof -i :9370
 
 ```
 source /data/projects/fate/bin/init_env.sh
-cd /data/projects/fate/python/component_plugins/fate/examples/toy_example
-python run_toy_example.py 10000 10000 1 192.168.0.1 9380
+flow test toy --guest-party-id 10000 --host-party-id 10000
 ```
 
 类似如下结果表示成功：
 
-"2020-04-28 18:26:20,789 - secure_add_guest.py[line:126] - INFO: success to calculate secure_sum, it is 1999.9999999999998"
+"[INFO] [2021-11-11 11:23:33,178] [202111111123207247000] [28465:140214461818688] - [secure_add_guest.run] [line:122]: success to calculate secure_sum, it is 2000.0"
 
 2）192.168.1.1上执行，guest_partyid和host_partyid都设为9999：
 
 ```
 source /data/projects/fate/bin/init_env.sh
-cd /data/projects/fate/python/component_plugins/fate/examples/toy_example
-python run_toy_example.py 9999 9999 1 192.168.1.1 9380
+flow test toy --guest-party-id 9999 --host-party-id 9999
 ```
 
 类似如下结果表示成功：
 
-"2020-04-28 18:26:20,789 - secure_add_guest.py[line:126] - INFO: success to calculate secure_sum, it is 1999.9999999999998"
+"[INFO] [2021-11-11 11:23:33,178] [202111111123207247000] [28465:140214461818688] - [secure_add_guest.run] [line:122]: success to calculate secure_sum, it is 2000.0"
 
 ##### 2.7.3 双边测试
 
@@ -1378,14 +1383,12 @@ python run_toy_example.py 9999 9999 1 192.168.1.1 9380
 
 ```
 source /data/projects/fate/bin/init_env.sh
-cd /data/projects/fate/python/component_plugins/fate/examples/toy_example
-python run_toy_example.py 9999 10000 1 192.168.1.1 9380
-//参数依此是 guest_party_id, host_party_id, work_mode, flow_server_ip, flow_server_por
+flow test toy  --guest-party-id 9999 --host-party-id 10000
 ```
 
 类似如下结果表示成功：
 
-"2020-04-28 18:26:20,789 - secure_add_guest.py[line:126] - INFO: success to calculate secure_sum, it is 1999.9999999999998"
+"[INFO] [2021-11-11 11:01:06,259] [202111111100501997750] [27675:140315080054592] - [secure_add_guest.run] [line:122]: success to calculate secure_sum, it is 1999.9999999999998"
 
 
 

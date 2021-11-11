@@ -1,9 +1,9 @@
 fate:
-  1.7.0-rc11:
+  1.7.0-rc12:
     fateboard:
-    - 1.7.0-rc11
+    - 1.7.0-rc12
     fateflow:
-    - 1.7.0-rc11
+    - 1.7.0-rc12
     eggroll:
     - 2.4.0
     - 2.2.1
