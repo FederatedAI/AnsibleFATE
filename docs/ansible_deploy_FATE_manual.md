@@ -6,9 +6,11 @@
 
 
 
+[toc]
+
 ### 1概述
 
-#### 1.1 FATE简介s
+#### 1.1 FATE简介
 
 FATE (Federated AI Technology Enabler) 是微众银行AI部门发起的开源项目，为联邦学习生态系统提供了可靠的安全计算框架。FATE项目使用多方安全计算 (MPC) 以及同态加密 (HE) 技术构建底层安全计算协议，以此支持不同种类的机器学习的安全计算，包括逻辑回归、基于树的算法、深度学习和迁移学习等。
 
@@ -32,7 +34,7 @@ FATE官方网站：https://fate.fedai.org/
 
 
 
-#### 2.2 依赖条件
+#### 2.2 依赖条件和前置操作
 
 假定是以普通账号（app账号）进行部署，部署Base模块则需要root权限(假定app账号具有免输入密码的sudo权限）。部署的目标为: $pbase/fate目录下。这里假定：
 
@@ -42,6 +44,8 @@ FATE官方网站：https://fate.fedai.org/
 
 - host_id: 10000
 - guest_id: 9999
+
+前置操作请参考： <<[部署fate集群的前置操作](action_before_deploy_fate_cluster.md)>> 一文。
 
 
 
@@ -539,7 +543,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
 
 ​		参数说明：
 
-​		exchange_special_routes：exchange端额外路由，数组格式：party_id:ip:port，例：									exchange_special_routes: [ '8888:192.168.2.1:9370' ]
+​		exchange_special_routes：exchange端额外路由，数组格式：party_id:ip:port，例：exchange_special_routes: [ '8888:192.168.2.1:9370' ]
 
 - **场景3：部署两方exchange-guest**
 
