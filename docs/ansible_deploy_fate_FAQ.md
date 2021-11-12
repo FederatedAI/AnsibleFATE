@@ -11,6 +11,9 @@
 ```
 vi project_prod.yaml
  #- base	--注释base行
+ 
+若绕过sudo，需要提前执行安装系统依赖脚本(使用root或者sudo安装)
+/bin/bash tools/install_base.sh
 ```
 
 - Q2: 如何绕过环境检查？

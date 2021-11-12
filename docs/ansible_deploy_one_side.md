@@ -16,6 +16,8 @@
 
 ​        本章是通过ansible 部署FATE集群单边场景之一：单独部署exchange。
 
+​		 在进行部署之前请确认已经执行前置操作.（ 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.2 章节） 
+
 
 
 #### 2.2 部署目标介绍
@@ -26,7 +28,7 @@
 
 
 
-#### 3.3 进入部署包根目录
+#### 2.3 进入部署包根目录
 
   请按需使用合适的方式获取部署包，并解压，然后进入【部署包根目录】。具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.4.1和2.6.1等章节。
 
@@ -88,7 +90,7 @@ sh deploy/deploy.sh render
 
 ##### 2.4.2 配置exchange信息
 
-如需要自定义高级配置，可参考[部署手册](ansible_deploy_FATE_manual.md) 2.5.3一节，修改如下文件，默认可以不修改。
+如需要自定义高级配置，可参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.5.3一节，修改如下文件，默认可以不修改。
 
 ```
 vi var_files/prod/fate_exchange
@@ -220,7 +222,7 @@ sh deploy/deploy.sh render
 
 ##### 3.4.2 配置host信息
 
-如需要自定义高级配置，可参考[部署手册](ansible_deploy_FATE_manual.md) 2.5.3一节，修改如下文件，默认可以不修改。
+如需要自定义高级配置，可参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.5.3一节，修改如下文件，默认可以不修改。
 
 ```
 vi var_files/prod/fate_host
@@ -281,7 +283,10 @@ host:
     httpPort: 9380	
     dbname: "fate_flow"	
     proxy: rollsite	
+    http_app_key:
+    http_secret_key:
     use_deserialize_safe_module: false
+    default_engines: eggroll
   fateboard:
     enable: True		
     ips:
