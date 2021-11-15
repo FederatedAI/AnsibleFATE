@@ -68,11 +68,13 @@ AnsibleFATE
 
 - [部署手册](docs/ansible_deploy_FATE_manual.md)
 
-- [场景部署示例： 部署一方](docs/ansible_deploy_one_side.md)
+- 场景部署示例
 
-- [场景部署示例： 部署二方](docs/ansible_deploy_two_sides.md)
+  - [示例一： 部署一方](docs/ansible_deploy_one_side.md)
 
-- [场景部署示例： 部署三方](docs/ansible_deploy_three_sides.md)
+  - [示例二： 部署二方](docs/ansible_deploy_two_sides.md)
+
+  - [示例三： 部署三方](docs/ansible_deploy_three_sides.md)
 
 
 
