@@ -60,8 +60,14 @@
   debug: msg="******start fate_flow successfully******"
   when: "waitfor_fate_flow_grpc_host.get('state') == 'started' and waitfor_fate_flow_http_host.get('state') == 'started'"
 
+- name: "check({{deploy_mode}}): fate_client Install"
+  shell: "source {{pbase}}/{{pname}}/bin/init_env.sh;flow --help >/dev/null 2>&1;[ $? -eq 0 ] && echo 0 || echo 1"
+  register: client_check
+
 - name: "update({{deploy_mode}}): {{tbase}}/{{pname}}/fate_client_init.sh"
   template: src=fate_client_init.sh.jinja dest={{tbase}}/{{pname}}/fate_client_init.sh
+  when: client_check['stdout'] == "1"
 
 - name: "commit({{deploy_mode}}): Install and Initial Configuration FATE Client"
   shell: "/bin/bash {{tbase}}/{{pname}}/fate_client_init.sh"
+  when: client_check['stdout'] == "1"

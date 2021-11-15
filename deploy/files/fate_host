@@ -30,7 +30,10 @@ host:
     httpPort: 9380
     dbname: "fate_flow"
     proxy: rollsite
+    http_app_key:
+    http_secret_key:
     use_deserialize_safe_module: false
+    default_engines: eggroll
   fateboard:
     enable: false
     ips: []

@@ -1,4 +1,14 @@
 fate:
+  1.7.0-rc14:
+    fateboard:
+    - 1.7.0-rc14
+    fateflow:
+    - 1.7.0-rc14
+    eggroll:
+    - 2.4.0
+    - 2.2.1
+    spark:
+    - 1.2.1
   1.7.0-rc12:
     fateboard:
     - 1.7.0-rc12
