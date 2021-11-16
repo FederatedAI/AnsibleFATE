@@ -77,7 +77,7 @@ get_pinfo() {
 download() {
   url="https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com"
   mysql="mysql-8.0.13.tar.gz"
-  java="jdk-8u192.tar"
+  java="jdk-8u192.tar.gz"
   python="fate_python-${product_fate_version%-*}.tar.gz"
   supervisor="fate_supervisor.tar.gz"  
   if [ ! -f ${workdir}/../roles/python/files/pip-packages-fate-${product_fate_version%-*}.tar.gz ]; then
@@ -94,8 +94,8 @@ download() {
   fi
   if [ ! -f ${workdir}/../roles/java/files/$java ]; then
     echo "-------------Download JDK package-----------"
-    echo "wget -P ${workdir}/../roles/java/files/ ${url}/${java}"
-    wget -P ${workdir}/../roles/java/files/ ${url}/${java}
+    echo "wget --tries=0 -P ${workdir}/../roles/java/files/ ${url}/${java}"
+    wget --tries=0 -P ${workdir}/../roles/java/files/ ${url}/${java}
   fi
   if [ ! -f ${workdir}/../roles/supervisor/files/supervisord-conf-1.1.4.tar.gz ]; then
     echo "-------------Download supervisor package-----------"
@@ -120,7 +120,7 @@ download() {
     tp="${name}-build-${fversion}.tar.gz"
     link="${purl}/$tp"
     echo "$link  ../roles/${name}/files/${tp}"
-    if [ ! -f ../roles/${name}/files/$temp ]
+    if [ ! -f ../roles/${name}/files/$name-${fversion}.tar.gz ]
     then
       curl  $link -o ../roles/${name}/files/${tp}
       tar xf ../roles/${name}/files/${tp} -C ../roles/${name}/files/

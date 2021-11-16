@@ -1,4 +1,24 @@
 fate:
+  1.7.0-rc17:
+    fateboard:
+    - 1.7.0-rc17
+    fateflow:
+    - 1.7.0-rc17
+    eggroll:
+    - 2.4.0
+    - 2.2.1
+    spark:
+    - 1.2.1
+  1.7.0-rc16:
+    fateboard:
+    - 1.7.0-rc16
+    fateflow:
+    - 1.7.0-rc16
+    eggroll:
+    - 2.4.0
+    - 2.2.1
+    spark:
+    - 1.2.1
   1.7.0-rc14:
     fateboard:
     - 1.7.0-rc14
@@ -9,41 +29,11 @@ fate:
     - 2.2.1
     spark:
     - 1.2.1
-  1.7.0-rc12:
-    fateboard:
-    - 1.7.0-rc12
-    fateflow:
-    - 1.7.0-rc12
-    eggroll:
-    - 2.4.0
-    - 2.2.1
-    spark:
-    - 1.2.1
-  1.7.0-rc9:
-    fateboard:
-    - 1.7.0-rc9
-    fateflow:
-    - 1.7.0-rc9
-    eggroll:
-    - 2.4.0
-    - 2.2.1
-    spark:
-    - 1.2.1
   1.6.1:
     fateboard:
     - 1.6.1
     fateflow:
     - 1.6.1
-    eggroll:
-    - 2.2.1
-    - 2.2.0
-    spark:
-    - 1.2.1
-  1.6.1-rc2:
-    fateboard:
-    - 1.6.1-rc2
-    fateflow:
-    - 1.6.1-rc2
     eggroll:
     - 2.2.1
     - 2.2.0

@@ -112,7 +112,7 @@ function_archive() {
 
 function_download() {
   mysql="mysql-8.0.13.tar.gz"
-  java="jdk-8u192.tar"
+  java="jdk-8u192.tar.gz"
   python="fate_python-${version}.tar.gz"
   supervisor="fate_supervisor.tar.gz"
   if [ ! -f ${workdir}/../roles/python/files/pip-packages-fate-${version}.tar.gz ]; then
@@ -129,8 +129,8 @@ function_download() {
   fi
   if [ ! -f ${workdir}/../roles/java/files/$java ]; then
     echo "-------------Download JDK package-----------"
-    echo "wget -P ${workdir}/../roles/java/files/ ${url}/${java}"
-    wget -P ${workdir}/../roles/java/files/ ${url}/${java}
+    echo "wget --tries=0 -P ${workdir}/../roles/java/files/ ${url}/${java}"
+    wget --tries=0 -P ${workdir}/../roles/java/files/ ${url}/${java}
   fi
   if [ ! -f ${workdir}/../roles/supervisor/files/supervisord-conf-1.1.4.tar.gz ]; then
     echo "-------------Download supervisor package-----------"
@@ -176,7 +176,7 @@ function_check() {
 
 function_package() {
   tar xf $fname
-  cd FATE_install_${version};
+  cd FATE_install_${version}_${minversion};
   function_check
   function_copy
   function_download
@@ -190,7 +190,7 @@ function_main() {
   else
     cd ${dir}
     function_package
-    cd ${dir} && rm -rf $fname FATE_install_${version}
+    cd ${dir} && rm -rf $fname FATE_install_${version}_${minversion}
     if [ "${is_archive}" == "true" ]; then
       function_archive
     fi
