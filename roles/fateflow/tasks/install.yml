@@ -11,9 +11,9 @@
   - bin
   - conf
 
-- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/examples/toy_example/run_toy_example.py"
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/examples/__init__.py"
   stat:
-    path: "{{pbase}}/{{pname}}/examples/toy_example/run_toy_example.py"
+    path: "{{pbase}}/{{pname}}/examples/__init__.py"
   register: fate_exp_stat
 
 - name: "untar({{deploy_mode}}): fate_examples-{{versions.get('fate_flow')}}.tar.gz"
@@ -74,5 +74,6 @@
   copy:
     src: "{{item}}"
     dest: "{{pbase}}/{{pname}}/conf/{{item}}"
+    force: no
   with_items:
   - "service_conf.yaml"

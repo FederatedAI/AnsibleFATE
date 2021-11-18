@@ -477,8 +477,9 @@ def_render_fate_init() {
   local eversion="$( ./bin/yq  eval '.product_fate_versions.eggroll' ${base}/build/conf/setup.conf )"
   local pversion="$( ./bin/yq  eval '.product_fate_version' ${base}/build/conf/setup.conf )"
   local pip="pip-packages-fate-${pversion%-*}"
+  local version=${pversion%-*}
   echo "hello-------------${fversion} ${eversion}"
-  myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} pip=${pip} fversion=${fversion} bversion=${bversion} eversion=${eversion} roles=${deploy_roles} ssl_roles=${ssl_roles} pname=${pname}"
+  myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} pip=${pip} version=${version} fversion=${fversion} bversion=${bversion} eversion=${eversion} roles=${deploy_roles} ssl_roles=${ssl_roles} pname=${pname}"
   eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
           " .pname \|\=env\(pname\) \| "\
           " .deploy_mode \|\=env\(deploy_mode\) \| "\
@@ -486,6 +487,7 @@ def_render_fate_init() {
           " .deploy_roles \|\=env\(roles\) \| "\
           " .ssl_roles \|\=env\(ssl_roles\) \| "\
           " .python.pip \|\=env\(pip\) \| "\
+          " .version \|\=env\(version\) \| "\
           " .versions.eggroll \|\=env\(eversion\) \| "\
           " .versions.fate_flow \|\=env\(fversion\) \| "\
           " .versions.fateboard \|\=env\(fversion\) "\
@@ -546,9 +548,10 @@ def_render_playbook() {
       done 
       if [ ${deploy_mode} != "uninstall" ]
       then 
-        if [ $i -eq 2 ]
+        if [ $i -eq 2 -o "${deploy_mode}" != "deploy" ]
         then
           sed -i '/role: "python",/d' $dfile
+          sed -i '/role: "rabbitmq",/d' $dfile
         fi
       fi
     ;;

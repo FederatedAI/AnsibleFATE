@@ -4,10 +4,8 @@ deploy_mode: deploy
 deploy_modules: []
 deploy_roles: []
 
-versions:
-  fate_flow: 1.7.0
-  eggroll: 2.4.0
-  fateboard: 1.7.0
+version: 1.7.0
+versions: {}
 
 python:
   version: 4.5.4

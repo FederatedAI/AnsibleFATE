@@ -4,9 +4,9 @@
     state: directory
     mode: 0755
 
-- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{versions.get(role_name)}}.jar"
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{version}}.jar"
   stat:
-    path: "{{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{versions.get(role_name)}}.jar"
+    path: "{{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{version}}.jar"
   register: fateboard_stat
 
 - name: "untar({{deploy_mode}}): {{role_name}}-{{versions.get(role_name)}}.tar.gz"
