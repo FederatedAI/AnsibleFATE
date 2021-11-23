@@ -77,9 +77,5 @@ AnsibleFATE
   - [示例三： 部署三方](docs/ansible_deploy_three_sides.md)
 
 
-
-
-
 ## License
-
-Apache License 2.0
+[Apache License 2.0](LICENSE)
