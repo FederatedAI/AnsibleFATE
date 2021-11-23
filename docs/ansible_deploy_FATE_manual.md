@@ -1492,7 +1492,7 @@ cd /data/projects/fate/examples/scripts/
 python upload_default_data.py
 ```
 
-更多细节信息，敬请参考[脚本README](../../../../examples/scripts/README.rst)
+更多细节信息，敬请参考[脚本README](https://github.com/FederatedAI/FATE/tree/master/examples/scripts/README.rst)
 
 ###### **2.7.3.2 快速模式**
 
