@@ -1424,42 +1424,94 @@ lsof -i :9370
 
 
 
-##### 2.7.2 单边测试
+##### 2.7.2 Toy_example部署验证
+-----------------------
 
-1）192.168.0.1上执行，guest_partyid和host_partyid都设为10000：
+此测试您需要设置2个参数：gid(guest partyid)，hid(host_partyid)。
+
+###### 2.7.2.1 单边测试
+
+1）192.168.0.1上执行，gid和hid都设为10000：
 
 ```
 source /data/projects/fate/bin/init_env.sh
-flow test toy --guest-party-id 10000 --host-party-id 10000
+flow test toy -gid 10000 -hid 10000 
 ```
 
 类似如下结果表示成功：
 
-"[INFO] [2021-11-11 11:23:33,178] [202111111123207247000] [28465:140214461818688] - [secure_add_guest.run] [line:122]: success to calculate secure_sum, it is 2000.0"
+"2020-04-28 18:26:20,789 - secure_add_guest.py[line:126] - INFO: success to calculate secure_sum, it is 1999.9999999999998"
 
-2）192.168.1.1上执行，guest_partyid和host_partyid都设为9999：
+提示：如出现max cores per job is 1, please modify job parameters报错提示，需要修改运行时参数task_cores为1，增加命令行参数 '--task-core 1'.
+
+2）192.168.0.2上执行，gid和hid都设为9999：
 
 ```
 source /data/projects/fate/bin/init_env.sh
-flow test toy --guest-party-id 9999 --host-party-id 9999
+flow test toy -gid 9999 -hid 9999
 ```
 
 类似如下结果表示成功：
 
-"[INFO] [2021-11-11 11:23:33,178] [202111111123207247000] [28465:140214461818688] - [secure_add_guest.run] [line:122]: success to calculate secure_sum, it is 2000.0"
+"2020-04-28 18:26:20,789 - secure_add_guest.py[line:126] - INFO: success to calculate secure_sum, it is 1999.9999999999998"
 
-##### 2.7.3 双边测试
+###### 2.7.2.2 双边测试
 
-选定9999为guest方，在192.168.1.1上执行：
+选定9999为guest方，在192.168.0.2上执行：
 
 ```
 source /data/projects/fate/bin/init_env.sh
-flow test toy  --guest-party-id 9999 --host-party-id 10000
+flow test toy -gid 9999 -hid 10000
 ```
 
 类似如下结果表示成功：
 
-"[INFO] [2021-11-11 11:01:06,259] [202111111100501997750] [27675:140315080054592] - [secure_add_guest.run] [line:122]: success to calculate secure_sum, it is 1999.9999999999998"
+"2020-04-28 18:26:20,789 - secure_add_guest.py[line:126] - INFO: success to calculate secure_sum, it is 1999.9999999999998"
+
+
+
+##### 2.7.3 最小化测试
+--------------
+
+###### **2.7.3.1 上传预设数据**
+
+分别在192.168.0.1和192.168.0.2上执行：
+
+```
+source /data/projects/fate/bin/init_env.sh
+cd /data/projects/fate/examples/scripts/
+python upload_default_data.py
+```
+
+更多细节信息，敬请参考[脚本README](../../../../examples/scripts/README.rst)
+
+###### **2.7.3.2 快速模式**
+
+请确保guest和host两方均已分别通过给定脚本上传了预设数据。
+
+快速模式下，最小化测试脚本将使用一个相对较小的数据集，即包含了569条数据的breast数据集。
+
+选定9999为guest方，在192.168.0.2上执行：
+
+```
+source /data/projects/fate/bin/init_env.sh
+cd /data/projects/fate/examples/min_test_task/
+#单边测试
+python run_task.py -gid 9999 -hid 9999 -aid 9999 -f fast
+#双边测试
+python run_task.py -gid 9999 -hid 10000 -aid 10000 -f fast
+```
+
+其他一些可能有用的参数包括：
+
+1. -f: 使用的文件类型. "fast" 代表 breast数据集, "normal" 代表 default credit 数据集.
+2. --add_sbt: 如果被设置为1, 将在运行完lr以后，启动secureboost任务，设置为0则不启动secureboost任务，不设置此参数系统默认为1。
+
+若数分钟后在结果中显示了“success”字样则表明该操作已经运行成功了。若出现“FAILED”或者程序卡住，则意味着测试失败。
+
+###### **2.7.3.3 正常模式**
+
+只需在命令中将“fast”替换为“normal”，其余部分与快速模式相同。
 
 
 

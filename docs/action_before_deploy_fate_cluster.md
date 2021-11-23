@@ -79,7 +79,7 @@ ufw status
 #### **6.1 创建用户**
 
 ```
-groupadd -g 6000 apps
+groupadd apps
 useradd -s /bin/bash -g apps -d /home/app app
 passwd app
 ```
