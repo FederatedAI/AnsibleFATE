@@ -2,6 +2,7 @@
 
 workdir=$(cd $(dirname $0); pwd)
 cd $workdir
+chmod a+x ./bin/*
 
 init() {
   [ ! -d ./conf ] && mkdir ./conf

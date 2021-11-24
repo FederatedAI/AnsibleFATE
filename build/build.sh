@@ -3,6 +3,7 @@
 
 workdir=$(cd $(dirname $0); pwd)
 cd ${workdir}
+chmod a+x ./bin/*
 
 case $1 in
   "init")
