@@ -1,0 +1,24 @@
+---
+- hostss: guest
+  any_errors_fatal: True
+  vars:
+    jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
+    pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
+    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+    eggroll: "{{ guest.get('eggroll',{}) }}"
+    rollsite: "{{ guest.get('rollsite',{}) }}"
+    clustermanager: "{{ guest.get('clusermanager',{}) }}"
+    nodemanager: "{{ guest.get('nodemanager',{}) }}"
+    side: "{{ guest.get('side',{}) }}"
+    db: "{{ guest.get('mysql',{}) }}"
+    deploy_role: "guest"
+    fateboard: "{{ guest.get('fateboard',{}) }}"
+    fate_flow: "{{ guest.get('fate_flow',{}) }}"
+    zk: "{{ guest.get('zk',{}) }}"
+    servings: "{{ guest.get('servings',{}) }}"
+  vars_files:
+    - fate-init
+    - base-init
+    - fate-guest
+  roles:
+  - role: fateboard

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+mkdir -pv {{lbase}}/{{pname}}/{{role_name}}
+if [ ! -f  {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/.init ]
+then
+  {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/bin/mysqld --initialize-insecure --user=app --basedir={{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/  --datadir={{pbase}}/data/{{pname}}/mysql/ > {{lbase}}/{{pname}}/{{role_name}}/init.log 2>&1
+fi
+
+touch {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/.init
+
+
+

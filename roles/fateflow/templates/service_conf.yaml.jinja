@@ -1,0 +1,189 @@
+{% if zk.get('enable',False) == True %}
+use_registry: true
+{% else %}
+use_registry: false
+{% endif %}
+{% if fate_flow.get('use_deserialize_safe_module',false) == true or fate_flow.get('use_deserialize_safe_module',false) == True %}
+use_deserialize_safe_module: true
+{% endif %}
+dependent_distribution: false
+fateflow:
+  host: {{fate_flow.get('ips',['127.0.0.1'])[0]}}
+  http_port: {{fate_flow.get('httpPort',9380)}}
+  grpc_port: {{fate_flow.get('grpcPort',9360)}}
+  http_app_key: {{fate_flow.get('http_app_key','')}}
+  http_secret_key: {{fate_flow.get('http_secret_key','')}}
+  # support rollsite/nginx/fateflow as a coordination proxy
+  # rollsite support fate on eggroll, use grpc protocol
+  # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
+  # fateflow support fate on eggroll and fate on spark, use http protocol, but not support exchange network mode
+
+  # format(proxy: rollsite) means rollsite use the rollsite configuration of fate_one_eggroll and nginx use the nginx configuration of fate_one_spark
+  # you also can customize the config like this(set fateflow of the opposite party as proxy):
+  # proxy:
+  #   name: fateflow
+  #   host: xx
+  #   http_port: xx
+  #   grpc_port: xx
+{% if fate_flow.get('proxy','rollsite') == 'fateflow' %}
+  proxy:
+    name: fateflow
+    host: {{fate_flow.get('ips',['127.0.0.1'])[0]}}
+    http_port: {{fate_flow.get('httpPort',9380)}}
+    grpc_port: {{fate_flow.get('grpcPort',9360)}}
+{% else %}
+  proxy: {{fate_flow.get('proxy','rollsite')}}
+  # support default/http/grpc
+  protocol: default
+{% endif %}
+database:
+  name: {{fate_flow.get('dbname','fate_flow')}}
+  user: {{db.get('dbuser','fate')}}
+  passwd: {{db.get('dbpasswd','fate_dev')}}
+  host: {{db.get('ips',['127.0.0.1'])[0]}}
+  port: {{db.get('port',3306)}}
+  max_connections: 100
+  stale_timeout: 30
+zookeeper:
+{% if zk.get('enable',False) == False %}
+  hosts: []
+{% else %}
+  hosts:
+{% for temp in zk.get('lists',[]) %}
+  - {{temp['ip']}}:{{temp['port']}}
+{% endfor %}
+{% endif %}
+  use_acl: {{zk.get('use_acl','false')}}
+  user: {{zk.get('user','fate')}}
+  password: {{zk.get('passwd','fate')}}
+# engine services
+{% if fate_flow.get('default_engines','eggroll') == 'eggroll' %}
+default_engines:
+  computing: eggroll
+  federation: eggroll
+  storage: eggroll
+fate_on_eggroll:
+  rollsite:
+{% for ip in rollsite.get('ips',['127.0.0.1']) %}
+    host: {{ip}}
+{% endfor %}
+    port: {{rollsite.get('port',9370)}}
+  clustermanager:
+    cores_per_node: {{clustermanager.get('cores_per_node',16)}}
+    nodes: {{nodemanager.get('ips',[])|length}}
+{% elif fate_flow.get('default_engines','eggroll') == 'standalone' %}
+default_engines:
+  computing: standalone
+  federation: standalone
+  storage: standalone
+fate_on_standalone:
+  standalone:
+    cores_per_node: 20
+    nodes: 1
+{% else %}
+default_engines:
+  computing: {{fate_flow['default_engines']}}
+  federation: {{fate_flow['default_engines']}}
+  storage: {{fate_flow['default_engines']}}
+fate_on_spark:
+{% endif %}
+{% if spark.get('enable',False) == True %}
+  spark:
+    home: {{spark.get('home','')}}
+    cores_per_node: {{spark.get('cores_per_node',20)}}
+    nodes: {{spark.get('nodes',2)}}
+{% endif %}
+{% if linkis_spark.get('enable',False) == True %}
+  linkis_spark:
+    cores_per_node: {{linkis_spark.get('cores_per_node',20)}}
+    nodes: {{linkis_spark.get('nodes',2)}}
+    host: {{linkis_spark.get('host','127.0.0.1')}}
+    port: {{linkis_spark.get('port',9001)}}
+    token_code: {{linkis_spark.get('token_code','MLSS')}}
+    python_path: {{linkis_spark.get('python_path','/data/projects/fate/python')}}
+  linkis_hive:
+    host: {{linkis_spark.get('host','127.0.0.1')}}
+    port: 9001
+{% endif %} 
+{% if hive.get('enable',False) == True %}
+  hive:
+    host: {{hive.get('host','127.0.0.1')}}
+    port: {{hive.get('port',10000)}}
+    auth: {{hive.get('auth','')}}
+    configuration: {{hive.get('configuration','')}}
+    kerberos_service_name: {{hive.get('kerberos_service_name','')}}
+    username: {{hive.get('username','')}}
+    password: {{hive.get('password','')}}
+{% endif %}
+{% if hdfs.get('enable',False) == True %}
+  hdfs:
+    name_node: {{hdfs.get('name_node','hdfs://fate-cluster')}}
+    path_prefix: {{hdfs.get('path_prefix','')}}
+{% endif %}
+{% if rabbit.get('enable',False) == True %}
+  rabbit:
+    host: {{rabbit.get('host','192.168.0.1')}}
+    mng_port: {{rabbit.get('mng_port',12345)}}
+    port: {{rabbit.get('port',5672)}}
+    user: {{rabbit.get('user','fate')}}
+    password: {{rabbit.get('password','fate')}}
+    route_table:
+{% endif %}
+{% if pulsar.get('enable',False) == True %}
+  pulsar:
+    host: {{pulsar.get('host','192.168.0.1')}}
+    port: {{pulsar.get('port',6650)}}
+    mng_port: {{pulsar.get('mng_port',8080)}}
+    topic_ttl: {{pulsar.get('topic_ttl',5)}}
+    route_table:
+{% endif %}
+{% if nginx.get('enable',False) == True %}
+  nginx:
+    host: {{nginx.get('host','127.0.0.1')}}
+    http_port: {{nginx.get('http_port',9300)}}
+    grpc_port: {{nginx.get('grpc_port',9310)}}
+{% endif %}
+fateboard:
+  host: {{fateboard.get('ips',['127.0.0.1'])[0]}}
+  port: {{fateboard.get('port',8080)}}
+
+# on API `/model/load` and `/model/load/do`
+# automatic upload models to the model store if it exists locally but does not exist in the model storage
+# or download models from the model store if it does not exist locally but exists in the model storage
+# this config will not affect API `/model/store` or `/model/restore`
+enable_model_store: false
+model_store_address:
+  # other optional configs send to the engine
+#  max_connections: 10
+#  stale_timeout: 10
+  # use redis as the model store engine
+#  storage: redis
+#  host: 127.0.0.1
+#  port: 6379
+#  db: 0
+#  password:
+  # the expiry time of keys, in seconds. defaults None (no expiry time)
+#  ex:
+  # use tencent cos as model store engine
+# storage: tencent_cos
+# Region:
+# SecretId:
+# SecretKey:
+# Bucket:
+  storage: mysql
+  ame: model
+  user: {{db.get('dbuser','fate')}}
+  passwd: {{db.get('dbpasswd','fate_dev')}}
+  host: {{db['ips'][0]}}
+  port: {{db.get('port',3306)}}
+  max_connections: 10
+  stale_timeout: 10
+servings:
+  hosts:
+{% for ip in servings.get('ips',[]) %}
+  - {{ip}}:{{servings.get('port',8000)}}
+{% endfor %}
+fatemanager:
+  host: 127.0.0.1
+  port: 8001
+  federatedId: 0

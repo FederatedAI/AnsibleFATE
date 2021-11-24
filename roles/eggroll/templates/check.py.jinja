@@ -1,0 +1,36 @@
+import pymysql,sys
+
+db_host="{{db_host}}"
+db_port={{db_port}}
+user="{{admin_user}}"
+passwd="{{admin_passwd}}"
+db=""
+
+ 
+def db_query(sql):
+
+  conn=None
+
+  try:
+    conn= pymysql.connect(host=db_host,port=db_port,user=user,password=passwd,database=db, charset="utf8") 
+    cur = conn.cursor()
+    cur.execute(sql)
+    data=cur.fetchone()
+    #print(data)
+    #print(data[0])
+    conn.close()
+  except pymysql.Error as e:
+    print('mysql.Error: ',e.args[0],e.args[1])
+    data=[0]
+  #print('--------3-------------')
+  if data[0] == 0:
+    print('connect_failed')
+    return 1
+  else:
+    #print('--------3-------------')
+    print('connect_ok')
+    return 0
+
+code=db_query('select version();')
+sys.exit(code)
+

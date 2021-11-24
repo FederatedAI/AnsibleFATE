@@ -1,0 +1,9 @@
+alter user 'root'@'localhost' identified with mysql_native_password by '{{mysql['passwd']}}';
+CREATE USER if not exists root@'%' IDENTIFIED BY "{{mysql['passwd']}}";
+GRANT ALL ON *.* TO root@'%' WITH GRANT OPTION;
+alter user 'root'@'%' identified with mysql_native_password by '{{mysql['passwd']}}';
+
+{% if linkis_spark.get('enable',False) == True %}
+CREATE USER {{db['dbuser']}}@"{{linkis_spark['host']}}" IDENTIFIED BY "{{db['dbpasswd']}}";
+GRANT ALL ON {{fate_flow['dbname']}}.* TO {{db['dbuser']}}@"{{linkis_spark['host']}}";
+{% endif %}

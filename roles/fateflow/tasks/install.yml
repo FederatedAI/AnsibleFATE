@@ -1,0 +1,71 @@
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/python"
+  stat:
+    path: "{{pbase}}/{{pname}}/python"
+  register: flow_dir_stat
+
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/{bin,conf}"
+  file:
+    path: "{{pbase}}/{{pname}}/{{item}}"
+    state: directory
+  with_items:
+  - bin
+  - conf
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/examples/__init__.py"
+  stat:
+    path: "{{pbase}}/{{pname}}/examples/__init__.py"
+  register: fate_exp_stat
+
+- name: "untar({{deploy_mode}}): fate_examples-{{versions.get('fate_flow')}}.tar.gz"
+  unarchive:
+    src: "fate_examples-{{versions.get('fate_flow')}}.tar.gz"
+    dest: "{{pbase}}/{{pname}}/"
+  when: fate_exp_stat.stat.exists == False
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/python/fate_flow/fate_flow_server.py"
+  stat:
+    path: "{{pbase}}/{{pname}}/{{role_name}}/python/fate_flow/fate_flow_server.py"
+  register: flow_stat
+
+- name: "untar({{deploy_mode}}): {{role_name}}-{{versions.get('fate_flow')}}.tar.gz"
+  unarchive:
+    src: "{{role_name}}-{{versions.get('fate_flow')}}.tar.gz"
+    dest: "{{pbase}}/{{pname}}/"
+  when: flow_stat.stat.exists == False
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{pname}}/python/__init__.py"
+  stat:
+    path: "{{pbase}}/{{pname}}/{{pname}}/python/__init__.py"
+  register: fate_stat
+
+- name: "untar({{deploy_mode}}): {{pname}}-{{versions.get('fate_flow')}}.tar.gz"
+  unarchive:
+    src: "{{pname}}-{{versions.get('fate_flow')}}.tar.gz"
+    dest: "{{pbase}}/{{pname}}/"
+  when: fate_stat.stat.exists == False
+
+- name: "mkdir({{deploy_mode}}): {{lbase}}/{{pname}}/{{role_name}}"
+  file:
+    path: "{{lbase}}/{{pname}}/{{role_name}}"
+    state: directory
+
+- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/logs"
+  file:
+    path: "{{pbase}}/{{pname}}/logs"
+    state: absent
+  when: flow_stat.stat.exists == False
+
+- name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/{{role_name}}"
+  file:
+    src: "{{lbase}}/{{pname}}/{{role_name}}"
+    dest: "{{pbase}}/{{pname}}/logs"
+    state: link
+  when: flow_stat.stat.exists == False
+
+- name: "copy({{deploy_mode}}): to {{pbase}}/{{pname}}/"
+  copy:
+    src: "{{item}}"
+    dest: "{{pbase}}/{{pname}}/{{item}}"
+  with_items:
+  - "RELEASE.md"
+  - "fate.env"

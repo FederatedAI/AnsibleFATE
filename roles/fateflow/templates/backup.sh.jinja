@@ -1,0 +1,12 @@
+#!/bin/bash
+
+now=$( date "+%s" );
+name=$1
+
+if [ -d $name ]
+then
+  mkdir -p  {{bbase}}/{{role_name}}-$now
+  mv $name  {{bbase}}/{{role_name}}-$now/python
+  echo "{{bbase}}/{{role_name}}-$now/python"
+fi
+

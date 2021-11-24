@@ -1,0 +1,20 @@
+#!/bin/bash
+
+fname="{{pbase}}/{{pname}}/eggroll/conf/route_table_tmp.json"
+#cat $fname | jq .
+
+python {{pbase}}/{{pname}}/tools/jcheck.py $fname
+if [ $? -eq 0 ]
+then
+  echo "check_json_pass"
+  [ ! -d {{pbase}}/backups/{{pname}}/eggroll/conf ] && mkdir -p {{pbase}}/backups/{{pname}}/eggroll/conf
+  if [ -f {{pbase}}/{{pname}}/eggroll/conf/route_table.json ]
+  then
+    echo "backup {{pbase}}/{{pname}}/eggroll/conf/route_table.json"
+    mv {{pbase}}/{{pname}}/eggroll/conf/route_table.json {{pbase}}/backups/{{pname}}/eggroll/conf/route_table-$(date "+%s" ).json
+  fi
+  echo "replace {{pbase}}/{{pname}}/eggroll/conf/route_table.json"
+  mv $fname {{pbase}}/{{pname}}/eggroll/conf/route_table.json
+fi
+
+ 

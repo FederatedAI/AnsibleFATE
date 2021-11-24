@@ -1,0 +1,5 @@
+#check {{process["name"]}}
+check process {{process['name']}} matching "{{process['key']}}"
+        start program = "{{cbase}}/monit/scripts/start_{{process['name']}}.sh"
+        stop program = "{{cbase}}/monit/scripts/stop_{{process['name']}}.sh"
+

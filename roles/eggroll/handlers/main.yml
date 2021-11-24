@@ -1,0 +1,12 @@
+- name: reload {{pname}}-rollsite
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-rollsite
+- name: restart {{pname}}-rollsite
+  shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-rollsite
+- name: reload {{pname}}-clustermanager
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-clustermanager
+- name: restart {{pname}}-clustermanager
+  shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-clustermanager
+- name: reload {{pname}}-nodemanager
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-nodemanager
+- name: restart {{pname}}-nodemanager
+  shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-nodemanager

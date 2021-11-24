@@ -1,0 +1,8 @@
+---
+- hosts: guest
+  any_errors_fatal: True
+  vars_files:
+    - fate-init
+    - base-init
+  roles:
+  - role: supervisor

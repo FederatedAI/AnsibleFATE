@@ -1,0 +1,118 @@
+#!/bin/bash
+
+check_arg=( {{' '.join(deploy_modules)}} )
+
+#check open files and max user process
+ulimit  -a |egrep 'open files|max user processes'|awk '{ if($1$2 == "openfiles") { if(  $4 <  64000 ) print "Warning: now open files is "$4", and need to turn up to 64000";} if( $1$2$3 == "maxuserprocesses" ) { if(  $5 < 65535 ) print "Warning: now max user processes is "$5", and need to turn up to 65535";} }'
+
+#check swap
+mem=$(free -g|grep 'Mem:'|awk '{ print $2; }' )
+free -g|grep 'Swap'|awk '{ if( int($2) < '"$(( 128-$mem))"' ) print "Warning: now swap is "$2", need to turn up"; }'
+
+#check fate process
+pnum=$( ps aux|egrep -v "grep|{{pname}}/tools/check.sh|serving|ansilbe|tail|" | grep -c {{pname}} );
+if [ $pnum -gt 0 ]
+then
+  echo "Warning: key {{pname}} process exists, please has a check and clean"
+fi
+
+#check port
+open_ports=( $( ss -lnt | grep LISTEN | grep -v ':::' | awk '{print $4 }' | awk -F ":" '{print $2}' ) )
+open_ports=( ${open_ports[*]} $( ss -lnt | grep LISTEN | grep ':::' | awk '{print $4 }' | awk -F ":" '{print $4}' ) )
+open_ports=( $( echo ${open_ports[*]} | sed 's/ /\n/g' | sort | uniq ) )
+#open_ports=( $( /usr/sbin/ss -lnt|grep 'LISTEN'|grep -v ':::' | awk '{print ; }'|cut -d : -f 2|sort -u | awk '{print $1}') )
+tports=()
+
+for oport in ${open_ports[*]}; do
+{% for role in deploy_roles %}
+{% if role == 'host' and ( ansible_ssh_host in host['rollsite']['ips'] or ansible_ssh_host in host['nodemanager']['ips'] or ansible_ssh_host in host['clustermanager']['ips'] or ansible_ssh_host in host['fate_flow']['ips'] or ansible_ssh_host in host['mysql']['ips'] or ansible_ssh_host in host['fateboard']['ips'] ) %}
+{% if host['mysql']['type'] != 'inside' %}
+{% raw %}
+  for ((i=0;i<${#check_arg[*]};i++)); do
+{% endraw %}
+{% raw %}
+    if [ "${check_arg[$i]}" == "mysql" ]; then
+{% endraw %}
+      unset check_arg[$i]
+    fi
+  done
+{% endif %}
+  for port in "eggroll:{{host['rollsite'].get('port',9370)}}" "eggroll:{{host['clustermanager'].get('port',4670)}}" "eggroll:{{host['nodemanager'].get('port',4671)}}" "fate_flow:{{host['fate_flow'].get('grpcPort',9360)}}" "fate_flow:{{host['fate_flow'].get('httpPort',9380)}}" "mysql:{{host['mysql'].get('port',3306)}}" "fateboard:{{host['fateboard'].get('port',8080)}}";
+{% elif role == 'guest' and ( ansible_ssh_host in guest['rollsite']['ips'] or ansible_ssh_host in guest['nodemanager']['ips'] or ansible_ssh_host in guest['clustermanager']['ips'] or ansible_ssh_host in guest['fate_flow']['ips'] or ansible_ssh_host in guest['mysql']['ips'] or ansible_ssh_host in guest['fateboard']['ips'] ) %}
+{% if guest['mysql']['type'] != 'inside' %}
+{% raw %}
+  for ((i=0;i<${#check_arg[*]};i++)); do
+{% endraw %}
+{% raw %}
+    if [ "${check_arg[$i]}" == "mysql" ]; then
+{% endraw %}
+      unset check_arg[$i]
+    fi
+  done
+{% endif %}
+  for port in "eggroll:{{guest['rollsite'].get('port',9370)}}" "eggroll:{{guest['clustermanager'].get('port',4670)}}" "eggroll:{{guest['nodemanager'].get('port',4671)}}" "fate_flow:{{guest['fate_flow'].get('grpcPort',9360)}}" "fate_flow:{{guest['fate_flow'].get('httpPort',9380)}}" "mysql:{{guest['mysql'].get('port',3306)}}" "fateboard:{{guest['fateboard'].get('port',8080)}}";
+{% elif role == 'exchange' and ansible_ssh_host in exchange['rollsite']['ips']  %}
+  for port in "eggroll:{{exchange['rollsite'].get('port',9370)}}";
+{% endif %}
+{% endfor %}
+  do
+{% raw %}
+    if [[ $oport == ${port#*:} && ( ${check_arg[@]} =~ ${port%%:*} ) ]]
+{% endraw %}
+    then
+      tports=( ${tports[*]} ${port#*:} )
+    fi
+  done
+done
+{% raw %}
+if [ ${#tports[*]} -gt 0 ]
+{% endraw %}
+then
+  echo "Warning: these ports: ${tports[*]} have been used"
+fi
+
+#check mysql
+if [[ -f /etc/my.cnf && "${check_arg[@]}" =~ "mysql" ]]
+then
+  echo "Warning: if reinstall mysql, please stop mysql, and rename /etc/my.cnf"
+fi
+
+if [[ ( -d "{{pbase}}/{{pname}}/{{mysql['path']}}" || -d "{{dbase}}/{{pname}}/mysql" ) && "${check_arg[@]}" =~ "mysql" ]]
+then
+  echo "Warning: please rename {{pbase}}/{{pname}}/{{mysql['path']}} and {{dbase}}/{{pname}}/mysql"
+fi
+
+#check dircetory
+if [[  -d "{{pbase}}/{{pname}}/eggroll" && "${check_arg[@]}" =~ "eggroll" ]]; then
+  echo "Warning: please rename {{pbase}}/{{pname}}/eggroll"
+fi
+if [[ -d "{{pbase}}/{{pname}}/fateboard" && "${check_arg[@]}" =~ "fateboard" ]]; then
+  echo "Warning: please rename {{pbase}}/{{pname}}/fateboard"
+fi
+if [[ ( -d "{{pbase}}/{{pname}}/python" ||  -d "{{pbase}}/{{pname}}/example" || -d "{{pbase}}/{{pname}}/{{python['venv']}}" ) && "${check_arg[@]}" =~ "fate_flow" ]]; then
+  echo "Warning: please rename {{pbase}}/{{pname}}{python|example}"
+fi
+
+#check supervisor conf
+if [[ "${check_arg[@]}" =~ "eggroll" ]]; then
+  for temp in "rollsite" "clustermanager" "nodemanager"; do
+    num=$( ls {{cbase}}/supervisord/supervisord.d/fate-${temp}.conf | wc -l )
+    if [ $num -gt 0 ]; then
+      echo "Warning: supervisor_fate_conf exists, please remove {{cbase}}/supervisord/supervisord.d/fate-${temp}.conf and update all"
+    fi
+  done
+fi
+for temp in "fateboard" "mysql"; do
+  if [[ "${check_arg[@]}" =~ $temp ]]; then
+    num=$( ls {{cbase}}/supervisord/supervisord.d/fate-${temp}.conf | wc -l )
+    if [ $num -gt 0 ]; then
+      echo "Warning: supervisor_fate_conf exists, please remove {{cbase}}/supervisord/supervisord.d/fate-${temp}.conf and update all"
+    fi
+  fi
+done
+if [[ "${check_arg[@]}" =~ "fate_flow" ]]; then
+  num=$( ls {{cbase}}/supervisord/supervisord.d/fate-fateflow.conf | wc -l )
+  if [ $num -gt 0 ]; then
+    echo "Warning: supervisor_fate_conf exists, please remove {{cbase}}/supervisord/supervisord.d/fate-fateflow.conf and update all"
+  fi
+fi

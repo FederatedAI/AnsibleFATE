@@ -1,0 +1,40 @@
+- name: "check({{deploy_mode}}): {{pname}}-{{role_name}} is running or not"
+  shell: /bin/bash {{cbase}}/supervisord/service.sh status {{pname}}-{{role_name}}
+  register: mysql_status
+  until: mysql_status.stdout.find("RUNNING") != -1
+  retries: 2
+  delay: 60
+
+- debug: var=mysql_status.get('stderr_lines')
+
+- name: "check({{deploy_mode}}): check if change admin password or not"
+  stat:
+    path: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/.chpasswd"
+  register: stat_mysql_chpasswd
+
+- name: "chpasswd({{deploy_mode}}): admin password "
+  shell: "/bin/bash {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/chpasswd.sh {{mysql['passwd']}}"
+  register: mysql_chpasswd_status
+  when: mysql_status.stdout.find('RUNNING')  > 0 and stat_mysql_chpasswd.stat.exists == False
+
+- debug: var=mysql_chpasswd_status.get('stderr_lines')
+
+- name: "check({{deploy_mode}}): check if load data or not "
+  stat:
+    path: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/.load"
+  register: stat_mysql_load
+
+- name: "commit({{deploy_mode}}): load.sh"
+  shell: /bin/bash {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/load.sh
+  when: stat_mysql_load.stat.exists == False
+  register: mysql_load
+
+- debug: var=mysql_load.get('stderr_lines')
+
+- set_fact:
+    temp: "{{ mysql_load.stderr_lines | join('\n') }}"
+  when: stat_mysql_load.stat.exists == False
+
+- fail:
+   msg: "Load fate sql data failed, Please check the authorization of MySQL"
+  when: "stat_mysql_load.stat.exists == False and ( 'ERROR' in temp or 'error' in temp or 'failed' in temp )"

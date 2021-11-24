@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]
+then
+  echo "$0 new_password"
+  exit 1;
+fi
+
+npasswd=$1;
+
+base="{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}"
+
+sleep 10
+
+#passwd="$(grep 'A temporary password is generated for' {{lbase}}/{{pname}}/mysql/init.log |sed -n 's#.*root@localhost: \(.*\)#\1#p')"
+#echo "$passwd $npasswd"
+$base/bin/mysqladmin -h 127.0.0.1 -P {{db['port']}} -S {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/run/mysql.sock  -uroot password "$npasswd"
+
+echo $npasswd >>  $base/.chpasswd

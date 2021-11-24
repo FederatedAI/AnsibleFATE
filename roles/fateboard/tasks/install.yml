@@ -1,0 +1,48 @@
+- name: "mkdir({{deploy_mode}}): {{lbase}}/{{pname}}/{{role_name}}"
+  file:
+    path: "{{lbase}}/{{pname}}/{{role_name}}"
+    state: directory
+    mode: 0755
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{version}}.jar"
+  stat:
+    path: "{{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{version}}.jar"
+  register: fateboard_stat
+
+- name: "untar({{deploy_mode}}): {{role_name}}-{{versions.get(role_name)}}.tar.gz"
+  unarchive:
+    src: "{{role_name}}-{{versions.get(role_name)}}.tar.gz"
+    dest: "{{pbase}}/{{pname}}/"
+  when: fateboard_stat.stat.exists == False
+
+- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/fateboard/logs"
+  file:
+    path: "{{pbase}}/{{pname}}/fateboard/logs"
+    state: absent
+  when: fateboard_stat.stat.exists == False
+
+- name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/fateboard"
+  file:
+    src: "{{lbase}}/{{pname}}/fateboard"
+    dest: "{{pbase}}/{{pname}}/fateboard/logs"
+    state: link
+  when: fateboard_stat.stat.exists == False
+
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/logs"
+  file:
+    path: "{{pbase}}/{{pname}}/{{role_name}}/{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - conf
+
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/bin"
+  file:
+    path: "{{pbase}}/{{pname}}/{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - bin
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/bin/init_env.sh"
+  template: src=init_env.sh.jinja dest={{pbase}}/{{pname}}/bin/init_env.sh

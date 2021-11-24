@@ -1,0 +1,9 @@
+- name: reload {{pname}}-mysql
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-mysql
+
+- name: stop {{pname}}-mysql
+  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-mysql
+
+- name: restart {{pname}}-mysql
+  shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-mysql
+

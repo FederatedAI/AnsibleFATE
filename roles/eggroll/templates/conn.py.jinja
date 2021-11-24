@@ -1,0 +1,105 @@
+import pymysql,sys
+
+#if len(sys.argv) != 6:
+#  print(f'Usage: {sys.argv[0]} ip port user password sql_file')
+#  sys.exit(1)
+
+db_host="{{db_host}}"
+db_port={{db_port}}
+user="{{admin_user}}"
+passwd="{{admin_passwd}}"
+db_user="{{db_user}}"
+db_passwd="{{db_passwd}}"
+db="{{db_name}}"
+ip="{{rip}}"
+port="{{rport}}"
+stype="{{rrole}}"
+dtype="insert"
+
+def make_data():
+  
+  temp={}
+  temp["ip"]=ip
+  temp["port"]=port
+  if stype == "nodemanager":
+    temp["node_type"]="NODE_MANAGER"
+  if stype == "clustermanager":
+    temp["node_type"]="CLUSTER_MANAGER"
+  return temp
+ 
+def db_query(sql):
+
+  conn=None
+
+  conn= pymysql.connect(host=db_host,port=db_port,user=user,password=passwd,database=db, charset="utf8")
+ 
+  cur = conn.cursor()
+  try:
+    cur.execute(sql)
+    data=cur.fetchone()
+    #print(data)
+    #print(data[0])
+  except pymysql.Error as e:
+    print('mysql.Error: ',e.args[0],e.args[1])
+    data=(0) 
+  conn.close()
+  #print('--------3-------------')
+  if data[0] == 0:
+    return 1
+  else:
+    #print('--------3-------------')
+    return 0
+
+def db_commit(sql):
+  conn=None
+
+  #print('-------0----------') 
+  conn= pymysql.connect(host=db_host,port=db_port,user=user,password=passwd,database=db, charset="utf8")
+  #print('-------2----------') 
+
+  cur = conn.cursor()
+  try:
+    cur.execute(sql)
+    conn.commit()
+  except pymysql.Error as e:
+    print('mysql.Error: ',e.args[0],e.args[1])  
+    conn.rollback()
+  conn.close()
+
+def is_in(temp):
+  ip=temp['ip']
+  port=temp['port']
+  node_type=temp['node_type']
+  sql=f'select count(*) from server_node where host="{ip}" and port="{port}" and node_type="{node_type}" and status="HEALTHY";'
+  code=db_query(sql) 
+  if code == 1:
+    print('not exists')
+  else:
+    print('exists')
+  return code
+
+def db_insert(temp):
+  ip=temp['ip']
+  port=temp['port']
+  node_type=temp['node_type']
+  sql=f'INSERT INTO server_node (host, port, node_type, status) values ("{ip}", "{port}", "{node_type}", "HEALTHY");'
+  db_commit(sql)
+
+def db_grant():
+  sql=f'create user if not exists {db_user}@"{ip}" identified by "{db_passwd}";'
+  db_commit(sql)
+  sql=f'grant all on {db}.* to {db_user}@"{ip}";'
+  db_commit(sql)
+
+if stype == "clustermanager":
+  print("grant")
+  db_grant()
+
+datas=make_data()
+
+tcode=is_in(datas)
+if tcode == 1:
+  print("insert")
+  db_insert(datas)
+else:
+  print("not insert")

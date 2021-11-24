@@ -1,0 +1,124 @@
+- when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+  block:
+  - name: "Copy: eggroll keys (host)"
+    copy:
+      src: "keys/{{ item.src }}"
+      dest: "{{dbase}}/{{pname}}/keys/{{ item.dest }}"
+    with_items:
+    - { src: 'host/host-ca.pem', dest: 'host-ca.pem' }
+    - { src: 'host/host-server.pem', dest: 'host-server.pem' }
+    - { src: 'host/host-server.key', dest: 'host-server.key' }
+    - { src: 'host/host-client-ca.pem', dest: 'host-client-ca.pem' }
+    - { src: 'host/host-client-client.pem', dest: 'host-client-client.pem' }
+    - { src: 'host/host-client-client.key', dest: 'host-client-client.key' }
+    when: "ssl_roles|length == 2 and 'host' in ssl_roles and rollsite.get('server_secure', False) == True and rollsite.get('client_secure', False) == True"
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/conf/eggroll.properties"
+  template: src=eggroll.properties.jinja dest={{pbase}}/{{pname}}/eggroll/conf/eggroll.properties
+  when: "( ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True ) or ( ansible_ssh_host in clustermanager.get('ips',[]) and clustermanager.get('enable', False) == True ) or ( ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True )"
+
+- when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+  block:
+  - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/conf/route_table_tmp.json(host)"
+    template: src=route_table.json.jinja dest={{pbase}}/{{pname}}/eggroll/conf/route_table_tmp.json
+
+  - name: "new({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/bin/json-replace.sh"
+    template: src=json-replace.sh.jinja dest={{pbase}}/{{pname}}/eggroll/bin/json-replace.sh
+
+  - name: "check({{deploy_mode}}): route table json format"
+    shell: /bin/bash {{pbase}}/{{pname}}/eggroll/bin/json-replace.sh
+    register: json_replace
+
+  - debug: var=json_replace['stdout_lines']
+
+  - name: "output({{deploy_mode}}): check json bad result"
+    fail:
+      msg: "please check json"
+    when: json_replace.stdout.find('check_json_pass') == -1
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-rollsite.conf"
+  template: src=supervisor.d/eggroll.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-rollsite.conf
+  vars:
+    role: rollsite
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-rollsite
+  - restart {{pname}}-rollsite
+  when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-clustermanager.conf"
+  template: src=supervisor.d/eggroll.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-clustermanager.conf
+  vars:
+    role: clustermanager
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-clustermanager
+  - restart {{pname}}-clustermanager
+  when: ansible_ssh_host in clustermanager.get('ips',[]) and clustermanager.get('enable', False) == True
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-nodemanager.conf"
+  template: src=supervisor.d/eggroll.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-nodemanager.conf
+  vars:
+    role: nodemanager
+    service: "{{supervisord['service']}}"
+  notify:
+  - reload {{pname}}-nodemanager
+  - restart {{pname}}-nodemanager
+  when: ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True
+
+- name: "flush_handlers"
+  meta: flush_handlers
+
+- name: "wait({{deploy_mode}})): open port {{rollsite.get('port',9370)}}(host)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{rollsite.get('port',9370)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_rollsite_host
+  when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+
+- name: "wait({{deploy_mode}})): open port {{rollsite.get('secure_port',9371)}}(host)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{rollsite.get('secure_port',9371)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_rollsite_secure_host
+  when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True and rollsite.get('server_secure', False) == True and rollsite.get('client_secure', False) == True
+
+- name: "check({{deploy_mode}})): check rollsite service(host)"
+  debug: msg="******start rollsite successfully******"
+  when: "ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True and waitfor_rollsite_host.get('state') == 'started' and waitfor_rollsite_secure_host.get('state') == 'started'"
+
+- name: "wait({{deploy_mode}})): open port {{clustermanager.get('port',4670)}}(host)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{clustermanager.get('port',4670)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_clustermanager_host
+  when: ansible_ssh_host in clustermanager.get('ips',[]) and clustermanager.get('enable', False) == True
+
+- name: "check({{deploy_mode}})): check clustermanager service(host)"
+  debug: msg="******start clustermanager successfully******"
+  when: "ansible_ssh_host in clustermanager.get('ips',[]) and clustermanager.get('enable', False) == True and waitfor_clustermanager_host.get('state') == 'started'"
+
+- name: "wait({{deploy_mode}})): open port {{nodemanager.get('port',4671)}}(host)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "{{nodemanager.get('port',4671)}}"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_nodemanager_host
+  when: ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True
+
+- name: "check({{deploy_mode}})): check nodemanager service(host)"
+  debug: msg="******start nodemanager successfully******"
+  when: "ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True and waitfor_nodemanager_host.get('state') == 'started'"
+
+

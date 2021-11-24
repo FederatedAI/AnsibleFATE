@@ -1,0 +1,3 @@
+---
+deploy_role: "guest"
+rabbit: "{{ guest.get('rabbitmq',{}) }}"

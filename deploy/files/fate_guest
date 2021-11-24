@@ -1,0 +1,60 @@
+guest:
+  rollsite:
+    enable: false
+    partyid: 9999
+    coordinator: fate
+    ips: []
+    port: 9370
+    secure_port: 9371
+    server_secure: false
+    client_secure: false
+    polling:
+      enable: false
+    route_tables: []
+  clustermanager:
+    enable: false
+    ips: []
+    port: 4670
+    cores_per_node: 16
+  nodemanager:
+    enable: false
+    ips: []
+    port: 4671
+  eggroll:
+    dbname: "eggroll_meta"
+    egg: 4
+  fate_flow:
+    enable: false
+    ips: []
+    grpcPort: 9360
+    httpPort: 9380
+    dbname: "fate_flow"
+    proxy: rollsite
+    http_app_key:
+    http_secret_key:
+    use_deserialize_safe_module: false
+    default_engines: eggroll
+  fateboard:
+    enable: false
+    ips: []
+    port: 8080
+    dbname: "fate_flow"
+  mysql:
+    enable: false
+    type: inside
+    ips: []
+    port: 3306
+    dbuser: "fate"
+    dbpasswd: "fate_deV2999"
+  zk:
+    enable: false
+    lists:
+    - ip: 127.0.0.1
+      port: 2181
+    use_acl: false
+    user: "fate"
+    passwd: "fate"
+  servings:
+    ips: 
+    - 127.0.0.1
+    port: 8000

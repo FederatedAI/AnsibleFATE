@@ -1,0 +1,13 @@
+[program:{{pname}}-{{role_name}}]
+command={{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}/sbin/rabbitmq-server
+environment=ERL_HOME=/usr/lib64/erlang,PATH="/usr/lib64/erlang/bin:%(ENV_PATH)s"
+#environment=ERL_HOME={{pbase}}/{{pname}}/common/erlang,PATH="{{pbase}}/{{pname}}/common/erlang/bin:%(ENV_PATH)s"
+directory={{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}
+user={{service['owner']}}
+autorestart=true
+redirect_stderr=true
+logfile_maxbytes=50MB
+logfile_backups=10
+stdout_logfile={{lbase}}/{{pname}}/{{role_name}}/info.log
+stderr_logfile={{lbase}}/{{pname}}/{{role_name}}/error.log
+loglevel=info

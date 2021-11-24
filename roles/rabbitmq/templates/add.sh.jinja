@@ -1,0 +1,15 @@
+#!/bin/bash
+
+base="{{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}"
+
+cd $base
+
+sbin/rabbitmq-plugins enable rabbitmq_management
+sbin/rabbitmq-plugins enable rabbitmq_federation
+sbin/rabbitmq-plugins enable rabbitmq_federation_management 
+
+{% if ansible_ssh_host in rabbit.get('host','192.168.0.1') %}
+sbin/rabbitmqctl add_user {{rabbit['user']}} {{rabbit['password']}}
+sbin/rabbitmqctl set_user_tags {{rabbit['user']}} administrator
+sbin/rabbitmqctl set_permissions -p / {{rabbit['user']}} ".*" ".*" ".*"  
+{% endif %}

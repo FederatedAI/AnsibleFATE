@@ -1,0 +1,8 @@
+#!/bin/bash
+
+[ ! -d {{pbase}}/backups/{{pname}}/eggroll/conf ] && mkdir -p {{pbase}}/backups/{{pname}}/eggroll/conf
+if [ -f {{pbase}}/{{pname}}/eggroll/conf/route_table.json ]
+then
+  mv {{pbase}}/{{pname}}/eggroll/conf/route_table.json {{pbase}}/backups/{{pname}}/eggroll/conf/route_table-$(date "+%s" ).json
+fi
+

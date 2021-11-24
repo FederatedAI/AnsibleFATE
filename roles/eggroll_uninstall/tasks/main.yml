@@ -1,0 +1,65 @@
+- name: Stop clustermanager service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-clustermanager
+  ignore_errors: yes
+
+- name: Stop nodemanager service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-nodemanager
+  ignore_errors: yes
+
+- name: Stop rollsite service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-rollsite
+  ignore_errors: yes
+
+- name: Remove supervisord files
+  file: path={{item}} state=absent
+  with_items:
+  - "{{cbase}}/supervisord/supervisord.d/{{pname}}-clustermanager.conf"
+  - "{{cbase}}/supervisord/supervisord.d/{{pname}}-nodemanager.conf"
+  - "{{cbase}}/supervisord/supervisord.d/{{pname}}-rollsite.conf"
+
+- name: Update clustermanager service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-clustermanager
+  ignore_errors: yes
+
+- name: Update nodemanager service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-nodemanager
+  ignore_errors: yes
+
+- name: Update rollsite service
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-rollsite
+  ignore_errors: yes
+
+- name: "show route_table.json"
+  shell: cat {{pbase}}/{{pname}}/eggroll/conf/route_table.json
+  register: show_text
+  ignore_errors: yes
+
+- name: "display show route_table in msg"
+  debug: var=show_text.stdout_lines   
+
+- name: "mkdir: {{bbase}}/{{pname}}/eggroll/conf"
+  file:
+    path: "{{bbase}}/{{pname}}/eggroll/conf"
+    state: directory
+
+- name: "backup route_tables.json to {{bbase}}/{{pname}}/eggroll/conf"
+  copy:
+    content: "{% for lines in  show_text.stdout_lines %} {% for line in  lines %} {{ line }} \n {%endfor%} {%endfor%}"
+    dest: "{{bbase}}/{{pname}}/eggroll/conf/route_table_{{lookup('pipe','date +%Y%m%d')}}.json"
+  ignore_errors: yes
+
+- name: Remove eggroll deployfiles
+  file: path={{item}} state=absent
+  with_items:
+  - "{{pbase}}/{{pname}}/eggroll"
+
+- name: "backup datafiles"
+  shell: /bin/mv {{dbase}}/{{pname}}/eggroll {{dbase}}/{{pname}}/eggroll_$(date +%Y%m%d)
+  ignore_errors: yes
+
+- name: Remove eggroll datafiles
+  file: path={{item}} state=absent
+  with_items:
+  - "{{dbase}}/{{pname}}/eggroll"
+  - "{{dbase}}/{{pname}}/keys"
+

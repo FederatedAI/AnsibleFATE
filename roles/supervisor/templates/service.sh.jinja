@@ -1,0 +1,57 @@
+#!/bin/bash
+
+
+action=$1
+name=$2
+base="{{supervisord_path}}"
+user="{{account['name']}}"
+password="{{account['password']}}"
+port="{{service['port']}}"
+ip="127.0.0.1"
+
+cd {{cbase}}/supervisord
+if [ $# -ne 2 ]
+then
+  echo "Usage: $0 start|stop|status|restart|update name|all"
+  exit 1;
+fi
+
+case $action in
+  restart)
+    if [ $name == "all" ]
+    then
+        for name in $( /bin/bash ./service.sh status all| awk '{ print $1; }' );
+        do
+          $base/supervisorctl -s http://$ip:$port -u$user -p$password stop $name
+          $base/supervisorctl -s http://$ip:$port -u$user -p$password start $name
+        done
+    else
+        $base/supervisorctl -s http://$ip:$port -u$user -p$password $action $name
+    fi
+  ;;
+
+  status)
+      $base/supervisorctl -s http://$ip:$port -u$user -p$password $action $name
+  ;;
+
+  start|stop)
+    if [ $name == "all" ]
+    then
+        for name in $( /bin/bash ./service.sh status all| awk '{ print $1; }' );
+        do
+          $base/supervisorctl -s http://$ip:$port -u$user -p$password $action $name
+        done
+    else
+        $base/supervisorctl -s http://$ip:$port -u$user -p$password $action $name
+    fi
+  ;;
+
+  update)
+      $base/supervisorctl -s http://$ip:$port -u$user -p$password $action $name
+  ;;
+
+  *)
+    echo "Usage: $0 start|stop|status|restart|update name|all"
+  ;;
+
+esac

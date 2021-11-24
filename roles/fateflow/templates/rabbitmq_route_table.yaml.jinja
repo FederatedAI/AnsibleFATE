@@ -1,0 +1,9 @@
+{% if ansible_ssh_host in fate_flow.get('ips',[]) %}
+{% for item in rabbit.get('route_table',{}) %}
+{{item['id']}}:
+{% for route in item.get('routes',{}) %}
+  host: {{route['ip']}}
+  port: {{route['port']}}
+{% endfor %}
+{% endfor %}
+{% endif %}

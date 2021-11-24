@@ -1,0 +1,38 @@
+- name: "mkdir({{deploy_mode}}): {{pname}} {{role_name}} directory"
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - "{{pbase}}/{{pname}}/{{mysql['path']}}"
+  - "{{lbase}}/{{pname}}/{{role_name}}"
+  - "{{lbase}}/{{pname}}/supervisord"
+
+
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}" 
+  stat:
+    path: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}"
+  register: stat_mysql_dir
+
+- name: "untar({{deploy_mode}}): {{role_name}}-{{mysql['version']}}.tar.gz"
+  unarchive:
+    src: "{{role_name}}-{{mysql['version']}}.tar.gz"
+    dest: "{{pbase}}/{{pname}}/{{mysql['path']}}"
+  register: stat_mysql_tar
+  when: stat_mysql_dir.stat.exists == False
+
+#- debug: var=stat_mysql_tar
+
+
+- name: "mkdir({{deploy_mode}}): {{pname}}/{{role_name}} conf-run-sql data"
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conf"
+  - "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/run"
+  - "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/sql"
+  - "{{pbase}}/data/{{pname}}/{{role_name}}"
+  when: stat_mysql_dir.stat.exists == False
+
