@@ -99,6 +99,7 @@ guest_special_routes: []
 exchange_ips:
   - default:192.168.0.88
 exchange_special_routes: []
+default_engines: eggroll
 ```
 
 如果部署需要证书验证，则执行命令：
@@ -207,62 +208,6 @@ host:
     ips:				
     - 192.168.0.1
     port: 8000 
-  spark:			---开启spark信息
-    enable: False
-    home:
-    cores_per_node: 20
-    nodes: 2
-  linkis_spark:		---开启linkis_spark信息
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
-  hive:
-    enable: False
-    host: 127.0.0.1
-    port: 10000
-    auth:
-    configuration:
-    kerberos_service_name:
-    username:
-    password:
-  hdfs:
-    enable: False
-    name_node: hdfs://fate-cluster
-    path_prefix:
-  rabbitmq:			---rabbitmq部署信息
-    enable: False
-    host: 192.168.0.1
-    mng_port: 12345
-    port: 5672
-    user: fate
-    password: fate
-    route_table:
-      - id: 10000
-        routes:
-          - ip: 192.168.0.1
-            port: 5672
-  pulsar:
-    enable: False
-    host: 192.168.0.1
-    port: 6650
-    mng_port: 8080
-    topic_ttl: 5
-    route_table:
-      - id: 10000
-        routes:
-          - ip: 192.168.0.1
-            port: 6650
-            sslPort: 6651
-            proxy: ""
-  nginx:
-    enable: False
-    host: 127.0.0.1
-    http_port: 9300
-    grpc_port: 9310      
 ```
 
 #### 4.3 配置guest信息
@@ -357,62 +302,6 @@ guest:
     ips:				
     - 192.168.1.1
     port: 8000  
-  spark:			---开启spark信息
-    enable: False
-    home:
-    cores_per_node: 20
-    nodes: 2
-  linkis_spark:		---开启linkis_spark信息
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
-  hive:
-    enable: False
-    host: 127.0.0.1
-    port: 10000
-    auth:
-    configuration:
-    kerberos_service_name:
-    username:
-    password:
-  hdfs:
-    enable: False
-    name_node: hdfs://fate-cluster
-    path_prefix:
-  rabbitmq:			---rabbitmq部署信息
-    enable: False
-    host: 192.168.0.1
-    mng_port: 12345
-    port: 5672
-    user: fate
-    password: fate
-    route_table:
-      - id: 10000
-        routes:
-          - ip: 192.168.0.1
-            port: 5672
-  pulsar:
-    enable: False
-    host: 192.168.0.1
-    port: 6650
-    mng_port: 8080
-    topic_ttl: 5
-    route_table:
-      - id: 10000
-        routes:
-          - ip: 192.168.0.1
-            port: 6650
-            sslPort: 6651
-            proxy: ""
-  nginx:
-    enable: False
-    host: 127.0.0.1
-    http_port: 9300
-    grpc_port: 9310  
 ```
 
 #### 4.4 配置exchange信息
@@ -469,6 +358,14 @@ sh deploy/deploy.sh deploy
 
 
 
-### 6 服务验证与测试
+
+### 6 后置操作
+
+具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.6.8一节。
+
+
+
+
+### 7 服务验证与测试
 
 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.7一节。

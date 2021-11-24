@@ -53,7 +53,8 @@
     - [2.6.5 生成证书(可选)](#265-生成证书可选)
     - [2.6.6 执行部署（按需）](#266-执行部署按需)
     - [2.6.7 检查服务](#267-检查服务)
-    - [2.6.8 执行测试](#268-执行测试)
+    - [2.6.8 执行部署后置操作](#268-执行部署后置操作)
+    - [2.6.9 执行测试](#269-执行测试)
 - [2.7 服务验证](#27-服务验证)
     - [2.7.1 服务进程验证](#271-服务进程验证)
     - [2.7.2 Toy_example部署验证](#272-toy_example部署验证)
@@ -167,11 +168,11 @@ FATE官方网站：https://fate.fedai.org/
 
 ##### 2.4.4 部署角色、后端引擎和模块
 
-| 后端引擎        | 可选部署角色          | 可选部署模块                         |
-| --------------- | --------------------- | ------------------------------------ |
-| standalone      | host、guest、exchange | mysql、eggroll、fate_flow、fateboard |
-| eggroll（默认） | host、guest、exchange | mysql、eggroll、fate_flow、fateboard |
-| spark           | host、guest           | mysql、fate_flow、fateboard          |
+| 后端引擎        | 可选部署角色          | 可选部署模块                          |
+| --------------- | --------------------- | ------------------------------------- |
+| standalone      | host、guest、exchange | mysql、eggroll、fate_flow、fateboard  |
+| eggroll（默认） | host、guest、exchange | mysql、eggroll、fate_flow、fateboard  |
+| spark           | host、guest           | mysql、fate_flow、fateboard、rabbitmq |
 
 
 
@@ -260,6 +261,7 @@ FATE官方网站：https://fate.fedai.org/
 ##### 2.4.9 配置Spark参数
 
 - 支持spark、plusar/rabbitmq、hdfs/hive等应用场景
+- spark只有host&guest场景适用
 
 
 
@@ -283,7 +285,6 @@ FATE官方网站：https://fate.fedai.org/
           minversion： 资源包小版本号
   使用示例：	
   bash build/build.sh init fate 1.7.0 release
-  
   ```
 
 ​        
@@ -344,6 +345,7 @@ Usage: deploy/deploy.sh -h|-g|-e|-m|-k
          -e=ip
          -m=install or uninstall
          -k=both roles of keys(eg: host|guest)
+         -n=standalone or eggroll or spark（default： eggroll）
 ```
 
 
@@ -353,7 +355,7 @@ Usage: deploy/deploy.sh -h|-g|-e|-m|-k
 - 生成部署配置文件
 
 ```
-sh deploy/deploy.sh  init [-g|-h|-e|-m|-k]
+sh deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
 ```
 
 参数说明： 
@@ -366,7 +368,7 @@ sh deploy/deploy.sh  init [-g|-h|-e|-m|-k]
 
 ​        -m：部署模式，-m=deploy|install|config|uninstall，默认deploy（安装+配置）
 
-​         -k：开启证书，支持部署单边证书、双边或三边使用，使用示例：-k="host|guest" 或 -k  
+​        -k：开启证书，支持部署单边证书、双边或三边使用，使用示例：-k="host|guest" 或 -k  
 
 ​                 默认规则： 
 
@@ -375,6 +377,8 @@ sh deploy/deploy.sh  init [-g|-h|-e|-m|-k]
 ​                          部署3方，必须指定角色列表。
 
 ​                          部署一方，必须使用不带参数。
+
+​        -n: 后端引擎，-n=standalone or eggroll or spark，默认为eggroll，使用示例：-n=spark
 
 ​          ***上述参数可以混合使用，多个表示部署多方。***
 
@@ -472,7 +476,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
 
 ###### 2.5.2.5 配置文件场景示例
 
-- **部署配置文件讲解**
+- **spark引擎部署配置文件**
 
   文件：`deploy/conf/setup.conf`
 
@@ -482,7 +486,69 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   ssh_port: 22
   deploy_user: app	---部署目标服务的远程连接用户
   deploy_group: apps	---部署目标服务的远程连接用户的用户组
+  deploy_mode: deploy
   
+  modules:
+    - mysql
+    - fate_flow
+    - fateboard
+  roles:
+    - host:10000
+    - guest:9999
+  ssl_roles: []
+  
+  host_ips:
+    - default:192.168.0.1
+  host_special_routes: []
+  guest_ips:
+    - default:192.168.1.1
+  guest_special_routes: []
+  
+  default_engines: spark
+  #host spark configuration information
+  #compute_engine: spark or linkis
+  host_compute_engine: spark
+  host_spark_home: ""
+  host_linkis_Ips: ""
+  #storage_engine: hive or hdfs
+  host_storage_engine: hive
+  host_hive_ips: ""
+  host_hdfs_addr: ""
+  #mq_engine: rabbitmq or pulsar
+  host_mq_engine: rabbitmq
+  host_rabbitmq_ips: ""
+  host_pulsar_ips: ""
+  #proxy
+  host_nginx_ips: ""
+  
+  #
+  #guest spark configuration information
+  #compute_engine: spark or linkis
+  guest_compute_engine: spark
+  guest_spark_home: ""
+  guest_linkis_Ips: ""
+  #storage_engine: hive or hdfs
+  guest_storage_engine: hive
+  guest_hive_ips: ""
+  guest_hdfs_addr: ""
+  #mq_engine: rabbitmq or pulsar
+  guest_mq_engine: rabbitmq
+  guest_rabbitmq_ips: ""
+  guest_pulsar_ips: ""
+  #proxy
+  guest_nginx_ips: ""
+  ```
+
+- **非spark引擎部署配置文件**
+
+  文件：`deploy/conf/setup.conf`
+
+  ```
+  env: prod
+  pname: fate
+  ssh_port: 22
+  deploy_user: app	---部署目标服务的远程连接用户
+  deploy_group: apps	---部署目标服务的远程连接用户的用户组
   deploy_mode: deploy
   
   modules:
@@ -490,54 +556,65 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
     - eggroll
     - fate_flow
     - fateboard
-  
   roles:
+    - host:10000
     - guest:9999
-  
   ssl_roles: []
-  
   polling: {}
   
-  host_ips: []
-  
+  host_ips:
+    - default:192.168.0.1
   host_special_routes: []
-  
   guest_ips:
     - default:192.168.1.1
-  
   guest_special_routes: []
-  
   exchange_ips: []
-  
   exchange_special_routes: []
-  
+  default_engines: eggroll
   ```
 
-​      参数说明：
 
-	1，deploy_mode： 部署模式。 取值有： deploy、install、config、uninstall，设置方式： 默认deploy表示安装软件并配置服务，install只安装软件，config只更新配置服务，uninstall表示卸载。
-	 
-	2，modules：需要的部署的模块。取值有：mysql、eggroll 、fate_flow、fateboard，设置方式： 单独一个，多个或者全部。例：modules: ['mysql','eggroll']
-	 
-	3，roles：需要部署的某一端的角色。取值有： host、 guest、exchange，设置方式： 3个任意组合。
-	
-	4，ssl_roles： 使用证书的角色。取值有： host、 guest、exchange，设置方式： 空值或三选二。 三边部署不支持-k="host|guest"
-	
-	5，polling： polling的角色。取值有： 字典，包含服务端的角色和客户端的角色，格式： { "server_role": "exchange", "client_role": "host" }，设置方式： 空值或字典。（部署2方或者3方才支持）
-	
-	6，host_ips：host端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
-	
-	7，host_special_routes： host端额外路由。取值有： 数组，成员格式：party_id:ip:port,设置方式：可以设置零个、一个或多个。例：- 8888:192.168.1.2:9370（支持证书方式: - 8888:192.168.1.2:9371:secure），额外路由指向exchange示例为： - default:192.168.1.2:9370
-	
-	8，guest_ips：guest端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
-	
-	9，guest_special_routes： guest端额外路由。取值有： 数组，成员格式：party_id:ip:port, 设置方式： 可以设置零个、一个或多个。（支持证书方式：- 8888:192.168.1.2:9371:secure），指向exchange示例为： - default:192.168.1.2:9370
-	
-	10，exchange_ips： exchange端机器列表，取值："default:ip列表"、"rollsite:ip列表" ，设置方式： 二选一。多个exchange_ip使用|分割。
-	
-	11，exchange_special_routes：exchange端额外路由。取值有： 数组，成员格式：party_id:ip:port, 设置方式： 可以设置零个、一个或多个。（支持配置使用证书方式： - 8888:192.168.1.2:9371:secure）
-	
-	12，默认路由的设置，请参考2.4.8“路由支持”一节的介绍。
+
+- **部署配置文件讲解参数说明：**
+  
+  ```
+  1，deploy_mode： 部署模式。 取值有： deploy、install、config、uninstall，设置方式： 默认deploy表示安装软件并配置服务，install只安装软件，config只更新配置服务，uninstall表示卸载。
+   
+  2，modules：需要的部署的模块。取值有：mysql、eggroll 、fate_flow、fateboard，设置方式： 单独一个，多个或者全部。例：modules: ['mysql','eggroll']
+   
+  3，roles：需要部署的某一端的角色。取值有： host、 guest、exchange，设置方式： 3个任意组合。
+  
+  4，ssl_roles： 使用证书的角色。取值有： host、 guest、exchange，设置方式： 空值或三选二。 三边部署不支持-k="host|guest"
+  
+  5，polling： polling的角色。取值有： 字典，包含服务端的角色和客户端的角色，格式： { "server_role": "exchange", "client_role": "host" }，设置方式： 空值或字典。（部署2方或者3方才支持）
+  
+  6，host_ips：host端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
+  
+  7，host_special_routes： host端额外路由。取值有： 数组，成员格式：party_id:ip:port,设置方式：可以设置零个、一个或多个。例：- 8888:192.168.1.2:9370（支持证书方式: - 8888:192.168.1.2:9371:secure），额外路由指向exchange示例为： - default:192.168.1.2:9370
+  
+  8，guest_ips：guest端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
+  
+  9，guest_special_routes： guest端额外路由。取值有： 数组，成员格式：party_id:ip:port, 设置方式： 可以设置零个、一个或多个。（支持证书方式：- 8888:192.168.1.2:9371:secure），指向exchange示例为： - default:192.168.1.2:9370
+  
+  10，exchange_ips： exchange端机器列表，取值："default:ip列表"、"rollsite:ip列表" ，设置方式： 二选一。多个exchange_ip使用|分割。
+  
+  11，exchange_special_routes：exchange端额外路由。取值有： 数组，成员格式：party_id:ip:port, 设置方式： 可以设置零个、一个或多个。（支持配置使用证书方式： - 8888:192.168.1.2:9371:secure）
+  
+  12，默认路由的设置，请参考2.4.8“路由支持”一节的介绍。
+  13，default_engines：fate使用的引擎，默认为eggroll，取值列表（eggroll、standalone、spark）
+  	
+  14，host_compute_engine：计算引擎，取值：（spark、linkis）；设置spark可启动spark配置或linkis配置，设置linkis只能启用linkis配置。
+  15，host_spark_home：spark目录，默认使用环境变量的SPARK_HOME。
+  16，host_linkis_Ips：linkis的ip，填写可开启linkis配置。
+  17，host_storage_engine：存储引擎，取值（hive、hdfs）二选一。
+  18，host_hive_ips：hive的IP地址。
+  19，host_hdfs_addr：hdfs的address地址。
+  20，host_mq_engine：需要部署的mq组件，取值（rabbitmq、pulsar）二选一。
+  21，host_rabbitmq_ips：需要部署rabbitmq的IP地址
+  22，host_pulsar_ips：需要部署pulsar的IP地址
+  23，host_nginx_ips：nginx代理IP，填写开启nginx配置
+  ```
+
 
 
 
@@ -570,6 +647,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   guest_special_routes: []
   exchange_ips: []
   exchange_special_routes: []
+  default_engines: eggroll
   ```
 
 ​      参数说明：
@@ -578,7 +656,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
 
 ​		host_special_routes：host端额外路由，一般指向exchange，数组格式：party_id:ip:port，指向exchange				例：host_special_routes: [ 'default:192.168.0.88:9370' ]
 
-​	
+​		default_engines: eggroll,默认后端引擎	
 
 - **场景2：单部署exchange**
 
@@ -609,13 +687,12 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   exchange_ips:
     - default:192.168.0.88
   exchange_special_routes: []
+  default_engines: eggroll
   ```
 
 ​		参数说明：
 
 ​		exchange_special_routes：exchange端额外路由，数组格式：party_id:ip:port，指向其他party例：					exchange_special_routes: [ '8888:192.168.2.1:9370' ]
-
-
 
 - **场景3：部署两方exchange-guest**
 
@@ -650,15 +727,79 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   exchange_ips:
     - default:192.168.0.88
   exchange_special_routes: []
+  default_engines: eggroll
   ```
 
   参数说明：
 
   ssl_roles：证书启用方
 
-  
+- **场景4：部署两方host-guest（spark）**
 
-- **场景4：部署两方host-guest**
+  命令： `sh deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1" -n=spark`
+
+  配置文件：`vim deploy/conf/setup.conf`
+
+  ```
+  env: prod
+  pname: fate
+  ssh_port: 22
+  deploy_user: app
+  deploy_group: apps
+  deploy_mode: deploy
+  modules:
+    - mysql
+    - fate_flow
+    - fateboard
+  roles:
+    - host:10000
+    - guest:9999
+  ssl_roles:
+    - host
+    - guest
+  
+  host_ips:
+    - default:192.168.0.1
+  host_special_routes: []
+  guest_ips:
+    - default:192.168.1.1
+  guest_special_routes: []
+  default_engines: spark
+  #host spark configuration information
+  #compute_engine: spark or linkis
+  host_compute_engine: spark
+  host_spark_home: ""
+  host_linkis_Ips: ""
+  #storage_engine: hive or hdfs
+  host_storage_engine: hive
+  host_hive_ips: ""
+  host_hdfs_addr: ""
+  #mq_engine: rabbitmq or pulsar
+  host_mq_engine: rabbitmq
+  host_rabbitmq_ips: ""
+  host_pulsar_ips: ""
+  #proxy
+  host_nginx_ips: ""
+  
+  #
+  #guest spark configuration information
+  #compute_engine: spark or linkis
+  guest_compute_engine: spark
+  guest_spark_home: ""
+  guest_linkis_Ips: ""
+  #storage_engine: hive or hdfs
+  guest_storage_engine: hive
+  guest_hive_ips: ""
+  guest_hdfs_addr: ""
+  #mq_engine: rabbitmq or pulsar
+  guest_mq_engine: rabbitmq
+  guest_rabbitmq_ips: ""
+  guest_pulsar_ips: ""
+  #proxy
+  guest_nginx_ips: ""
+  ```
+
+- **场景5：部署两方host-guest（非spark）**
 
   命令： `sh deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1" -k`
 
@@ -691,11 +832,10 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   guest_special_routes: []
   exchange_ips: []
   exchange_special_routes: []
+  default_engines: eggroll
   ```
-  
-  
-  
-- **场景5：部署三方host-guest-exchange**
+
+- **场景6：部署三方host-guest-exchange**
 
   命令： `sh deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1" -e="192.168.0.88" -k="host|exchange"`
 
@@ -730,8 +870,9 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   exchange_ips:
     - default:192.168.0.88
   exchange_special_routes: []
+  default_engines: eggroll
   ```
-  
+
 
 
 
@@ -876,7 +1017,6 @@ exchange:
         ip: 192.168.1.1		---party_id为9999集群下的rollsite IP
         port: 9370			---开启证书设置为9371
         is_secure: False	---开启证书设置为true，并把上面的port端口设置为9371
-
 ```
 
 
@@ -889,53 +1029,10 @@ exchange:
 vi var_files/prod/fate_host
 ```
 
-内容如下：
+- spark引擎场景配置请参考如下：
 
 ```
 host:
-  rollsite:
-    enable: True   ---true为需要部署此模块，False则否
-    partyid: 10000   ---host端partyid，根据实际规划修改
-    coordinator: fate
-    ips:			---IP列表，目前rollsite只支持部署到一台服务器
-    - 192.168.0.1
-    port: 9370	---服务端口
-    secure_port: 9371		---开启证书通讯时对外的端口
-    server_secure: False	---作为服务端，使用证书验证，开启True
-    client_secure: False	---作为客户端，使用证书验证，开启True
-    polling:		
-      enable: False		---polling设置开关，开启设置为True
-    route_tables:	---host端路由表				
-    - id: default		------本party指向exchange或者其他party的IP，端口路由配置
-      routes:
-      - name: default	---默认路由表，目前支持一个默认路由。如果有exchange，则指向exchange，如无，则指向对端party。
-        ip: 192.168.0.88	---exchange或者对端party rollsite IP
-        port: 9370		---exchange或者对端party rollsite 端口，默认9370
-        is_secure: False	---host开启证书设置为true
-    - id: 10000		---本party自身路由配置
-      routes:
-      - name: default
-        ip: 192.168.0.1	---rollsitede IP
-        port: 9370
-        is_secure: false
-      - name: fateflow
-        ip: 192.168.0.1	---fateflow IP
-        port: 9360
-  clustermanager:
-    enable: True		---true为需要部署此模块，False则否
-    ips:
-    - 192.168.0.1		---只支持部署一台主机
-    port: 4670		---服务端口
-    cores_per_node: 16	---设置cpu核数，统一为nodemanager所在机器的总cpu核数
-  nodemanager:		---可以多节点，在ips中加配置
-    enable: True		---true为需要部署此模块，False则否
-    ips:		---支持部署多台
-    - 192.168.0.1
-    - 192.168.0.x
-    port: 4671	---服务端口
-  eggroll:
-    dbname: "eggroll_meta"	---eggroll使用的数据库名，默认即可
-    egg: 4					---egg并发数可以根据附录公式计算修改
   fate_flow:
     enable: True		---true为需要部署此模块，False则否
     ips:
@@ -1032,6 +1129,93 @@ host:
     grpc_port: 9310
 ```
 
+- 非spark引擎场景配置请参考如下：
+
+```
+host:
+  rollsite:
+    enable: True   ---true为需要部署此模块，False则否
+    partyid: 10000   ---host端partyid，根据实际规划修改
+    coordinator: fate
+    ips:			---IP列表，目前rollsite只支持部署到一台服务器
+    - 192.168.0.1
+    port: 9370	---服务端口
+    secure_port: 9371		---开启证书通讯时对外的端口
+    server_secure: False	---作为服务端，使用证书验证，开启True
+    client_secure: False	---作为客户端，使用证书验证，开启True
+    polling:		
+      enable: False		---polling设置开关，开启设置为True
+    route_tables:	---host端路由表				
+    - id: default		------本party指向exchange或者其他party的IP，端口路由配置
+      routes:
+      - name: default	---默认路由表，目前支持一个默认路由。如果有exchange，则指向exchange，如无，则指向对端party。
+        ip: 192.168.0.88	---exchange或者对端party rollsite IP
+        port: 9370		---exchange或者对端party rollsite 端口，默认9370
+        is_secure: False	---host开启证书设置为true
+    - id: 10000		---本party自身路由配置
+      routes:
+      - name: default
+        ip: 192.168.0.1	---rollsitede IP
+        port: 9370
+        is_secure: false
+      - name: fateflow
+        ip: 192.168.0.1	---fateflow IP
+        port: 9360
+  clustermanager:
+    enable: True		---true为需要部署此模块，False则否
+    ips:
+    - 192.168.0.1		---只支持部署一台主机
+    port: 4670		---服务端口
+    cores_per_node: 16	---设置cpu核数，统一为nodemanager所在机器的总cpu核数
+  nodemanager:		---可以多节点，在ips中加配置
+    enable: True		---true为需要部署此模块，False则否
+    ips:		---支持部署多台
+    - 192.168.0.1
+    - 192.168.0.x
+    port: 4671	---服务端口
+  eggroll:
+    dbname: "eggroll_meta"	---eggroll使用的数据库名，默认即可
+    egg: 4					---egg并发数可以根据附录公式计算修改
+  fate_flow:
+    enable: True		---true为需要部署此模块，False则否
+    ips:
+    - 192.168.0.1		---只支持部署一台主机
+    grpcPort: 9360	---grpc服务端口
+    httpPort: 9380	---http服务端口
+    dbname: "fate_flow"	---数据库名称
+    proxy: rollsite			---可选值：rollsite|fateflow|nginx，fateflow和nginx用于spark
+    http_app_key:
+    http_secret_key:
+    use_deserialize_safe_module: false
+    default_engines: eggroll	---可选值：standalone、eggroll、spark等
+  fateboard:
+    enable: True		---true为需要部署此模块，False则否
+    ips:
+    - 192.168.0.1		---只支持部署一台主机
+    port: 8080		---服务端口
+    dbname: "fate_flow"	---数据库名称
+  mysql:
+    enable: True		---true为需要部署此模块，False则否
+    type: inside		---inside表示内部数据库，自动部署；outside表示外部数据库，不提供部署
+    ips:
+    - 192.168.0.1		---只支持部署一台主机
+    port: 3306		---服务端口
+    dbuser: "fate"	---数据库业务账号，使用外部mysql可修改此参数
+    dbpasswd: "fate_deV2999"	---数据库业务密码，使用外部mysql可修改此参数
+  zk:					---不支持部署zk，配置信息用于fateflow
+    enable: False		---true为开启zk配置信息，False则否
+    lists:			---zk集群IP列表
+    - ip: 192.168.0.1		
+      port: 2181		---zk服务端口
+    use_acl: false	---zk是否启动acl
+    user: "fate"		---acl用户
+    passwd: "fate"	---acl密码
+  servings:			---serving-server配置信息
+    ips:				---serving集群IP列表，配置host端serving
+    - 192.168.0.1
+    port: 8000		---服务端口
+```
+
 
 
 ###### 2.5.3.5 配置Guest信息
@@ -1042,7 +1226,7 @@ host:
 vi var_files/prod/fate_guest
 ```
 
-内容如下：
+- spark引擎场景配置请参考如下：
 
 ```
 guest:
@@ -1089,6 +1273,49 @@ guest:
   eggroll:
     dbname: "eggroll_meta"	---eggroll使用的数据库名，默认即可
     egg: 4					---egg并发数可以根据附录公式计算修改
+  fate_flow:
+    enable: True		---true为需要部署此模块，False则否
+    ips:
+    - 192.168.1.1		---只支持部署一台主机
+    grpcPort: 9360	---grpc服务端口
+    httpPort: 9380	---http服务端口
+    dbname: "fate_flow"	---数据库名称
+    proxy: rollsite			---可选值：rollsite|fateflow|nginx，fateflow和nginx用于spark
+    http_app_key:
+    http_secret_key:
+    use_deserialize_safe_module: false
+    default_engines: eggroll	---可选值：standalone、eggroll、spark等
+  fateboard:
+    enable: True		---true为需要部署此模块，False则否
+    ips:
+    - 192.168.1.1		---只支持部署一台主机
+    port: 8080		---服务端口
+    dbname: "fate_flow"	---数据库名称
+  mysql:
+    enable: True		---true为需要部署此模块，False则否
+    type: inside		---inside表示内部数据库，自动部署；outside表示外部数据库，不提供部署
+    ips:
+    - 192.168.1.1		---只支持部署一台主机
+    port: 3306		---服务端口
+    dbuser: "fate"	---数据库业务账号，使用外部mysql可修改此参数
+    dbpasswd: "fate_deV2999"	---数据库业务密码，使用外部mysql可修改此参数
+  zk:					---不支持部署zk，配置信息用于fateflow
+    enable: False		---true为开启zk配置信息，False则否
+    lists:			---zk集群IP列表
+    - ip: 192.168.1.1		
+      port: 2181		---zk服务端口
+    use_acl: false	---zk是否启动acl
+    user: "fate"		---acl用户
+    passwd: "fate"	---acl密码
+  servings:			---serving-server配置信息
+    ips:				---serving集群IP列表，配置guest端serving
+    - 192.168.1.1
+    port: 8000		---服务端口
+```
+
+- 非spark引擎场景配置请参考如下：
+
+```
   fate_flow:
     enable: True		---true为需要部署此模块，False则否
     ips:
@@ -1195,7 +1422,31 @@ guest:
 vi project_prod.yaml
 ```
 
-project_prod.yaml内容如下：
+spark引擎场景配置project_prod.yaml内容如下：
+
+```
+- hosts: fate
+  any_errors_fatal: True
+  vars:
+    jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
+    pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
+    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+  vars_files:
+  - var_files/prod/base_init
+  - var_files/prod/fate_init
+  - var_files/prod/fate_host
+  - var_files/prod/fate_guest
+  roles:
+  - base
+  - supervisor
+  - { role: "mysql", when: "( 'host' in deploy_roles and ansible_ssh_host in host['mysql']['ips'] and host['mysql']['enable'] == True and host['mysql']['type'] == 'inside' and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['mysql']['ips'] and guest['mysql']['enable'] == True and guest['mysql']['type'] == 'inside' and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "python", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ]  ) or ( 'host' in deploy_roles and ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "rabbitmq", when: "( 'host' in deploy_roles and ansible_ssh_host == host['rabbitmq']['host'] and host['rabbitmq']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host == guest['rabbitmq']['host'] and guest['rabbitmq']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "fateflow", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'host' in deploy_roles and ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "fateboard", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fateboard']['ips'] and host['fateboard']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fateboard']['ips'] and guest['fateboard']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+```
+
+非spark引擎场景配置project_prod.yaml内容如下：
 
 ```
 - hosts: fate
@@ -1341,6 +1592,7 @@ Usage:  /bin/bash deploy/deploy.sh init -h|-g|-e|-m|-k
          -e=ip or ips
          -m=install or uninstall
          -k=both roles of keys(eg: host|guest)
+         -n=standalone or eggroll or spark（default： eggroll）
 ```
 
 
@@ -1391,14 +1643,15 @@ vi deploy/conf/setup.conf
 
 ##### 2.6.7 检查服务
 
-​        详看2.7.1一节。
+详看2.7.1一节。
 
+##### 2.6.8 执行部署后置操作
 
+后置操作请参考： <<[部署fate集群的后置操作](action_after_deploy_fate_cluster.md)>> 一文。
 
-##### 2.6.8 执行测试
+##### 2.6.9 执行测试
 
-跑toy测试和最小化测试（详看2.7节”服务验证“）
-
+跑toy测试和最小化测试（详看2.7.2节”Toy_example部署验证“和2.7.3节“最小化测试”）
 
 
 #### 2.7 服务验证

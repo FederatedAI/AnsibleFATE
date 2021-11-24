@@ -5,7 +5,6 @@ workdir=$(cd $(dirname $0); pwd)
 base="${workdir}/.."
 cd ${workdir}
 mkdir -p ${base}/logs
-[ ! -x bin/yq ] && chmod +x bin/*
 
 pname=( $( ${workdir}/bin/yq eval '.project' ${base}/build/conf/setup.conf ) )
 
@@ -41,17 +40,8 @@ case $pname in
     fi
   ;;
 
-  "fate-cloud")
-    if [ -f "deploy-fate-cloud.sh" ]
-    then
-      /bin/bash deploy-fate-cloud.sh  ${args[*]}
-    else
-      echo "to be supported"
-    fi
-  ;;
-  
   *)
-    echo "Usage: $0 [fate|fate-serving|fate-cloud]"
+    echo "Usage: $0 [fate|fate-serving]"
   ;;
 
 esac

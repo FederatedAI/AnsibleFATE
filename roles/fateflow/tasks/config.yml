@@ -7,18 +7,18 @@
 
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/rabbitmq_route_table.yaml"
   template: src=rabbitmq_route_table.yaml.jinja dest={{pbase}}/{{pname}}/conf/rabbitmq_route_table.yaml
-  when: ( ansible_ssh_host in fate_flow["ips"] and rabbit['enable'] == True )
+  when: ( ansible_ssh_host in fate_flow["ips"] and fate_flow['default_engines'] == 'spark' and rabbit['enable'] == True )
 
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/pulsar_route_table.yaml"
   template: src=pulsar_route_table.yaml.jinja dest={{pbase}}/{{pname}}/conf/pulsar_route_table.yaml
-  when: ( ansible_ssh_host in fate_flow["ips"] and pulsar['enable'] == True )
+  when: ( ansible_ssh_host in fate_flow["ips"] and fate_flow['default_engines'] == 'spark' and pulsar['enable'] == True )
 
 - name: "modify({{deploy_mode}}): {{pbase}}/{{pname}}/python/fate_flow/settings.py"
   shell: "sed -i 's/AUTHENTICATION = False/AUTHENTICATION = True/g' {{pbase}}/{{pname}}/python/fate_flow/settings.py"
   notify:
   - reload {{pname}}-{{role_name}}
   - restart {{pname}}-{{role_name}}
-  when: ( ansible_ssh_host in fate_flow["ips"] and linkis_spark['enable'] == True )
+  when: ( ansible_ssh_host in fate_flow["ips"] and fate_flow['default_engines'] == 'spark' and linkis_spark['enable'] == True )
 
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/service_conf.yaml"
   template: src=service_conf.yaml.jinja dest={{pbase}}/{{pname}}/conf/service_conf.yaml

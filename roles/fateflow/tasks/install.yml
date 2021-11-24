@@ -69,11 +69,3 @@
   with_items:
   - "RELEASE.md"
   - "fate.env"
-
-- name: "copy({{deploy_mode}}): service_conf.yaml {{pbase}}/{{pname}}/conf/service_conf.yaml"
-  copy:
-    src: "{{item}}"
-    dest: "{{pbase}}/{{pname}}/conf/{{item}}"
-    force: no
-  with_items:
-  - "service_conf.yaml"

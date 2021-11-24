@@ -6,19 +6,27 @@
     mode: 0755
   with_items:
   - "{{tbase}}/{{pname}}"
+  - "{{tbase}}/{{pname}}/pypi/{{version}}"
+
+- name: get timestamp
+  set_fact: ntimestamp="{{ansible_date_time.epoch}}"
+
+- name: "mkdir temp directory for fate python"
+  file:
+    path: "{{tbase}}/{{pname}}/fate-python-{{ntimestamp}}"
+    state: directory
 
 - name: "copy({{deploy_mode}}): requirements.txt"
   copy:
     src: "{{item}}"
     dest: "{{tbase}}/{{pname}}/{{item}}"
   with_items:
-  - requirements.txt
-  - setuptools-50.3.2-py3-none-any.whl
+  - "requirements.txt"
+  - "{{python['must']}}"
 
 - name: "check({{deploy_mode}}): python"
   stat: path="{{cbase}}/{{python['dest']}}/bin/python"
   register: py_reg
-
 
 - name: "check({{deploy_mode}}): miniconda3 package"
   stat: path="{{tbase}}/{{pname}}/Miniconda3-{{python['version']}}-Linux-x86_64.sh"
@@ -37,19 +45,13 @@
   when: py_reg.stat.exists == False
 
 - name: "check({{deploy_mode}}): pip3 package"
-  stat: path="{{tbase}}/{{pname}}/{{python['pip']}}.tar.gz"
+  stat: path="{{tbase}}/{{pname}}/{{python['pip']}}"
   register: pp_reg
 
-- name: "copy({{deploy_mode}}): pip packages"
-  copy:
-    src: "{{python['pip']}}.tar.gz"
-    dest: "{{tbase}}/{{pname}}"
-  when: pp_reg.stat.exists == False
-
-- name: "untar({{deploy_mode}}): {{tbase}}/{{pname}}/{{python['pip']}}.tar.gz"
+- name: "untar({{deploy_mode}}): pypi.tar.gz"
   unarchive:
-    src: "{{python['pip']}}.tar.gz"
-    dest: "{{tbase}}/{{pname}}"
+    src: "pypi.tar.gz"
+    dest: "{{tbase}}/{{pname}}/pypi/{{version}}/"
   when: pp_reg.stat.exists == False
 
 - name: "check({{deploy_mode}}): {{cbase}}/{{python['dest']}}/bin/virtualenv"
@@ -90,7 +92,7 @@
 
 - name: "pip({{deploy_mode}}): venv install packages"
   pip:
-    extra_args: "-b {{tbase}}/{{pname}} --no-index --find-links={{tbase}}/{{pname}}/{{python['pip']}}"
+    extra_args: "-b {{tbase}}/{{pname}}/fate-python-{{ntimestamp}} --no-index --find-links={{tbase}}/{{pname}}/{{python['pip']}}"
     requirements: "{{tbase}}/{{pname}}/requirements.txt"
     virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
   when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
@@ -104,7 +106,10 @@
 
 - name: "pip({{deploy_mode}}): venv reinstall packages"
   pip:
-    extra_args: "-b {{tbase} --no-index --find-links={{tbase}}/{{pname}}/{{python['pip']}}"
+    extra_args: "-b {{tbase}/{{pname}}/fate-python-{{ntimestamp}} --no-index --find-links={{tbase}}/{{pname}}/{{python['pip']}}"
     requirements: "{{tbase}}/{{pname}}/requirements.txt"
     virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
   when: pip_check.stdout.find("fate_pip_check_pass") != -1
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/tools/clean_tmp.sh"
+  template: src=clean_tmp.sh.jinja dest={{pbase}}/{{pname}}/tools/clean_tmp.sh

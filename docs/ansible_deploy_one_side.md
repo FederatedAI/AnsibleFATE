@@ -80,6 +80,7 @@ exchange_ips:
 exchange_special_routes:
   - 10000:192.168.0.1:9370		//支持证书模式，在后面加上 :secure
   - 9999:192.168.1.1:9370
+default_engines: eggroll
 ```
 
 - 步骤3：执行辅助脚本产生配置
@@ -139,6 +140,19 @@ sh deploy/deploy.sh deploy
 ```
 
 查看部署日志：`tailf logs/deploy-??.log`	
+
+
+
+#### 2.6 后置操作
+
+具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.6.8一节。
+
+
+
+
+#### 2.7 服务验证与测试
+
+具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.7一节。
 
 
 
@@ -212,6 +226,7 @@ guest_ips: []
 guest_special_routes: []
 exchange_ips: []
 exchange_special_routes: []
+default_engines: eggroll
 ```
 
 - 步骤3：执行辅助脚本产生配置
@@ -313,63 +328,9 @@ host:
     ips:				
     - 192.168.0.1
     port: 8000   
-  spark:			---开启spark信息
-    enable: False
-    home:
-    cores_per_node: 20
-    nodes: 2
-  linkis_spark:		---开启linkis_spark信息
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
-  hive:
-    enable: False
-    host: 127.0.0.1
-    port: 10000
-    auth:
-    configuration:
-    kerberos_service_name:
-    username:
-    password:
-  hdfs:
-    enable: False
-    name_node: hdfs://fate-cluster
-    path_prefix:
-  rabbitmq:			---rabbitmq部署信息
-    enable: False
-    host: 192.168.0.1
-    mng_port: 12345
-    port: 5672
-    user: fate
-    password: fate
-    route_table:
-      - id: 10000
-        routes:
-          - ip: 192.168.0.1
-            port: 5672
-  pulsar:
-    enable: False
-    host: 192.168.0.1
-    port: 6650
-    mng_port: 8080
-    topic_ttl: 5
-    route_table:
-      - id: 10000
-        routes:
-          - ip: 192.168.0.1
-            port: 6650
-            sslPort: 6651
-            proxy: ""
-  nginx:
-    enable: False
-    host: 127.0.0.1
-    http_port: 9300
-    grpc_port: 9310  
 ```
+
+
 
 #### 3.5 执行部署
 
@@ -379,11 +340,17 @@ host:
 sh deploy/deploy.sh deploy
 ```
 
-查看部署日志：`tailf logs/deploy-??.log`			
+查看部署日志：`tailf logs/deploy-??.log`		
 
-### 4 服务验证与测试
+
+
+
+#### 3.6 后置操作
+
+具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.6.8一节。
+
+
+
+#### 3.7 服务验证与测试
 
 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.7一节。
-
-
-

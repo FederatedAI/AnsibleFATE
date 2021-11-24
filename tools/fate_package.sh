@@ -87,13 +87,13 @@ function_copy() {
   mv examples.tar.gz fate_examples-${version}-${minversion}.tar.gz
   mv fateflow.tar.gz fateflow-${version}-${minversion}.tar.gz
   mv fate.tar.gz fate-${version}-${minversion}.tar.gz
-  tar xf conf.tar.gz
-  cp conf/rabbitmq_route_table.yaml .
-  cp conf/service_conf.yaml .
   cp -v fateboard-${version}-${minversion}.tar.gz ${workdir}/../roles/fateboard/files/ -f
   cp -v eggroll-${eversion}-release.tar.gz ${workdir}/../roles/eggroll/files/ -f
-  cp -v fate_examples-${version}-${minversion}.tar.gz fateflow-${version}-${minversion}.tar.gz fate-${version}-${minversion}.tar.gz RELEASE.md fate.env rabbitmq_route_table.yaml service_conf.yaml ${workdir}/../roles/fateflow/files/ -f
-  cp build.tar.gz deploy.tar.gz ${workdir}/../roles/check/files/ -f
+  cp -v fate_examples-${version}-${minversion}.tar.gz fateflow-${version}-${minversion}.tar.gz fate-${version}-${minversion}.tar.gz RELEASE.md fate.env ${workdir}/../roles/fateflow/files/ -f
+  cp -v pypi.tar.gz requirements.txt ${workdir}/../roles/python/files/ -f
+  cp -v build.tar.gz deploy.tar.gz ${workdir}/../roles/check/files/ -f
+  tar xf jdk.tar.gz
+  cp -v jdk/jdk-8u192.tar.gz ${workdir}/../roles/java/files/ -f
 }
 
 function_archive() {
@@ -112,13 +112,13 @@ function_archive() {
 
 function_download() {
   mysql="mysql-8.0.13.tar.gz"
-  java="jdk-8u192.tar.gz"
-  python="fate_python-${version}.tar.gz"
+  python="fate_python.tar.gz"
   supervisor="fate_supervisor.tar.gz"
-  if [ ! -f ${workdir}/../roles/python/files/pip-packages-fate-${version}.tar.gz ]; then
+  rabbitmq="rabbitmq-server-generic-unix-3.6.15.tar"
+  if [ ! -f ${workdir}/../roles/python/files/setuptools-50.3.2-py3-none-any.whl ]; then
     echo "-------------Download python package-----------"
-    echo "wget -P ${workdir}/../roles/python/files/ ${url}/${python}"
-    wget -P ${workdir}/../roles/python/files/ ${url}/${python}
+    echo "wget -P ${workdir}/../roles/python/files/ ${url}/fate/${version}/${minversion}/${python}"
+    wget -P ${workdir}/../roles/python/files/ ${url}/fate/${version}/${minversion}/${python}
     tar xf ${workdir}/../roles/python/files/${python} -C ${workdir}/../roles/python/files/
     rm ${workdir}/../roles/python/files/${python}
   fi
@@ -127,11 +127,6 @@ function_download() {
     echo "wget -P ${workdir}/../roles/mysql/files/ ${url}/${mysql}"
     wget -P ${workdir}/../roles/mysql/files/ ${url}/${mysql}
   fi
-  if [ ! -f ${workdir}/../roles/java/files/$java ]; then
-    echo "-------------Download JDK package-----------"
-    echo "wget --tries=0 -P ${workdir}/../roles/java/files/ ${url}/${java}"
-    wget --tries=0 -P ${workdir}/../roles/java/files/ ${url}/${java}
-  fi
   if [ ! -f ${workdir}/../roles/supervisor/files/supervisord-conf-1.1.4.tar.gz ]; then
     echo "-------------Download supervisor package-----------"
     echo "wget -P ${workdir}/../roles/supervisor/files/ ${url}/${supervisor}"
@@ -139,12 +134,17 @@ function_download() {
     tar xf  ${workdir}/../roles/supervisor/files/${supervisor} -C  ${workdir}/../roles/supervisor/files/
     rm ${workdir}/../roles/supervisor/files/${supervisor}
   fi
+  if [ ! -f ${workdir}/../roles/rabbitmq/files/$rabbitmq ]; then
+    echo "-------------Download rabbitmq package-----------"
+    echo "wget -P ${workdir}/../roles/rabbitmq/files/ ${url}/${rabbitmq}"
+    wget -P ${workdir}/../roles/rabbitmq/files/ ${url}/${rabbitmq}
+  fi
 }
 
 function_check() {
   packages_md5=()
   value=`cat packages_md5.txt`
-  for name in "bin" "conf" "build" "deploy" "fate" "fateflow" "examples" "fateboard" "eggroll"
+  for name in "bin" "conf" "build" "deploy" "fate" "fateflow" "examples" "fateboard" "eggroll" "jdk" "pypi" "proxy" "python36"
   do
     package_name=$name".tar.gz"
     package_md5=`md5sum ${package_name} |awk '{print $1}'`

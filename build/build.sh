@@ -4,8 +4,6 @@
 workdir=$(cd $(dirname $0); pwd)
 cd ${workdir}
 
-[ ! -x bin/yq ] && chmod +x bin/*
-
 case $1 in
   "init")
     shift
@@ -27,24 +25,8 @@ case $1 in
         fi
       ;;
 
-      "fate-cloud")
-        if [ -f "build-fate-cloud.sh" ]; then
-          /bin/bash build-fate-cloud.sh init $@
-        else
-          echo "to be supported"
-        fi
-      ;;
-
-      "fate-studio")
-        if [ -f "build-fate-studio.sh" ]; then
-          /bin/bash build-fate-studio.sh init $@
-        else
-          echo "to be supported"
-        fi
-      ;;
-
       *)
-        echo "Usage: $0 init [fate|fate-serving|fate-cloud|fate-studio]"
+        echo "Usage: $0 init [fate|fate-serving]"
       ;;
     esac
 
@@ -64,22 +46,6 @@ case $1 in
       "fate-serving")
         if [ -f "build-fate-serving.sh" ]; then
           /bin/bash build-fate-serving.sh $1
-        else
-          echo "to be supported"
-        fi
-      ;;
-
-      "fate-cloud")
-        if [ -f "build-fate-cloud.sh" ]; then
-          /bin/bash build-fate-cloud.sh $1 
-        else
-          echo "to be supported"
-        fi
-      ;;
-
-      "fate-studio")
-        if [ -f "build-fate-studio.sh" ]; then
-          /bin/bash build-fate-studio.sh $1
         else
           echo "to be supported"
         fi
