@@ -1433,6 +1433,7 @@ def_main_process() {
 workdir=$(cd $(dirname $0); pwd)
 base="${workdir}/.."
 cd ${workdir}
+chmod a+x ./bin/*
 
 args=()
 until [ -z "$1" ]
