@@ -16,7 +16,7 @@
 
 - name: "untar: java-{{java['version']}}.tar"
   unarchive:
-    src: "{{java['name']}}-{{java['version']}}.tar"
+    src: "{{java['name']}}-{{java['version']}}.tar.gz"
     dest: "{{pbase}}/{{pname}}/{{java['path']}}"
   when: deploy_mode in [ 'deploy', 'install' ] and java_stat.stat.exists == False
 
