@@ -2,7 +2,7 @@
 
 
 def_check_setup() {
-  local cnames=( "modules" "ssl_roles" "host_ips" "host_special_routes" "guest_ips" "guest_special_routes"  )
+  local cnames=( "modules" "host_ips" "host_special_routes" "guest_ips" "guest_special_routes"  )
   for cname in ${cnames[*]};
   do
     tvar=( $( ${workdir}/bin/yq eval '.'"${cname}"'[]' ${workdir}/conf/setup.conf ) )
@@ -62,7 +62,6 @@ def_get_base_data() {
     for role in "host" "guest"; do
       eval ${role}_compute_engine\=$( ${workdir}/bin/yq eval ".${role}_compute_engine" ${workdir}/conf/setup.conf )
       eval ${role}_spark_home\=$( ${workdir}/bin/yq eval ".${role}_spark_home" ${workdir}/conf/setup.conf )
-      eval ${role}_linkis_Ips\=$( ${workdir}/bin/yq eval ".${role}_linkis_Ips" ${workdir}/conf/setup.conf )
       eval ${role}_storage_engine\=$( ${workdir}/bin/yq eval ".${role}_storage_engine" ${workdir}/conf/setup.conf )
       eval ${role}_hive_ips\=$( ${workdir}/bin/yq eval ".${role}_hive_ips" ${workdir}/conf/setup.conf )
       eval ${role}_hdfs_addr\=$( ${workdir}/bin/yq eval ".${role}_hdfs_addr" ${workdir}/conf/setup.conf )
@@ -70,7 +69,6 @@ def_get_base_data() {
       eval ${role}_rabbitmq_ips\=$( ${workdir}/bin/yq eval ".${role}_rabbitmq_ips" ${workdir}/conf/setup.conf )
       eval ${role}_pulsar_ips\=$( ${workdir}/bin/yq eval ".${role}_pulsar_ips" ${workdir}/conf/setup.conf )
       eval ${role}_nginx_ips\=$( ${workdir}/bin/yq eval ".${role}_nginx_ips" ${workdir}/conf/setup.conf )
-      eval ${role}_route_table\=\( $( ${workdir}/bin/yq eval ".${role}_route_table[]" ${workdir}/conf/setup.conf ) \)
     done
   fi
 
@@ -607,6 +605,10 @@ def_render_setup() {
       echo "error: spark no exchange"
       exit 1
     fi
+    if [ ${#ssl_roles[*]} -gt 0 ]; then
+      echo "error: Spark does not support ssl mode"
+      exit 1
+    fi
     eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
             " .deploy_mode \|\=env\(deploy_mode\) \| "\
             " .roles \|\=env\(roles\) \| "\
@@ -703,34 +705,32 @@ def_render_roles_core() {
       fi
 
       if [ "${default_engines}" == "spark" ]; then
+        eval local pid=\${${role}_pid}
+        eval local compute_engine="\${${role}_compute_engine}"
+        eval local mq_engine="\${${role}_mq_engine}"
+        eval local storage_engine="\${${role}_storage_engine}"
+        eval local rabbitmq_ips="\${${role}_rabbitmq_ips}"
+        eval local pulsar_ips="\${${role}_pulsar_ips}"
+        eval local spark_home="\${${role}_spark_home}"
+        eval local hive_ips="\${${role}_hive_ips}"
+        eval local hdfs_addr="\${${role}_hdfs_addr}"
+        eval local nginx_ips="\${${role}_nginx_ips}"
         for mq in "rabbitmq" "pulsar"; do
-          eval local temp=\${${role}_mq_engine}
-          if [ "${temp}" == "$mq" ]; then
+          if [ "${mq_engine}" == "$mq" ]; then
             eval local ${mq}_enable=true
           else
             eval local ${mq}_enable=false
           fi
         done
-        for storage in "hive" "hdfs"; do
-          eval local temp=\${${role}_storage_engine}
-          if [ "${temp}" == "${storage}" ]; then
+        for storage in "hive" "hdfs" "localfs"; do
+          if [ "${storage_engine}" == "${storage}" ]; then
             eval local ${storage}_enable=true
           else
             eval local ${storage}_enable=false
           fi
         done
-        eval local compute_engine="\${${role}_compute_engine}"
-        eval local rabbitmq_ips="\${${role}_rabbitmq_ips}"
-        eval local pulsar_ips="\${${role}_pulsar_ips}"
-        eval local spark_home="\${${role}_spark_home}"
-        eval local linkis_ips="\${${role}_linkis_Ips}"
-        eval local hive_ips="\${${role}_hive_ips}"
-        eval local hdfs_addr="\${${role}_hdfs_addr}"
-        eval local nginx_ips="\${${role}_nginx_ips}"
-        [ "${compute_engine}" == "spark" -o "${compute_engine}" == "linkis" ] && local spark_enable=true || local spark_enable=false
-        [ -n "${linkis_ips}" ] && local linkis_spark_enable=true || local linkis_spark_enable=false
+        [ "${storage_engine}" == "localfs" ] && local spark_enable=false || local spark_enable=true
         [ -n "${nginx_ips}" ] && local nginx_enable=true || local nginx_enable=false
-        eval local pid=\${${role}_pid}
         local ${role}_rabbitmq_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${rabbitmq_ips}\",\"port\":5672}]}]"
         eval local rabbitmq_routes=\'$( echo \${${role}_rabbitmq_route} | tr -s '"' '\"' | tr -s '[' '\[' | tr -s ']' '\]' )\'
         local ${role}_pulsar_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]}]"
@@ -744,8 +744,9 @@ def_render_roles_core() {
               fateboard_ips\=${fateboard_ips} \
               fate_flow_enable\=\${fate_flow_enable}  \
               fate_flow_ips\=${fate_flow_ips}  \
+              mq_engine\=${mq_engine} \
+              storage_engine\=${storage_engine} \
               spark_enable\=${spark_enable} \
-              linkis_spark_enable\=${linkis_spark_enable} \
               hive_enable\=${hive_enable} \
               hdfs_enable\=${hdfs_enable} \
               nginx_enable\=${nginx_enable} \
@@ -753,7 +754,6 @@ def_render_roles_core() {
               pulsar_enable\=${pulsar_enable} \
               rabbitmq_ips\=${rabbitmq_ips:-127.0.0.1} \
               pulsar_ips\=${pulsar_ips:-127.0.0.1} \
-              linkis_ips\=${linkis_ips:-127.0.0.1} \
               hive_ips\=${hive_ips:-127.0.0.1} \
               hdfs_addr\=${hdfs_addr} \
               nginx_ips\=${nginx_ips:-127.0.0.1} \
@@ -767,8 +767,9 @@ def_render_roles_core() {
               " .${role}.fateboard.ips\|\=env\(fateboard_ips\) \| "\
               " .${role}.fate_flow.enable\=env\(fate_flow_enable\) \| "\
               " .${role}.fate_flow.ips\|\=env\(fate_flow_ips\) \| "\
+              " .${role}.fate_flow.federation\|\=env\(mq_engine\) \|" \
+              " .${role}.fate_flow.storage\|\=env\(storage_engine\) \|" \
               " .${role}.spark.enable\|\=env\(spark_enable\) \|" \
-              " .${role}.linkis_spark.enable\|\=env\(linkis_spark_enable\) \|" \
               " .${role}.hive.enable\|\=env\(hive_enable\) \|" \
               " .${role}.hdfs.enable\|\=env\(hdfs_enable\) \|" \
               " .${role}.nginx.enable\|\=env\(nginx_enable\) \|" \
@@ -776,7 +777,6 @@ def_render_roles_core() {
               " .${role}.pulsar.enable\|\=env\(pulsar_enable\) \|" \
               " .${role}.rabbitmq.host\|\=env\(rabbitmq_ips\) \|" \
               " .${role}.pulsar.host\|\=env\(pulsar_ips\) \|" \
-              " .${role}.linkis_spark.host\|\=env\(linkis_ips\) \|" \
               " .${role}.hive.host\|\=env\(hive_ips\) \|" \
               " .${role}.hdfs.name_node\|\=strenv\(hdfs_addr\) \|" \
               " .${role}.nginx.host\|\=env\(nginx_ips\) \|" \

@@ -10,6 +10,8 @@ host:
     http_secret_key:
     use_deserialize_safe_module: false
     default_engines: spark
+    federation: rabbitmq
+    storage: hdfs
   fateboard:
     enable: false
     ips: []
@@ -39,14 +41,6 @@ host:
     home:
     cores_per_node: 20
     nodes: 2
-  linkis_spark:
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
   hive:
     enable: False
     host: 127.0.0.1
