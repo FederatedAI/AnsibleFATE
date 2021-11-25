@@ -14,9 +14,9 @@
   register: java_stat
   when: deploy_mode in [ 'deploy', 'install' ]
 
-- name: "untar: java-{{java['version']}}.tar"
+- name: "untar: java-{{java['version']}}.tar.gz"
   unarchive:
-    src: "{{java['name']}}-{{java['version']}}.tar"
+    src: "{{java['name']}}-{{java['version']}}.tar.gz"
     dest: "{{pbase}}/{{pname}}/{{java['path']}}"
   when: deploy_mode in [ 'deploy', 'install' ] and java_stat.stat.exists == False
 
