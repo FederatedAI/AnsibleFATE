@@ -314,7 +314,7 @@ FATE官方网站：https://fate.fedai.org/
   products:
   - fate
   - eggroll
-  product_fate_version: 1.7.0-release
+  product_fate_version: 1.7.0
   product_fate_versions:
     fateflow: 1.7.0-release
     fateboard: 1.7.0-release
@@ -495,7 +495,6 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   roles:
     - host:10000
     - guest:9999
-  ssl_roles: []
   
   host_ips:
     - default:192.168.0.1
@@ -506,11 +505,10 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   
   default_engines: spark
   #host spark configuration information
-  #compute_engine: spark or linkis
+  #compute_engine: spark
   host_compute_engine: spark
   host_spark_home: ""
-  host_linkis_Ips: ""
-  #storage_engine: hive or hdfs
+  #storage_engine: hive or hdfs or localfs
   host_storage_engine: hive
   host_hive_ips: ""
   host_hdfs_addr: ""
@@ -523,11 +521,10 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   
   #
   #guest spark configuration information
-  #compute_engine: spark or linkis
+  #compute_engine: spark
   guest_compute_engine: spark
   guest_spark_home: ""
-  guest_linkis_Ips: ""
-  #storage_engine: hive or hdfs
+  #storage_engine: hive or hdfs or localfs
   guest_storage_engine: hive
   guest_hive_ips: ""
   guest_hdfs_addr: ""
@@ -538,7 +535,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   #proxy
   guest_nginx_ips: ""
   ```
-
+  
 - **非spark引擎部署配置文件**
 
   文件：`deploy/conf/setup.conf`
@@ -584,7 +581,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
    
   3，roles：需要部署的某一端的角色。取值有： host、 guest、exchange，设置方式： 3个任意组合。
   
-  4，ssl_roles： 使用证书的角色。取值有： host、 guest、exchange，设置方式： 空值或三选二。 三边部署不支持-k="host|guest"
+  4，ssl_roles： 使用证书的角色。取值有： host、 guest、exchange，设置方式： 空值或三选二。 三边部署不支持-k="host|guest"；不支持spark场景
   
   5，polling： polling的角色。取值有： 字典，包含服务端的角色和客户端的角色，格式： { "server_role": "exchange", "client_role": "host" }，设置方式： 空值或字典。（部署2方或者3方才支持）
   
@@ -603,16 +600,15 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   12，默认路由的设置，请参考2.4.8“路由支持”一节的介绍。
   13，default_engines：fate使用的引擎，默认为eggroll，取值列表（eggroll、standalone、spark）
   	
-  14，host_compute_engine：计算引擎，取值：（spark、linkis）；设置spark可启动spark配置或linkis配置，设置linkis只能启用linkis配置。
+  14，host_compute_engine：计算引擎，取值：（spark）；设置spark可启动spark配置。
   15，host_spark_home：spark目录，默认使用环境变量的SPARK_HOME。
-  16，host_linkis_Ips：linkis的ip，填写可开启linkis配置。
-  17，host_storage_engine：存储引擎，取值（hive、hdfs）二选一。
-  18，host_hive_ips：hive的IP地址。
-  19，host_hdfs_addr：hdfs的address地址。
-  20，host_mq_engine：需要部署的mq组件，取值（rabbitmq、pulsar）二选一。
-  21，host_rabbitmq_ips：需要部署rabbitmq的IP地址
-  22，host_pulsar_ips：需要部署pulsar的IP地址
-  23，host_nginx_ips：nginx代理IP，填写开启nginx配置
+  16，host_storage_engine：存储引擎，取值（hive、hdfs、localfs）三选一。
+  17，host_hive_ips：hive的IP地址。
+  18，host_hdfs_addr：hdfs的address地址。
+  29，host_mq_engine：需要部署的mq组件，取值（rabbitmq、pulsar）二选一。
+  20，host_rabbitmq_ips：需要部署rabbitmq的IP地址
+  21，host_pulsar_ips：需要部署pulsar的IP地址
+  22，host_nginx_ips：nginx代理IP，填写开启nginx配置
   ```
 
 
@@ -754,9 +750,6 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   roles:
     - host:10000
     - guest:9999
-  ssl_roles:
-    - host
-    - guest
   
   host_ips:
     - default:192.168.0.1
@@ -766,11 +759,10 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   guest_special_routes: []
   default_engines: spark
   #host spark configuration information
-  #compute_engine: spark or linkis
+  #compute_engine: spark
   host_compute_engine: spark
   host_spark_home: ""
-  host_linkis_Ips: ""
-  #storage_engine: hive or hdfs
+  #storage_engine: hive or hdfs or localfs
   host_storage_engine: hive
   host_hive_ips: ""
   host_hdfs_addr: ""
@@ -783,11 +775,10 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   
   #
   #guest spark configuration information
-  #compute_engine: spark or linkis
+  #compute_engine: spark
   guest_compute_engine: spark
   guest_spark_home: ""
-  guest_linkis_Ips: ""
-  #storage_engine: hive or hdfs
+  #storage_engine: hive or hdfs or localfs
   guest_storage_engine: hive
   guest_hive_ips: ""
   guest_hdfs_addr: ""
@@ -798,7 +789,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   #proxy
   guest_nginx_ips: ""
   ```
-
+  
 - **场景5：部署两方host-guest（非spark）**
 
   命令： `sh deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1" -k`
@@ -1045,6 +1036,8 @@ host:
     http_secret_key:
     use_deserialize_safe_module: false
     default_engines: eggroll	---可选值：standalone、eggroll、spark等
+    federation: rabbitmq		---可选：rabbitmq或pulsar
+    storage: hdfs				---存储引擎：hdfs，hive和localfs
   fateboard:
     enable: True		---true为需要部署此模块，False则否
     ips:
@@ -1076,14 +1069,6 @@ host:
     home:
     cores_per_node: 20
     nodes: 2
-  linkis_spark:		---开启linkis_spark信息
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
   hive:
     enable: False
     host: 127.0.0.1
@@ -1229,6 +1214,100 @@ vi var_files/prod/fate_guest
 - spark引擎场景配置请参考如下：
 
 ```
+guest:  
+  fate_flow:
+    enable: True		---true为需要部署此模块，False则否
+    ips:
+    - 192.168.1.1		---只支持部署一台主机
+    grpcPort: 9360	---grpc服务端口
+    httpPort: 9380	---http服务端口
+    dbname: "fate_flow"	---数据库名称
+    proxy: rollsite			---可选值：rollsite|fateflow|nginx，fateflow和nginx用于spark
+    http_app_key:
+    http_secret_key:
+    use_deserialize_safe_module: false
+    default_engines: eggroll	---可选值：standalone、eggroll、spark等
+    federation: rabbitmq		---可选：rabbitmq或pulsar
+    storage: hdfs				---存储引擎：hdfs，hive和localfs
+  fateboard:
+    enable: True		---true为需要部署此模块，False则否
+    ips:
+    - 192.168.1.1		---只支持部署一台主机
+    port: 8080		---服务端口
+    dbname: "fate_flow"	---数据库名称
+  mysql:
+    enable: True		---true为需要部署此模块，False则否
+    type: inside		---inside表示内部数据库，自动部署；outside表示外部数据库，不提供部署
+    ips:
+    - 192.168.1.1		---只支持部署一台主机
+    port: 3306		---服务端口
+    dbuser: "fate"	---数据库业务账号，使用外部mysql可修改此参数
+    dbpasswd: "fate_deV2999"	---数据库业务密码，使用外部mysql可修改此参数
+  zk:					---不支持部署zk，配置信息用于fateflow
+    enable: False		---true为开启zk配置信息，False则否
+    lists:			---zk集群IP列表
+    - ip: 192.168.1.1		
+      port: 2181		---zk服务端口
+    use_acl: false	---zk是否启动acl
+    user: "fate"		---acl用户
+    passwd: "fate"	---acl密码
+  servings:			---serving-server配置信息
+    ips:				---serving集群IP列表，配置guest端serving
+    - 192.168.1.1
+    port: 8000		---服务端口
+  spark:			---开启spark信息
+    enable: False
+    home:
+    cores_per_node: 20
+    nodes: 2
+  hive:
+    enable: False
+    host: 127.0.0.1
+    port: 10000
+    auth:
+    configuration:
+    kerberos_service_name:
+    username:
+    password:
+  hdfs:
+    enable: False
+    name_node: hdfs://fate-cluster
+    path_prefix:
+  rabbitmq:			---rabbitmq部署信息
+    enable: False
+    host: 192.168.1.1
+    mng_port: 12345
+    port: 5672
+    user: fate
+    password: fate
+    route_table:
+      - id: 10000
+        routes:
+          - ip: 192.168.1.1
+            port: 5672
+  pulsar:
+    enable: False
+    host: 192.168.1.1
+    port: 6650
+    mng_port: 8080
+    topic_ttl: 5
+    route_table:
+      - id: 10000
+        routes:
+          - ip: 192.168.1.1
+            port: 6650
+            sslPort: 6651
+            proxy: ""
+  nginx:
+    enable: False
+    host: 127.0.0.1
+    http_port: 9300
+    grpc_port: 9310
+```
+
+- 非spark引擎场景配置请参考如下：
+
+```
 guest:
   rollsite:
     enable: True   ---true为需要部署此模块，False则否
@@ -1310,106 +1389,7 @@ guest:
   servings:			---serving-server配置信息
     ips:				---serving集群IP列表，配置guest端serving
     - 192.168.1.1
-    port: 8000		---服务端口
-```
-
-- 非spark引擎场景配置请参考如下：
-
-```
-  fate_flow:
-    enable: True		---true为需要部署此模块，False则否
-    ips:
-    - 192.168.1.1		---只支持部署一台主机
-    grpcPort: 9360	---grpc服务端口
-    httpPort: 9380	---http服务端口
-    dbname: "fate_flow"	---数据库名称
-    proxy: rollsite			---可选值：rollsite|fateflow|nginx，fateflow和nginx用于spark
-    http_app_key:
-    http_secret_key:
-    use_deserialize_safe_module: false
-    default_engines: eggroll	---可选值：standalone、eggroll、spark等
-  fateboard:
-    enable: True		---true为需要部署此模块，False则否
-    ips:
-    - 192.168.1.1		---只支持部署一台主机
-    port: 8080		---服务端口
-    dbname: "fate_flow"	---数据库名称
-  mysql:
-    enable: True		---true为需要部署此模块，False则否
-    type: inside		---inside表示内部数据库，自动部署；outside表示外部数据库，不提供部署
-    ips:
-    - 192.168.1.1		---只支持部署一台主机
-    port: 3306		---服务端口
-    dbuser: "fate"	---数据库业务账号，使用外部mysql可修改此参数
-    dbpasswd: "fate_deV2999"	---数据库业务密码，使用外部mysql可修改此参数
-  zk:					---不支持部署zk，配置信息用于fateflow
-    enable: False		---true为开启zk配置信息，False则否
-    lists:			---zk集群IP列表
-    - ip: 192.168.1.1		
-      port: 2181		---zk服务端口
-    use_acl: false	---zk是否启动acl
-    user: "fate"		---acl用户
-    passwd: "fate"	---acl密码
-  servings:			---serving-server配置信息
-    ips:				---serving集群IP列表，配置guest端serving
-    - 192.168.1.1
-    port: 8000		---服务端口
-  spark:			---开启spark信息
-    enable: False
-    home:
-    cores_per_node: 20
-    nodes: 2
-  linkis_spark:		---开启linkis_spark信息
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
-  hive:
-    enable: False
-    host: 127.0.0.1
-    port: 10000
-    auth:
-    configuration:
-    kerberos_service_name:
-    username:
-    password:
-  hdfs:
-    enable: False
-    name_node: hdfs://fate-cluster
-    path_prefix:
-  rabbitmq:			---rabbitmq部署信息
-    enable: False
-    host: 192.168.1.1
-    mng_port: 12345
-    port: 5672
-    user: fate
-    password: fate
-    route_table:
-      - id: 10000
-        routes:
-          - ip: 192.168.1.1
-            port: 5672
-  pulsar:
-    enable: False
-    host: 192.168.1.1
-    port: 6650
-    mng_port: 8080
-    topic_ttl: 5
-    route_table:
-      - id: 10000
-        routes:
-          - ip: 192.168.1.1
-            port: 6650
-            sslPort: 6651
-            proxy: ""
-  nginx:
-    enable: False
-    host: 127.0.0.1
-    http_port: 9300
-    grpc_port: 9310  
+    port: 8000		---服务端口    
 ```
 
 
@@ -1467,7 +1447,6 @@ spark引擎场景配置project_prod.yaml内容如下：
   - { role: "mysql", when: "( 'host' in deploy_roles and ansible_ssh_host in host['mysql']['ips'] and host['mysql']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['mysql']['ips'] and guest['mysql']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
   - { role: "python", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ]  ) or ( 'host' in deploy_roles and ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
   - { role: "eggroll", when: "( ( 'exchange' in deploy_roles and ansible_ssh_host in exchange['rollsite']['ips'] and exchange['rollsite']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or  ( 'host' in deploy_roles and ansible_ssh_host in host['rollsite']['ips'] and host['rollsite']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'host' in deploy_roles and ansible_ssh_host in host['clustermanager']['ips'] and host['clustermanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'host' in deploy_roles and ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )  or ( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['rollsite']['ips'] and guest['rollsite']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['clustermanager']['ips'] and guest['clustermanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) )" }
-  - { role: "rabbitmq", when: "( 'host' in deploy_roles and ansible_ssh_host == host['rabbitmq']['host'] and host['rabbitmq']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host == guest['rabbitmq']['host'] and guest['rabbitmq']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
   - { role: "fateflow", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'host' in deploy_roles and ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
   - { role: "fateboard", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fateboard']['ips'] and host['fateboard']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fateboard']['ips'] and guest['fateboard']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
 ```
@@ -1502,7 +1481,12 @@ ansible_become_pass=
 192.168.0.1
 ```
 
+若需在ansible本机安装且不经过ssh，则在IP后面添加 ansible_connection=local，如下
 
+```
+[fate]
+192.168.0.88 ansible_connection=local
+```
 
 
 
