@@ -247,9 +247,9 @@ vi var_files/prod/fate_host
 
 ```
 host:
+  partyid: 10000  
   rollsite:
-    enable: True   
-    partyid: 10000   
+    enable: True      
     coordinator: fate
     ips:			
     - 192.168.0.1
@@ -460,7 +460,7 @@ guest_nginx_ips: ""
 sh deploy/deploy.sh render 
 ```
 
-##### 4.4.2 配置host信息
+##### 4.4.2 配置guest信息
 
 如需要自定义高级配置，可参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.5.3一节，修改如下文件，默认可以不修改。
 
@@ -471,7 +471,8 @@ vi var_files/prod/fate_guest
 内容如下：
 
 ```
-guest:				
+guest:	
+  partyid: 9999
   fate_flow:
     enable: True		
     ips:

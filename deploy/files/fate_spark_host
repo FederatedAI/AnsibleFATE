@@ -1,4 +1,5 @@
 host:
+  partyid: 10000
   fate_flow:
     enable: false
     ips: []

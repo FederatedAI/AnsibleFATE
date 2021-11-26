@@ -124,9 +124,9 @@ vi var_files/prod/fate_guest
 
 ```
 guest:
+  partyid: 9999
   rollsite:
     enable: True   
-    partyid: 10000   
     coordinator: fate
     ips:			
     - 192.168.1.1
@@ -385,9 +385,9 @@ vi var_files/prod/fate_host
 
 ```
 host:
+  partyid: 10000
   rollsite:
-    enable: True   
-    partyid: 10000   
+    enable: True      
     coordinator: fate
     ips:			
     - 192.168.0.1
@@ -479,9 +479,9 @@ vi var_files/prod/fate_guest
 
 ```
 guest:
+  partyid: 9999
   rollsite:
-    enable: True   
-    partyid: 9999  
+    enable: True    
     coordinator: fate
     ips:			
     - 192.168.1.1
@@ -723,7 +723,8 @@ vi var_files/prod/fate_host
 内容如下：
 
 ```
-host:					
+host:
+  partyid: 10000
   fate_flow:
     enable: True		
     ips:
@@ -825,7 +826,8 @@ vi var_files/prod/fate_guest
 内容如下：
 
 ```
-guest:					
+guest:
+  partyid: 9999
   fate_flow:
     enable: True		
     ips:

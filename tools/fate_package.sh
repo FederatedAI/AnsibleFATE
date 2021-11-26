@@ -98,14 +98,15 @@ function_copy() {
 
 function_archive() {
   basedir="${workdir}/.."
-  cd $basedir/..
-  tempdir=`pwd`
+  packdir=$( cd ${basedir}; pwd )
+  tempdir=$( cd ${basedir}/..; pwd )
+  cd ${tempdir}
   if [ -n "${package_dir}" ]; then
-    tar -czf ${package_dir}/AnsibleFATE_${version}_${minversion}-offline.tar.gz --exclude=logs AnsibleFATE
+    tar czf ${package_dir}/AnsibleFATE_${version}_${minversion}-offline.tar.gz --exclude=logs ${packdir##*/}
     echo -e "\nThe fate offline  package is stored in the ${package_dir}/AnsibleFATE_${version}-${minversion}_offline.tar.gz"
   else
     mkdir -p packages
-    tar -czf packages/AnsibleFATE_${version}_${minversion}-offline.tar.gz --exclude=logs AnsibleFATE
+    tar czf packages/AnsibleFATE_${version}_${minversion}-offline.tar.gz --exclude=logs ${packdir##*/}
     echo -e "\nThe fate offline  package is stored in the ${tempdir}/packages/AnsibleFATE_${version}_${minversion}-offline.tar.gz"
   fi
 }

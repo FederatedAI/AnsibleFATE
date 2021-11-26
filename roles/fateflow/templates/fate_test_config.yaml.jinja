@@ -9,21 +9,21 @@ fate_base: {{pbase}}/{{pname}}/{{pname}}
 clean_data: true
 {% if deploy_roles|length == 1 %}
 parties:
-  guest: [{{rollsite.get('partyid',9999)}}]
-  host: [{{rollsite.get('partyid',9999)}}]
-  arbiter: [{{rollsite.get('partyid',9999)}}]
+  guest: [{{partyid}}]
+  host: [{{partyid}}]
+  arbiter: [{{partyid}}]
 services:
   - flow_services:
-      - {address: {{ansible_ssh_host}}:{{fate_flow.get('httpPort',9380)}}, parties: [{{rollsite.get('partyid',9999)}}]}
+      - {address: {{ansible_ssh_host}}:{{fate_flow.get('httpPort',9380)}}, parties: [{{partyid}}]}
 {% else %}
 parties:
-  guest: [{{rollsite.get('partyid',9999)}}]
-  host: [{{guest['rollsite'].get('partyid',9999)}},{{host['rollsite'].get('partyid',10000)}}]
-  arbiter: [{{guest['rollsite'].get('partyid',9999)}}]
+  guest: [{{partyid}}]
+  host: [{{guest.get('partyid',9999)}},{{host.get('partyid',10000)}}]
+  arbiter: [{{guest.get('partyid',9999)}}]
 services:
   - flow_services:
-      - {address: {{guest['fate_flow'].get('ips',['127.0.0.1'])[0]}}:{{guest['fate_flow'].get('httpPort',9380)}}, parties: [{{guest['rollsite'].get('partyid',9999)}}]}
-      - {address: {{host['fate_flow'].get('ips',['127.0.0.1'])[0]}}:{{host['fate_flow'].get('httpPort',9380)}}, parties: [{{host['rollsite'].get('partyid',10000)}}]}
+      - {address: {{guest['fate_flow'].get('ips',['127.0.0.1'])[0]}}:{{guest['fate_flow'].get('httpPort',9380)}}, parties: [{{guest.get('partyid',9999)}}]}
+      - {address: {{host['fate_flow'].get('ips',['127.0.0.1'])[0]}}:{{host['fate_flow'].get('httpPort',9380)}}, parties: [{{host.get('partyid',10000)}}]}
 {% endif %}
     serving_setting:
       address: 127.0.0.1:8059

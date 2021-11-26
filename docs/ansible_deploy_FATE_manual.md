@@ -604,7 +604,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   15，host_spark_home：spark目录，默认使用环境变量的SPARK_HOME。
   16，host_storage_engine：存储引擎，取值（hive、hdfs、localfs）三选一。
   17，host_hive_ips：hive的IP地址。
-  18，host_hdfs_addr：hdfs的address地址。
+  18，host_hdfs_addr：hdfs的address地址。示例：hdfs://fate-cluster
   29，host_mq_engine：需要部署的mq组件，取值（rabbitmq、pulsar）二选一。
   20，host_rabbitmq_ips：需要部署rabbitmq的IP地址
   21，host_pulsar_ips：需要部署pulsar的IP地址
@@ -941,6 +941,7 @@ ssl_roles:			---证书角色
   - host
   - exchange
 
+default_engines: eggroll	---默认后端引擎
 pname: "fate"			---项目名称
 versions:				---各服务版本号
   fateboard: 1.7.0-release
@@ -1024,6 +1025,7 @@ vi var_files/prod/fate_host
 
 ```
 host:
+  partyid: 10000   ---host端partyid，根据实际规划修改
   fate_flow:
     enable: True		---true为需要部署此模块，False则否
     ips:
@@ -1118,9 +1120,9 @@ host:
 
 ```
 host:
+  partyid: 10000   ---host端partyid，根据实际规划修改
   rollsite:
-    enable: True   ---true为需要部署此模块，False则否
-    partyid: 10000   ---host端partyid，根据实际规划修改
+    enable: True   ---true为需要部署此模块，False则否  
     coordinator: fate
     ips:			---IP列表，目前rollsite只支持部署到一台服务器
     - 192.168.0.1
@@ -1215,6 +1217,7 @@ vi var_files/prod/fate_guest
 
 ```
 guest:  
+  partyid: 9999   ---guest端partyid，根据实际规划修改
   fate_flow:
     enable: True		---true为需要部署此模块，False则否
     ips:
@@ -1309,9 +1312,9 @@ guest:
 
 ```
 guest:
+  partyid: 9999   ---guest端partyid，根据实际规划修改
   rollsite:
     enable: True   ---true为需要部署此模块，False则否
-    partyid: 9999   ---guest端partyid，根据实际规划修改
     coordinator: fate
     ips:			---IP列表，目前rollsite只支持部署到一台服务器
     - 192.168.1.1
@@ -1420,9 +1423,9 @@ spark引擎场景配置project_prod.yaml内容如下：
   - base
   - supervisor
   - { role: "mysql", when: "( 'host' in deploy_roles and ansible_ssh_host in host['mysql']['ips'] and host['mysql']['enable'] == True and host['mysql']['type'] == 'inside' and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['mysql']['ips'] and guest['mysql']['enable'] == True and guest['mysql']['type'] == 'inside' and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
-  - { role: "python", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ]  ) or ( 'host' in deploy_roles and ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "python", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ]  ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
   - { role: "rabbitmq", when: "( 'host' in deploy_roles and ansible_ssh_host == host['rabbitmq']['host'] and host['rabbitmq']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host == guest['rabbitmq']['host'] and guest['rabbitmq']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
-  - { role: "fateflow", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'host' in deploy_roles and ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "fateflow", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
   - { role: "fateboard", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fateboard']['ips'] and host['fateboard']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fateboard']['ips'] and guest['fateboard']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
 ```
 

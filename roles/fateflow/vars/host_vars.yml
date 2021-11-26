@@ -1,5 +1,6 @@
 ---
 deploy_role: "host"
+partyid: "{{ host.get('partyid',10000) }}"
 eggroll: "{{ host.get('eggroll',{}) }}"
 rollsite: "{{ host.get('rollsite',{}) }}"
 clustermanager: "{{ host.get('clustermanager',{}) }}"

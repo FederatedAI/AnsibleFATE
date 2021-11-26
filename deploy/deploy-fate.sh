@@ -495,13 +495,14 @@ def_render_fate_init() {
   local pip="pypi/${pversion}/pypi"
   local version=${pversion%-*}
   echo "hello-------------${fversion} ${eversion}"
-  myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} pip=${pip} version=${version} fversion=${fversion} bversion=${bversion} eversion=${eversion} roles=${deploy_roles} ssl_roles=${ssl_roles} pname=${pname}"
+  myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} pip=${pip} version=${version} fversion=${fversion} bversion=${bversion} eversion=${eversion} roles=${deploy_roles} ssl_roles=${ssl_roles} pname=${pname} default_engines=${default_engines}"
   eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
           " .pname \|\=env\(pname\) \| "\
           " .deploy_mode \|\=env\(deploy_mode\) \| "\
           " .deploy_modules \|\=env\(deploy_modules\) \| "\
           " .deploy_roles \|\=env\(roles\) \| "\
           " .ssl_roles \|\=env\(ssl_roles\) \| "\
+          " .default_engines\|\=env\(default_engines\) \| "\
           " .python.pip \|\=env\(pip\) \| "\
           " .version \|\=env\(version\) \| "\
           " .versions.eggroll \|\=env\(eversion\) \| "\
@@ -517,11 +518,18 @@ def_render_playbook() {
   case "${deploy_mode}" in
   
     "install"|"uninstall"|"deploy"|"config")
-      if [ "${deploy_mode}" == "uninstall" ]
-      then
-        cp ${workdir}/files/project-uninstall.yaml $dfile 
+      if [ "${deploy_mode}" == "uninstall" ]; then
+        if [ "${default_engines}" != "spark" ]; then
+          cp ${workdir}/files/project-uninstall.yaml $dfile
+        else
+          cp ${workdir}/files/spark-project-uninstall.yaml $dfile 
+        fi
       else
-        cp ${workdir}/files/project-install.yaml $dfile 
+        if [ "${default_engines}" != "spark" ]; then
+          cp ${workdir}/files/project-install.yaml $dfile
+        else
+          cp ${workdir}/files/spark-project-install.yaml $dfile 
+        fi
       fi
       sed -i 's#ENV#'"${deploy_env}"'#g;s#PNAME#'"${pname}"'#g' $dfile 
       for role in "host" "guest" "exchange";
@@ -534,10 +542,9 @@ def_render_playbook() {
       done
       
       local i=0
-      all_modules=( "mysql" "eggroll" "fateflow" "fateboard" )
-      if [ "${deploy_mode}" == "uninstall" ]
-      then
-        all_modules=( "mysql_uninstall" "eggroll_uninstall" "fateflow_uninstall" "fateboard_uninstall" )
+      [ "${default_engines}" != "spark" ] && all_modules=( "mysql" "eggroll" "fateflow" "fateboard" ) || all_modules=( "mysql" "fateflow" "fateboard" )
+      if [ "${deploy_mode}" == "uninstall" ]; then
+        [ "${default_engines}" != "spark" ] && all_modules=( "mysql_uninstall" "eggroll_uninstall" "fateflow_uninstall" "fateboard_uninstall" ) || all_modules=( "mysql_uninstall" "fateflow_uninstall" "fateboard_uninstall" )
       fi
 
       tmodules=()
@@ -563,9 +570,6 @@ def_render_playbook() {
         fi
       done 
       if [ ${deploy_mode} != "uninstall" ]; then 
-        if [ "${default_engines}" != "spark" ]; then
-          sed -i '/role: "rabbitmq",/d' $dfile
-        fi
         if [ $i -eq 2 -o "${deploy_mode}" != "deploy" ]
         then
           sed -i '/role: "python",/d' $dfile
@@ -731,13 +735,19 @@ def_render_roles_core() {
         done
         [ "${storage_engine}" == "localfs" ] && local spark_enable=false || local spark_enable=true
         [ -n "${nginx_ips}" ] && local nginx_enable=true || local nginx_enable=false
-        local ${role}_rabbitmq_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${rabbitmq_ips}\",\"port\":5672}]}]"
+        if [ ${#base_roles[*]} -eq 1 ]; then
+          [ "x" != "x${rabbitmq_ips}" ] && local ${role}_rabbitmq_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${rabbitmq_ips}\",\"port\":5672}]}]" || local ${role}_rabbitmq_route\="[]"
+          [ "x" != "x${pulsar_ips}" ] && local ${role}_pulsar_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]}]" || local ${role}_pulsar_route\="[]"
+        else
+          [ "x" != "x${rabbitmq_ips}" ] && local ${role}_rabbitmq_route\="[{\"id\":${host_pid},\"routes\":[{\"ip\":\"${host_rabbitmq_ips}\",\"port\":5672}]},{\"id\":${guest_pid},\"routes\":[{\"ip\":\"${guest_rabbitmq_ips}\",\"port\":5672}]}]" || local ${role}_rabbitmq_route\="[]"
+          [ "x" != "x${pulsar_ips}" ] && local ${role}_pulsar_route\="[{\"id\":${host_pid},\"routes\":[{\"ip\":\"${host_pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]},{\"id\":${guest_pid},\"routes\":[{\"ip\":\"${guest_pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]}]" || local ${role}_pulsar_route\="[]"
+        fi
         eval local rabbitmq_routes=\'$( echo \${${role}_rabbitmq_route} | tr -s '"' '\"' | tr -s '[' '\[' | tr -s ']' '\]' )\'
-        local ${role}_pulsar_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]}]"
         eval local pulsar_routes=\'$( echo \${${role}_pulsar_route} | tr -s '"' '\"' | tr -s '[' '\[' | tr -s ']' '\]' )\'
         eval echo "${role}_rabbitmq_route: \${${role}_rabbitmq_route}"
         eval echo "${role}_pulsar_route: \${${role}_pulsar_route}"
         myvars="${myvars} \
+              pid\=${pid}  \
               mysql_enable\=\${mysql_enable}  \
               mysql_ips\=${mysql_ips} \
               fateboard_enable\=\${fateboard_enable}  \
@@ -761,6 +771,7 @@ def_render_roles_core() {
               pulsar_routes\=\${pulsar_routes} \
               spark_home\=${spark_home} "
         eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
+              " .${role}.partyid\=env\(pid\) \| "\
               " .${role}.mysql.enable\=env\(mysql_enable\) \| "\
               " .${role}.mysql.ips\|\=env\(mysql_ips\) \| "\
               " .${role}.fateboard.enable\=env\(fateboard_enable\) \| "\
@@ -803,7 +814,7 @@ def_render_roles_core() {
               special_routes\=\${special_routes} \
               default_routes\=\${default_routes}  \
               self_routes\=\${self_routes}  \
-              rollsite_id\=\${${role}_pid} \
+              pid\=\${${role}_pid} \
               rollsite_ips\=${rollsite_ips} "
         eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
               " .${role}.rollsite.server_secure\|\=env\(server_secure\) \| "\
@@ -823,7 +834,7 @@ def_render_roles_core() {
               " .${role}.rollsite.route_tables\|\=env\(special_routes\) \| "\
               " .${role}.rollsite.route_tables \+\=env\(default_routes\) \| "\
               " .${role}.rollsite.route_tables \+\=env\(self_routes\) \| "\
-              " .${role}.rollsite.partyid\|\=env\(rollsite_id\) \| " \
+              " .${role}.partyid\|\=env\(pid\) \| " \
               " .${role}.rollsite.ips\|\=env\(rollsite_ips\) " \
            " \' ${workdir}/files/fate_${role} -I 2 -P " > ${base}/${pname:-fate}_${role}
       fi

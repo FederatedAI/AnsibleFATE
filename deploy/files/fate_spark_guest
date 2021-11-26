@@ -1,4 +1,5 @@
 guest:
+  partyid: 9999
   fate_flow:
     enable: false
     ips: []
