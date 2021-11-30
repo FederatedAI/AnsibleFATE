@@ -576,6 +576,10 @@ def_render_playbook() {
           sed -i '/role: "python",/d' $dfile
           sed -i '/role: "rabbitmq",/d' $dfile
         fi
+        if [ "${default_engines}" == "spark" -a $i -eq 1 ]; then
+          sed -i '/role: "python",/d' $dfile
+          sed -i '/role: "rabbitmq",/d' $dfile
+        fi
       fi
     ;;
 
@@ -718,8 +722,6 @@ def_render_roles_core() {
         eval local pulsar_ips="\${${role}_pulsar_ips}"
         eval local spark_home="\${${role}_spark_home}"
         eval local hadoop_home="\${${role}_hadoop_home}"
-        echo "hadoop: ${hadoop_home}"
-        echo "spark: ${spark_home}"
         eval local hive_ips="\${${role}_hive_ips}"
         eval local hdfs_addr="\${${role}_hdfs_addr}"
         eval local nginx_ips="\${${role}_nginx_ips}"
@@ -737,7 +739,7 @@ def_render_roles_core() {
             eval local ${storage}_enable=false
           fi
         done
-        [ "${storage_engine}" == "localfs" ] && local spark_enable=false || local spark_enable=true
+        [ "${compute_engine}" == "spark" ] && local spark_enable=true
         [ -n "${nginx_ips}" ] && local nginx_enable=true || local nginx_enable=false
         if [ ${#base_roles[*]} -eq 1 ]; then
           [ "x" != "x${rabbitmq_ips}" ] && local ${role}_rabbitmq_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${rabbitmq_ips}\",\"port\":5672}]}]" || local ${role}_rabbitmq_route\="[]"

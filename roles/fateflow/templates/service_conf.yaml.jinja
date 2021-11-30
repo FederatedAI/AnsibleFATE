@@ -6,7 +6,7 @@ use_registry: false
 {% if fate_flow.get('use_deserialize_safe_module',false) == true or fate_flow.get('use_deserialize_safe_module',false) == True %}
 use_deserialize_safe_module: true
 {% endif %}
-{% if fate_flow.get('default_engines','eggroll') == 'spark' %}
+{% if fate_flow.get('default_engines','eggroll') == 'spark' and spark.get('home','') != '' %}
 dependent_distribution: true
 {% else %}
 dependent_distribution: false
