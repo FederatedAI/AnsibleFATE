@@ -669,12 +669,12 @@ guest_ips:
 guest_special_routes: []
 default_engines: spark
 
-//以下信息按诗句情况填写，包括计算引擎、存储引擎和mq
+//以下信息按实际情况填写，包括计算引擎、存储引擎和mq
 #host spark configuration information
 #compute_engine: spark
 host_compute_engine: spark
 host_spark_home: ""
-host_linkis_Ips: ""
+host_hadoop_home: ""
 #storage_engine: hive or hdfs or localfs
 host_storage_engine: hive
 host_hive_ips: "192.168.0.1"
@@ -691,7 +691,7 @@ host_nginx_ips: "192.168.0.1"
 #compute_engine: spark
 guest_compute_engine: spark
 guest_spark_home: ""
-guest_linkis_Ips: ""
+guest_hadoop_home: ""
 #storage_engine: hive or hdfs or localfs
 guest_storage_engine: hive
 guest_hive_ips: "192.168.1.1"
@@ -768,6 +768,7 @@ host:
   spark:			---开启spark信息
     enable: True
     home:
+    hadoop_home:
     cores_per_node: 20
     nodes: 2
   hive:
@@ -871,6 +872,7 @@ guest:
   spark:			---开启spark信息
     enable: True
     home:
+    hadoop_home:
     cores_per_node: 20
     nodes: 2
   hive:

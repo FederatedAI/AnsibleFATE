@@ -113,3 +113,7 @@
 
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/tools/clean_tmp.sh"
   template: src=clean_tmp.sh.jinja dest={{pbase}}/{{pname}}/tools/clean_tmp.sh
+
+- name: "spark miniconda install"
+  include_tasks: spark_miniconda.yml
+  when: default_engines == 'spark'

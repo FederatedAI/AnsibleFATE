@@ -25,7 +25,7 @@ tports=()
 
 for oport in ${open_ports[*]}; do
 {% for role in deploy_roles %}
-{% if role == 'host' and ( ansible_ssh_host in host['fate_flow']['ips'] or ansible_ssh_host in host['mysql']['ips'] or ansible_ssh_host in host['fateboard']['ips'] ) %}
+{% if role == 'host' and ( ansible_ssh_host in host['fate_flow']['ips'] or ansible_ssh_host in host['mysql']['ips'] or ansible_ssh_host in host['fateboard']['ips'] or ansible_ssh_host == host['rabbitmq']['host'] ) %}
 {% if host['mysql']['type'] != 'inside' %}
 {% raw %}
   for ((i=0;i<${#check_arg[*]};i++)); do
@@ -38,7 +38,7 @@ for oport in ${open_ports[*]}; do
   done
 {% endif %}
   for port in "fate_flow:{{host['fate_flow'].get('grpcPort',9360)}}" "fate_flow:{{host['fate_flow'].get('httpPort',9380)}}" "mysql:{{host['mysql'].get('port',3306)}}" "fateboard:{{host['fateboard'].get('port',8080)}}";
-{% elif role == 'guest' and ( ansible_ssh_host in guest['fate_flow']['ips'] or ansible_ssh_host in guest['mysql']['ips'] or ansible_ssh_host in guest['fateboard']['ips'] ) %}
+{% elif role == 'guest' and ( ansible_ssh_host in guest['fate_flow']['ips'] or ansible_ssh_host in guest['mysql']['ips'] or ansible_ssh_host in guest['fateboard']['ips'] or ansible_ssh_host == guest['rabbitmq']['host'] ) %}
 {% if guest['mysql']['type'] != 'inside' %}
 {% raw %}
   for ((i=0;i<${#check_arg[*]};i++)); do
@@ -51,8 +51,6 @@ for oport in ${open_ports[*]}; do
   done
 {% endif %}
   for port in "fate_flow:{{guest['fate_flow'].get('grpcPort',9360)}}" "fate_flow:{{guest['fate_flow'].get('httpPort',9380)}}" "mysql:{{guest['mysql'].get('port',3306)}}" "fateboard:{{guest['fateboard'].get('port',8080)}}";
-{% elif role == 'exchange' and ansible_ssh_host in exchange['rollsite']['ips']  %}
-  for port in "eggroll:{{exchange['rollsite'].get('port',9370)}}";
 {% endif %}
 {% endfor %}
   do

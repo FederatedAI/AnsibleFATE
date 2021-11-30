@@ -1,0 +1,17 @@
+- name: "check({{deploy_mode}}): python"
+  stat: path="{{pbase}}/{{pname}}/common/{{python['dest']}}/bin/python"
+  register: spy_reg
+
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/common"
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: 0755
+  with_items:
+  - "{{pbase}}/{{pname}}/common"
+
+- name: "commit({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+  shell: "/bin/bash ./Miniconda3-{{python['version']}}-Linux-x86_64.sh  -b -p {{pbase}}/{{pname}}/common/{{python['dest']}}"
+  args:
+    chdir: "{{tbase}}/{{pname}}"
+  when: spy_reg.stat.exists == False

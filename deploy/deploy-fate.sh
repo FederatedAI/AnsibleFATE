@@ -62,6 +62,7 @@ def_get_base_data() {
     for role in "host" "guest"; do
       eval ${role}_compute_engine\=$( ${workdir}/bin/yq eval ".${role}_compute_engine" ${workdir}/conf/setup.conf )
       eval ${role}_spark_home\=$( ${workdir}/bin/yq eval ".${role}_spark_home" ${workdir}/conf/setup.conf )
+      eval ${role}_hadoop_home\=$( ${workdir}/bin/yq eval ".${role}_hadoop_home" ${workdir}/conf/setup.conf )
       eval ${role}_storage_engine\=$( ${workdir}/bin/yq eval ".${role}_storage_engine" ${workdir}/conf/setup.conf )
       eval ${role}_hive_ips\=$( ${workdir}/bin/yq eval ".${role}_hive_ips" ${workdir}/conf/setup.conf )
       eval ${role}_hdfs_addr\=$( ${workdir}/bin/yq eval ".${role}_hdfs_addr" ${workdir}/conf/setup.conf )
@@ -716,6 +717,9 @@ def_render_roles_core() {
         eval local rabbitmq_ips="\${${role}_rabbitmq_ips}"
         eval local pulsar_ips="\${${role}_pulsar_ips}"
         eval local spark_home="\${${role}_spark_home}"
+        eval local hadoop_home="\${${role}_hadoop_home}"
+        echo "hadoop: ${hadoop_home}"
+        echo "spark: ${spark_home}"
         eval local hive_ips="\${${role}_hive_ips}"
         eval local hdfs_addr="\${${role}_hdfs_addr}"
         eval local nginx_ips="\${${role}_nginx_ips}"
@@ -757,6 +761,7 @@ def_render_roles_core() {
               mq_engine\=${mq_engine} \
               storage_engine\=${storage_engine} \
               spark_enable\=${spark_enable} \
+              hadoop_home\=${hadoop_home} \
               hive_enable\=${hive_enable} \
               hdfs_enable\=${hdfs_enable} \
               nginx_enable\=${nginx_enable} \
@@ -781,6 +786,7 @@ def_render_roles_core() {
               " .${role}.fate_flow.federation\|\=env\(mq_engine\) \|" \
               " .${role}.fate_flow.storage\|\=env\(storage_engine\) \|" \
               " .${role}.spark.enable\|\=env\(spark_enable\) \|" \
+              " .${role}.spark.hadoop_home\|\=strenv\(hadoop_home\) \|" \
               " .${role}.hive.enable\|\=env\(hive_enable\) \|" \
               " .${role}.hdfs.enable\|\=env\(hdfs_enable\) \|" \
               " .${role}.nginx.enable\|\=env\(nginx_enable\) \|" \

@@ -28,3 +28,6 @@ export FATE_PROFILE_LOG_ENABLED=0
 export JAVA_HOME={{jbase}}
 export PATH=$PATH:$JAVA_HOME/bin
 export EGGROLL_LOG_LEVEL=INFO
+{% if default_engines == 'spark' %}
+export HADOOP_HOME={{spark['hadoop_home']}}
+{% endif %}

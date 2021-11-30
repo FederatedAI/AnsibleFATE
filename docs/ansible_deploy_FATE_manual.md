@@ -508,6 +508,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   #compute_engine: spark
   host_compute_engine: spark
   host_spark_home: ""
+  host_hadoop_home: ""
   #storage_engine: hive or hdfs or localfs
   host_storage_engine: hive
   host_hive_ips: ""
@@ -524,6 +525,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   #compute_engine: spark
   guest_compute_engine: spark
   guest_spark_home: ""
+  guest_hadoop_home: ""
   #storage_engine: hive or hdfs or localfs
   guest_storage_engine: hive
   guest_hive_ips: ""
@@ -602,13 +604,14 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   	
   14，host_compute_engine：计算引擎，取值：（spark）；设置spark可启动spark配置。
   15，host_spark_home：spark目录，默认使用环境变量的SPARK_HOME。
-  16，host_storage_engine：存储引擎，取值（hive、hdfs、localfs）三选一。
-  17，host_hive_ips：hive的IP地址。
-  18，host_hdfs_addr：hdfs的address地址。示例：hdfs://fate-cluster
-  29，host_mq_engine：需要部署的mq组件，取值（rabbitmq、pulsar）二选一。
-  20，host_rabbitmq_ips：需要部署rabbitmq的IP地址
-  21，host_pulsar_ips：需要部署pulsar的IP地址
-  22，host_nginx_ips：nginx代理IP，填写开启nginx配置
+  16，host_hadoop_home: hadoop服务目录
+  17，host_storage_engine：存储引擎，取值（hive、hdfs、localfs）三选一。
+  18，host_hive_ips：hive的IP地址。
+  19，host_hdfs_addr：hdfs的address地址。示例：hdfs://fate-cluster
+  20，host_mq_engine：需要部署的mq组件，取值（rabbitmq、pulsar）二选一。
+  21，host_rabbitmq_ips：需要部署rabbitmq的IP地址
+  22，host_pulsar_ips：需要部署pulsar的IP地址
+  23，host_nginx_ips：nginx代理IP，填写开启nginx配置
   ```
 
 
@@ -762,6 +765,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   #compute_engine: spark
   host_compute_engine: spark
   host_spark_home: ""
+  host_hadoop_home: ""
   #storage_engine: hive or hdfs or localfs
   host_storage_engine: hive
   host_hive_ips: ""
@@ -778,6 +782,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   #compute_engine: spark
   guest_compute_engine: spark
   guest_spark_home: ""
+  guest_hadoop_home: ""
   #storage_engine: hive or hdfs or localfs
   guest_storage_engine: hive
   guest_hive_ips: ""
@@ -1069,6 +1074,7 @@ host:
   spark:			---开启spark信息
     enable: False
     home:
+    hadoop_home:
     cores_per_node: 20
     nodes: 2
   hive:
@@ -1261,6 +1267,7 @@ guest:
   spark:			---开启spark信息
     enable: False
     home:
+    hadoop_home:
     cores_per_node: 20
     nodes: 2
   hive:

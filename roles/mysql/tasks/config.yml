@@ -44,7 +44,8 @@
     dest: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conf/my.cnf"
   notify:
   - reload {{pname}}-{{role_name}}
-  - restart {{pname}}-{{role_name}}
+  - stop {{pname}}-{{role_name}}
+  - start {{pname}}-{{role_name}}
 
 - name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-{{role_name}}.conf"
   template: src=supervisor.d/{{role_name}}.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-{{role_name}}.conf
@@ -52,7 +53,8 @@
     service: "{{supervisord['service']}}"
   notify:
   - reload {{pname}}-{{role_name}}
-  - restart {{pname}}-{{role_name}}
+  - stop {{pname}}-{{role_name}}
+  - start {{pname}}-{{role_name}}
 
 - name: "flush_handlers"
   meta: flush_handlers

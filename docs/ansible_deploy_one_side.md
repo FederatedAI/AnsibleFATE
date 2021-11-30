@@ -427,6 +427,7 @@ default_engines: spark
 #compute_engine: spark
 host_compute_engine: spark
 host_spark_home: ""
+host_hadoop_home: ""
 #storage_engine: hive or hdfs or localfs
 host_storage_engine: hive
 host_hive_ips: ""
@@ -442,6 +443,7 @@ host_nginx_ips: ""
 #compute_engine: spark
 guest_compute_engine: spark
 guest_spark_home: ""
+guest_hadoop_home: ""
 #storage_engine: hive or hdfs or localfs
 guest_storage_engine: hive
 guest_hive_ips: ""
@@ -516,6 +518,7 @@ guest:
   spark:
     enable: true
     home:
+    hadoop_home:
     cores_per_node: 20
     nodes: 2
   hive:

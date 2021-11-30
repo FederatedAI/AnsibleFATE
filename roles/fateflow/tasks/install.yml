@@ -49,16 +49,16 @@
     path: "{{lbase}}/{{pname}}/{{role_name}}"
     state: directory
 
-- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/logs"
+- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/logs"
   file:
-    path: "{{pbase}}/{{pname}}/logs"
+    path: "{{pbase}}/{{pname}}/{{role_name}}/logs"
     state: absent
   when: flow_stat.stat.exists == False
 
 - name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/{{role_name}}"
   file:
     src: "{{lbase}}/{{pname}}/{{role_name}}"
-    dest: "{{pbase}}/{{pname}}/logs"
+    dest: "{{pbase}}/{{pname}}/{{role_name}}/logs"
     state: link
   when: flow_stat.stat.exists == False
 

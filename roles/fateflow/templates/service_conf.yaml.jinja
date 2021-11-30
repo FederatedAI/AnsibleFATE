@@ -6,7 +6,11 @@ use_registry: false
 {% if fate_flow.get('use_deserialize_safe_module',false) == true or fate_flow.get('use_deserialize_safe_module',false) == True %}
 use_deserialize_safe_module: true
 {% endif %}
+{% if fate_flow.get('default_engines','eggroll') == 'spark' %}
+dependent_distribution: true
+{% else %}
 dependent_distribution: false
+{% endif %}
 fateflow:
   host: {{fate_flow.get('ips',['127.0.0.1'])[0]}}
   http_port: {{fate_flow.get('httpPort',9380)}}
@@ -33,9 +37,9 @@ fateflow:
     grpc_port: {{fate_flow.get('grpcPort',9360)}}
 {% else %}
   proxy: {{fate_flow.get('proxy','rollsite')}}
+{% endif %}
   # support default/http/grpc
   protocol: default
-{% endif %}
 database:
   name: {{fate_flow.get('dbname','fate_flow')}}
   user: {{db.get('dbuser','fate')}}
