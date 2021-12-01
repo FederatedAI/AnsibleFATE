@@ -32,50 +32,32 @@
   template:
     src: "check.sh.jinja"
     dest: "{{pbase}}/{{pname}}/tools/check.sh"
-  when: deploy_mode in [ 'deploy', 'install' ]
+  when: deploy_mode in [ 'deploy', 'install' ] and default_engines != 'spark'
 
-- name: "copy({{deploy_mode}}): check.sh"
+- name: "update({{deploy_mode}}): check.sh(spark)"
+  template:
+    src: "spark_check.sh.jinja"
+    dest: "{{pbase}}/{{pname}}/tools/check.sh"
+  when: deploy_mode in [ 'deploy', 'install' ] and default_engines == 'spark'
+
+- name: "copy({{deploy_mode}}): makeVirtualDisk.sh"
   copy:
     src: "{{item}}" 
     dest: "{{pbase}}/{{pname}}/tools/{{item}}"
   with_items:
   - makeVirtualDisk.sh
   when: deploy_mode in [ 'deploy', 'install' ]
-
-- name: "copy({{deploy_mode}}): check.sh"
-  copy:
-    src: "{{item}}" 
-    dest: "{{pbase}}/{{pname}}/tools/{{item}}"
-  with_items:
-  - ucheck.sh
-  - makeVirtualDisk.sh
-  when: deploy_mode == "update"
 
 - name: "check({{deploy_mode}}): doing"
   command: "/bin/bash {{pbase}}/{{pname}}/tools/check.sh"
   when: deploy_mode in [ 'deploy', 'install' ]
   register: checkOutputInstall
 
-- name: "check({{deploy_mode}}): doing"
-  command: "/bin/bash {{pbase}}/{{pname}}/tools/ucheck.sh"
-  when: deploy_mode == "update"
-  register: checkOutputUpdate
-
 - name: "output({{deploy_mode}}): check results"
   debug: msg={{checkOutputInstall.stdout_lines}} 
   when: deploy_mode in [ 'deploy', 'install' ]
-
-- name: "output({{deploy_mode}}): check results"
-  debug: msg={{checkOutputUpdate.stdout_lines}} 
-  when: deploy_mode == "update"
 
 - name: "Waring({{deploy_mode}}):"
   fail:
     msg: "Please fix the above Warning first"
   when: 'deploy_mode in [ "deploy", "install" ] and "Warning" in checkOutputInstall.stdout and envCheck == True'
-
-- name: "Waring({{deploy_mode}}):"
-  fail:
-    msg: "Please fix the above Warning first"
-  when: 'deploy_mode == "update" and "Warning" in checkOutputUpdate.stdout and envCheck == True'
-

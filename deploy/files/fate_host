@@ -1,7 +1,7 @@
 host:
+  partyid: 10000
   rollsite:
     enable: false
-    partyid: 10000
     coordinator: fate
     ips: []
     port: 9370

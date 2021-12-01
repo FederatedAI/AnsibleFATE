@@ -1,7 +1,7 @@
 guest:
+  partyid: 9999
   rollsite:
     enable: false
-    partyid: 9999
     coordinator: fate
     ips: []
     port: 9370

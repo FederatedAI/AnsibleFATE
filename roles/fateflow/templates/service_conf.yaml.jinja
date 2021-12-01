@@ -6,7 +6,11 @@ use_registry: false
 {% if fate_flow.get('use_deserialize_safe_module',false) == true or fate_flow.get('use_deserialize_safe_module',false) == True %}
 use_deserialize_safe_module: true
 {% endif %}
+{% if fate_flow.get('default_engines','eggroll') == 'spark' and spark.get('home','') != '' %}
+dependent_distribution: true
+{% else %}
 dependent_distribution: false
+{% endif %}
 fateflow:
   host: {{fate_flow.get('ips',['127.0.0.1'])[0]}}
   http_port: {{fate_flow.get('httpPort',9380)}}
@@ -33,9 +37,9 @@ fateflow:
     grpc_port: {{fate_flow.get('grpcPort',9360)}}
 {% else %}
   proxy: {{fate_flow.get('proxy','rollsite')}}
+{% endif %}
   # support default/http/grpc
   protocol: default
-{% endif %}
 database:
   name: {{fate_flow.get('dbname','fate_flow')}}
   user: {{db.get('dbuser','fate')}}
@@ -80,11 +84,11 @@ fate_on_standalone:
   standalone:
     cores_per_node: 20
     nodes: 1
-{% else %}
+{% elif fate_flow.get('default_engines','eggroll') == 'spark' %}
 default_engines:
   computing: {{fate_flow['default_engines']}}
-  federation: {{fate_flow['default_engines']}}
-  storage: {{fate_flow['default_engines']}}
+  federation: {{fate_flow['federation']}}
+  storage: {{fate_flow['storage']}}
 fate_on_spark:
 {% endif %}
 {% if spark.get('enable',False) == True %}
@@ -93,18 +97,6 @@ fate_on_spark:
     cores_per_node: {{spark.get('cores_per_node',20)}}
     nodes: {{spark.get('nodes',2)}}
 {% endif %}
-{% if linkis_spark.get('enable',False) == True %}
-  linkis_spark:
-    cores_per_node: {{linkis_spark.get('cores_per_node',20)}}
-    nodes: {{linkis_spark.get('nodes',2)}}
-    host: {{linkis_spark.get('host','127.0.0.1')}}
-    port: {{linkis_spark.get('port',9001)}}
-    token_code: {{linkis_spark.get('token_code','MLSS')}}
-    python_path: {{linkis_spark.get('python_path','/data/projects/fate/python')}}
-  linkis_hive:
-    host: {{linkis_spark.get('host','127.0.0.1')}}
-    port: 9001
-{% endif %} 
 {% if hive.get('enable',False) == True %}
   hive:
     host: {{hive.get('host','127.0.0.1')}}
@@ -121,7 +113,7 @@ fate_on_spark:
     path_prefix: {{hdfs.get('path_prefix','')}}
 {% endif %}
 {% if rabbit.get('enable',False) == True %}
-  rabbit:
+  rabbitmq:
     host: {{rabbit.get('host','192.168.0.1')}}
     mng_port: {{rabbit.get('mng_port',12345)}}
     port: {{rabbit.get('port',5672)}}

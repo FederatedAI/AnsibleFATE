@@ -124,9 +124,9 @@ vi var_files/prod/fate_guest
 
 ```
 guest:
+  partyid: 9999
   rollsite:
     enable: True   
-    partyid: 10000   
     coordinator: fate
     ips:			
     - 192.168.1.1
@@ -385,9 +385,9 @@ vi var_files/prod/fate_host
 
 ```
 host:
+  partyid: 10000
   rollsite:
-    enable: True   
-    partyid: 10000   
+    enable: True      
     coordinator: fate
     ips:			
     - 192.168.0.1
@@ -479,9 +479,9 @@ vi var_files/prod/fate_guest
 
 ```
 guest:
+  partyid: 9999
   rollsite:
-    enable: True   
-    partyid: 9999  
+    enable: True    
     coordinator: fate
     ips:			
     - 192.168.1.1
@@ -669,13 +669,13 @@ guest_ips:
 guest_special_routes: []
 default_engines: spark
 
-//以下信息按诗句情况填写，包括计算引擎、存储引擎和mq
+//以下信息按实际情况填写，包括计算引擎、存储引擎和mq
 #host spark configuration information
-#compute_engine: spark or linkis
+#compute_engine: spark
 host_compute_engine: spark
 host_spark_home: ""
-host_linkis_Ips: ""
-#storage_engine: hive or hdfs
+host_hadoop_home: ""
+#storage_engine: hive or hdfs or localfs
 host_storage_engine: hive
 host_hive_ips: "192.168.0.1"
 host_hdfs_addr: ""
@@ -688,11 +688,11 @@ host_nginx_ips: "192.168.0.1"
 
 #
 #guest spark configuration information
-#compute_engine: spark or linkis
+#compute_engine: spark
 guest_compute_engine: spark
 guest_spark_home: ""
-guest_linkis_Ips: ""
-#storage_engine: hive or hdfs
+guest_hadoop_home: ""
+#storage_engine: hive or hdfs or localfs
 guest_storage_engine: hive
 guest_hive_ips: "192.168.1.1"
 guest_hdfs_addr: ""
@@ -723,7 +723,8 @@ vi var_files/prod/fate_host
 内容如下：
 
 ```
-host:					
+host:
+  partyid: 10000
   fate_flow:
     enable: True		
     ips:
@@ -736,6 +737,8 @@ host:
     http_secret_key:
     use_deserialize_safe_module: false
     default_engines: spark
+    federation: rabbitmq
+    storage: hdfs
   fateboard:
     enable: True		
     ips:
@@ -765,16 +768,9 @@ host:
   spark:			---开启spark信息
     enable: True
     home:
+    hadoop_home:
     cores_per_node: 20
     nodes: 2
-  linkis_spark:		---开启linkis_spark信息
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
   hive:
     enable: True
     host: 192.168.0.1
@@ -831,7 +827,8 @@ vi var_files/prod/fate_guest
 内容如下：
 
 ```
-guest:					
+guest:
+  partyid: 9999
   fate_flow:
     enable: True		
     ips:
@@ -844,6 +841,8 @@ guest:
     http_secret_key:
     use_deserialize_safe_module: false
     default_engines: spark
+    federation: rabbitmq
+    storage: hdfs
   fateboard:
     enable: True		
     ips:
@@ -873,16 +872,9 @@ guest:
   spark:			---开启spark信息
     enable: True
     home:
+    hadoop_home:
     cores_per_node: 20
     nodes: 2
-  linkis_spark:		---开启linkis_spark信息
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
   hive:
     enable: True
     host: 192.168.1.1
@@ -951,6 +943,7 @@ sh deploy/deploy.sh deploy
 #### 4.7 服务验证与测试
 
 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.7一节。
+特别说明： 使用spark引擎的场景目前**不支持**进行2.7.2节的 Toy_example部署验证
 
 
 

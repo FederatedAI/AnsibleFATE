@@ -2,7 +2,7 @@
 
 
 def_check_setup() {
-  local cnames=( "modules" "ssl_roles" "host_ips" "host_special_routes" "guest_ips" "guest_special_routes"  )
+  local cnames=( "modules" "host_ips" "host_special_routes" "guest_ips" "guest_special_routes"  )
   for cname in ${cnames[*]};
   do
     tvar=( $( ${workdir}/bin/yq eval '.'"${cname}"'[]' ${workdir}/conf/setup.conf ) )
@@ -62,7 +62,7 @@ def_get_base_data() {
     for role in "host" "guest"; do
       eval ${role}_compute_engine\=$( ${workdir}/bin/yq eval ".${role}_compute_engine" ${workdir}/conf/setup.conf )
       eval ${role}_spark_home\=$( ${workdir}/bin/yq eval ".${role}_spark_home" ${workdir}/conf/setup.conf )
-      eval ${role}_linkis_Ips\=$( ${workdir}/bin/yq eval ".${role}_linkis_Ips" ${workdir}/conf/setup.conf )
+      eval ${role}_hadoop_home\=$( ${workdir}/bin/yq eval ".${role}_hadoop_home" ${workdir}/conf/setup.conf )
       eval ${role}_storage_engine\=$( ${workdir}/bin/yq eval ".${role}_storage_engine" ${workdir}/conf/setup.conf )
       eval ${role}_hive_ips\=$( ${workdir}/bin/yq eval ".${role}_hive_ips" ${workdir}/conf/setup.conf )
       eval ${role}_hdfs_addr\=$( ${workdir}/bin/yq eval ".${role}_hdfs_addr" ${workdir}/conf/setup.conf )
@@ -70,7 +70,6 @@ def_get_base_data() {
       eval ${role}_rabbitmq_ips\=$( ${workdir}/bin/yq eval ".${role}_rabbitmq_ips" ${workdir}/conf/setup.conf )
       eval ${role}_pulsar_ips\=$( ${workdir}/bin/yq eval ".${role}_pulsar_ips" ${workdir}/conf/setup.conf )
       eval ${role}_nginx_ips\=$( ${workdir}/bin/yq eval ".${role}_nginx_ips" ${workdir}/conf/setup.conf )
-      eval ${role}_route_table\=\( $( ${workdir}/bin/yq eval ".${role}_route_table[]" ${workdir}/conf/setup.conf ) \)
     done
   fi
 
@@ -497,13 +496,14 @@ def_render_fate_init() {
   local pip="pypi/${pversion}/pypi"
   local version=${pversion%-*}
   echo "hello-------------${fversion} ${eversion}"
-  myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} pip=${pip} version=${version} fversion=${fversion} bversion=${bversion} eversion=${eversion} roles=${deploy_roles} ssl_roles=${ssl_roles} pname=${pname}"
+  myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} pip=${pip} version=${version} fversion=${fversion} bversion=${bversion} eversion=${eversion} roles=${deploy_roles} ssl_roles=${ssl_roles} pname=${pname} default_engines=${default_engines}"
   eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
           " .pname \|\=env\(pname\) \| "\
           " .deploy_mode \|\=env\(deploy_mode\) \| "\
           " .deploy_modules \|\=env\(deploy_modules\) \| "\
           " .deploy_roles \|\=env\(roles\) \| "\
           " .ssl_roles \|\=env\(ssl_roles\) \| "\
+          " .default_engines\|\=env\(default_engines\) \| "\
           " .python.pip \|\=env\(pip\) \| "\
           " .version \|\=env\(version\) \| "\
           " .versions.eggroll \|\=env\(eversion\) \| "\
@@ -519,11 +519,18 @@ def_render_playbook() {
   case "${deploy_mode}" in
   
     "install"|"uninstall"|"deploy"|"config")
-      if [ "${deploy_mode}" == "uninstall" ]
-      then
-        cp ${workdir}/files/project-uninstall.yaml $dfile 
+      if [ "${deploy_mode}" == "uninstall" ]; then
+        if [ "${default_engines}" != "spark" ]; then
+          cp ${workdir}/files/project-uninstall.yaml $dfile
+        else
+          cp ${workdir}/files/spark-project-uninstall.yaml $dfile 
+        fi
       else
-        cp ${workdir}/files/project-install.yaml $dfile 
+        if [ "${default_engines}" != "spark" ]; then
+          cp ${workdir}/files/project-install.yaml $dfile
+        else
+          cp ${workdir}/files/spark-project-install.yaml $dfile 
+        fi
       fi
       sed -i 's#ENV#'"${deploy_env}"'#g;s#PNAME#'"${pname}"'#g' $dfile 
       for role in "host" "guest" "exchange";
@@ -536,10 +543,9 @@ def_render_playbook() {
       done
       
       local i=0
-      all_modules=( "mysql" "eggroll" "fateflow" "fateboard" )
-      if [ "${deploy_mode}" == "uninstall" ]
-      then
-        all_modules=( "mysql_uninstall" "eggroll_uninstall" "fateflow_uninstall" "fateboard_uninstall" )
+      [ "${default_engines}" != "spark" ] && all_modules=( "mysql" "eggroll" "fateflow" "fateboard" ) || all_modules=( "mysql" "fateflow" "fateboard" )
+      if [ "${deploy_mode}" == "uninstall" ]; then
+        [ "${default_engines}" != "spark" ] && all_modules=( "mysql_uninstall" "eggroll_uninstall" "fateflow_uninstall" "fateboard_uninstall" ) || all_modules=( "mysql_uninstall" "fateflow_uninstall" "fateboard_uninstall" )
       fi
 
       tmodules=()
@@ -565,11 +571,12 @@ def_render_playbook() {
         fi
       done 
       if [ ${deploy_mode} != "uninstall" ]; then 
-        if [ "${default_engines}" != "spark" ]; then
-          sed -i '/role: "rabbitmq",/d' $dfile
-        fi
         if [ $i -eq 2 -o "${deploy_mode}" != "deploy" ]
         then
+          sed -i '/role: "python",/d' $dfile
+          sed -i '/role: "rabbitmq",/d' $dfile
+        fi
+        if [ "${default_engines}" == "spark" -a $i -eq 1 ]; then
           sed -i '/role: "python",/d' $dfile
           sed -i '/role: "rabbitmq",/d' $dfile
         fi
@@ -605,6 +612,10 @@ def_render_setup() {
   if [ -n "${engines}" -a "${engines}" == "spark" ]; then
     if [ ${#exchange_ips[*]} -ge 1 ]; then
       echo "error: spark no exchange"
+      exit 1
+    fi
+    if [ ${#ssl_roles[*]} -gt 0 ]; then
+      echo "error: Spark does not support ssl mode"
       exit 1
     fi
     eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
@@ -703,49 +714,56 @@ def_render_roles_core() {
       fi
 
       if [ "${default_engines}" == "spark" ]; then
+        eval local pid=\${${role}_pid}
+        eval local compute_engine="\${${role}_compute_engine}"
+        eval local mq_engine="\${${role}_mq_engine}"
+        eval local storage_engine="\${${role}_storage_engine}"
+        eval local rabbitmq_ips="\${${role}_rabbitmq_ips}"
+        eval local pulsar_ips="\${${role}_pulsar_ips}"
+        eval local spark_home="\${${role}_spark_home}"
+        eval local hadoop_home="\${${role}_hadoop_home}"
+        eval local hive_ips="\${${role}_hive_ips}"
+        eval local hdfs_addr="\${${role}_hdfs_addr}"
+        eval local nginx_ips="\${${role}_nginx_ips}"
         for mq in "rabbitmq" "pulsar"; do
-          eval local temp=\${${role}_mq_engine}
-          if [ "${temp}" == "$mq" ]; then
+          if [ "${mq_engine}" == "$mq" ]; then
             eval local ${mq}_enable=true
           else
             eval local ${mq}_enable=false
           fi
         done
-        for storage in "hive" "hdfs"; do
-          eval local temp=\${${role}_storage_engine}
-          if [ "${temp}" == "${storage}" ]; then
+        for storage in "hive" "hdfs" "localfs"; do
+          if [ "${storage_engine}" == "${storage}" ]; then
             eval local ${storage}_enable=true
           else
             eval local ${storage}_enable=false
           fi
         done
-        eval local compute_engine="\${${role}_compute_engine}"
-        eval local rabbitmq_ips="\${${role}_rabbitmq_ips}"
-        eval local pulsar_ips="\${${role}_pulsar_ips}"
-        eval local spark_home="\${${role}_spark_home}"
-        eval local linkis_ips="\${${role}_linkis_Ips}"
-        eval local hive_ips="\${${role}_hive_ips}"
-        eval local hdfs_addr="\${${role}_hdfs_addr}"
-        eval local nginx_ips="\${${role}_nginx_ips}"
-        [ "${compute_engine}" == "spark" -o "${compute_engine}" == "linkis" ] && local spark_enable=true || local spark_enable=false
-        [ -n "${linkis_ips}" ] && local linkis_spark_enable=true || local linkis_spark_enable=false
+        [ "${compute_engine}" == "spark" ] && local spark_enable=true
         [ -n "${nginx_ips}" ] && local nginx_enable=true || local nginx_enable=false
-        eval local pid=\${${role}_pid}
-        local ${role}_rabbitmq_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${rabbitmq_ips}\",\"port\":5672}]}]"
+        if [ ${#base_roles[*]} -eq 1 ]; then
+          [ "x" != "x${rabbitmq_ips}" ] && local ${role}_rabbitmq_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${rabbitmq_ips}\",\"port\":5672}]}]" || local ${role}_rabbitmq_route\="[]"
+          [ "x" != "x${pulsar_ips}" ] && local ${role}_pulsar_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]}]" || local ${role}_pulsar_route\="[]"
+        else
+          [ "x" != "x${rabbitmq_ips}" ] && local ${role}_rabbitmq_route\="[{\"id\":${host_pid},\"routes\":[{\"ip\":\"${host_rabbitmq_ips}\",\"port\":5672}]},{\"id\":${guest_pid},\"routes\":[{\"ip\":\"${guest_rabbitmq_ips}\",\"port\":5672}]}]" || local ${role}_rabbitmq_route\="[]"
+          [ "x" != "x${pulsar_ips}" ] && local ${role}_pulsar_route\="[{\"id\":${host_pid},\"routes\":[{\"ip\":\"${host_pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]},{\"id\":${guest_pid},\"routes\":[{\"ip\":\"${guest_pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]}]" || local ${role}_pulsar_route\="[]"
+        fi
         eval local rabbitmq_routes=\'$( echo \${${role}_rabbitmq_route} | tr -s '"' '\"' | tr -s '[' '\[' | tr -s ']' '\]' )\'
-        local ${role}_pulsar_route\="[{\"id\":${pid},\"routes\":[{\"ip\":\"${pulsar_ips}\",\"port\":6650,\"sslPort\":6651,\"proxy\":\"\"}]}]"
         eval local pulsar_routes=\'$( echo \${${role}_pulsar_route} | tr -s '"' '\"' | tr -s '[' '\[' | tr -s ']' '\]' )\'
         eval echo "${role}_rabbitmq_route: \${${role}_rabbitmq_route}"
         eval echo "${role}_pulsar_route: \${${role}_pulsar_route}"
         myvars="${myvars} \
+              pid\=${pid}  \
               mysql_enable\=\${mysql_enable}  \
               mysql_ips\=${mysql_ips} \
               fateboard_enable\=\${fateboard_enable}  \
               fateboard_ips\=${fateboard_ips} \
               fate_flow_enable\=\${fate_flow_enable}  \
               fate_flow_ips\=${fate_flow_ips}  \
+              mq_engine\=${mq_engine} \
+              storage_engine\=${storage_engine} \
               spark_enable\=${spark_enable} \
-              linkis_spark_enable\=${linkis_spark_enable} \
+              hadoop_home\=${hadoop_home} \
               hive_enable\=${hive_enable} \
               hdfs_enable\=${hdfs_enable} \
               nginx_enable\=${nginx_enable} \
@@ -753,7 +771,6 @@ def_render_roles_core() {
               pulsar_enable\=${pulsar_enable} \
               rabbitmq_ips\=${rabbitmq_ips:-127.0.0.1} \
               pulsar_ips\=${pulsar_ips:-127.0.0.1} \
-              linkis_ips\=${linkis_ips:-127.0.0.1} \
               hive_ips\=${hive_ips:-127.0.0.1} \
               hdfs_addr\=${hdfs_addr} \
               nginx_ips\=${nginx_ips:-127.0.0.1} \
@@ -761,14 +778,17 @@ def_render_roles_core() {
               pulsar_routes\=\${pulsar_routes} \
               spark_home\=${spark_home} "
         eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
+              " .${role}.partyid\=env\(pid\) \| "\
               " .${role}.mysql.enable\=env\(mysql_enable\) \| "\
               " .${role}.mysql.ips\|\=env\(mysql_ips\) \| "\
               " .${role}.fateboard.enable\=env\(fateboard_enable\) \| "\
               " .${role}.fateboard.ips\|\=env\(fateboard_ips\) \| "\
               " .${role}.fate_flow.enable\=env\(fate_flow_enable\) \| "\
               " .${role}.fate_flow.ips\|\=env\(fate_flow_ips\) \| "\
+              " .${role}.fate_flow.federation\|\=env\(mq_engine\) \|" \
+              " .${role}.fate_flow.storage\|\=env\(storage_engine\) \|" \
               " .${role}.spark.enable\|\=env\(spark_enable\) \|" \
-              " .${role}.linkis_spark.enable\|\=env\(linkis_spark_enable\) \|" \
+              " .${role}.spark.hadoop_home\|\=strenv\(hadoop_home\) \|" \
               " .${role}.hive.enable\|\=env\(hive_enable\) \|" \
               " .${role}.hdfs.enable\|\=env\(hdfs_enable\) \|" \
               " .${role}.nginx.enable\|\=env\(nginx_enable\) \|" \
@@ -776,7 +796,6 @@ def_render_roles_core() {
               " .${role}.pulsar.enable\|\=env\(pulsar_enable\) \|" \
               " .${role}.rabbitmq.host\|\=env\(rabbitmq_ips\) \|" \
               " .${role}.pulsar.host\|\=env\(pulsar_ips\) \|" \
-              " .${role}.linkis_spark.host\|\=env\(linkis_ips\) \|" \
               " .${role}.hive.host\|\=env\(hive_ips\) \|" \
               " .${role}.hdfs.name_node\|\=strenv\(hdfs_addr\) \|" \
               " .${role}.nginx.host\|\=env\(nginx_ips\) \|" \
@@ -803,7 +822,7 @@ def_render_roles_core() {
               special_routes\=\${special_routes} \
               default_routes\=\${default_routes}  \
               self_routes\=\${self_routes}  \
-              rollsite_id\=\${${role}_pid} \
+              pid\=\${${role}_pid} \
               rollsite_ips\=${rollsite_ips} "
         eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
               " .${role}.rollsite.server_secure\|\=env\(server_secure\) \| "\
@@ -823,7 +842,7 @@ def_render_roles_core() {
               " .${role}.rollsite.route_tables\|\=env\(special_routes\) \| "\
               " .${role}.rollsite.route_tables \+\=env\(default_routes\) \| "\
               " .${role}.rollsite.route_tables \+\=env\(self_routes\) \| "\
-              " .${role}.rollsite.partyid\|\=env\(rollsite_id\) \| " \
+              " .${role}.partyid\|\=env\(pid\) \| " \
               " .${role}.rollsite.ips\|\=env\(rollsite_ips\) " \
            " \' ${workdir}/files/fate_${role} -I 2 -P " > ${base}/${pname:-fate}_${role}
       fi

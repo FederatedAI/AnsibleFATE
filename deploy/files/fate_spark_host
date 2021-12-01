@@ -1,15 +1,18 @@
 host:
+  partyid: 10000
   fate_flow:
     enable: false
     ips: []
     grpcPort: 9360
     httpPort: 9380
     dbname: "fate_flow"
-    proxy: rollsite
+    proxy: fateflow
     http_app_key:
     http_secret_key:
     use_deserialize_safe_module: false
     default_engines: spark
+    federation: rabbitmq
+    storage: hdfs
   fateboard:
     enable: false
     ips: []
@@ -37,16 +40,9 @@ host:
   spark:
     enable: False
     home:
+    hadoop_home:
     cores_per_node: 20
     nodes: 2
-  linkis_spark:
-    enable: False
-    cores_per_node: 20
-    nodes: 2
-    host: 127.0.0.1
-    port: 9001
-    token_code: MLSS
-    python_path: /data/projects/fate/python
   hive:
     enable: False
     host: 127.0.0.1

@@ -1,0 +1,22 @@
+- hosts: PNAME 
+  any_errors_fatal: True
+  vars:
+    jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
+    pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
+    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+  vars_files:
+  - var_files/ENV/base_init
+  - var_files/ENV/PNAME_init
+  - var_files/ENV/PNAME_host
+  - var_files/ENV/PNAME_guest
+  - var_files/ENV/PNAME_exchange
+  roles:
+  - base
+  - supervisor
+  - { role: "mysql", when: "( 'host' in deploy_roles and ansible_ssh_host in host['mysql']['ips'] and host['mysql']['enable'] == True and host['mysql']['type'] == 'inside' and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['mysql']['ips'] and guest['mysql']['enable'] == True and guest['mysql']['type'] == 'inside' and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "python", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ]  ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "rabbitmq", when: "( 'host' in deploy_roles and ansible_ssh_host == host['rabbitmq']['host'] and host['rabbitmq']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host == guest['rabbitmq']['host'] and guest['rabbitmq']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "fateflow", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+  - { role: "fateboard", when: "( 'host' in deploy_roles and ansible_ssh_host in host['fateboard']['ips'] and host['fateboard']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] ) or ( 'guest' in deploy_roles and ansible_ssh_host in guest['fateboard']['ips'] and guest['fateboard']['enable'] == True and deploy_mode in [ 'deploy', 'install', 'config' ] )" }
+
+

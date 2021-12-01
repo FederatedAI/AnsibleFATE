@@ -221,7 +221,7 @@ polling: {}
 host_ips:
   - default:192.168.0.1
 host_special_routes:	
-  - default:192.168.0.88:9370		//设置额外路由指向exchange
+  - default:192.168.0.88:9370		//可以设置额外路由指向exchange
 guest_ips: []
 guest_special_routes: []
 exchange_ips: []
@@ -247,9 +247,9 @@ vi var_files/prod/fate_host
 
 ```
 host:
+  partyid: 10000  
   rollsite:
-    enable: True   
-    partyid: 10000   
+    enable: True      
     coordinator: fate
     ips:			
     - 192.168.0.1
@@ -354,3 +354,230 @@ sh deploy/deploy.sh deploy
 #### 3.7 服务验证与测试
 
 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.7一节。
+
+
+
+### 4 部署guest(spark)
+
+#### 4.1 概述
+
+​      本章是通过ansible 部署FATE集群单边场景之一，单独部署guest-spark。（部署host类似）
+
+
+
+#### 4.2 部署目标介绍
+
+| 角色           | IP          | 端口      | 介绍                                   |
+| -------------- | ----------- | --------- | -------------------------------------- |
+| rollsite       | 192.168.0.1 | 9370      | 跨站点或者说跨party通讯组件            |
+| fate_flow      | 192.168.0.1 | 9360;9380 | 联合学习任务流水线管理模块             |
+| clustermanager | 192.168.0.1 | 4670      | cluster manager管理集群                |
+| nodemanger     | 192.168.0.1 | 4671      | node manager管理每台机器资源           |
+| fateboard      | 192.168.0.1 | 8080      | 联合学习过程可视化模块                 |
+| mysql          | 192.168.0.1 | 3306      | 数据存储，clustermanager和fateflow依赖 |
+
+#### 4.3 进入部署包根目录
+
+ 请按需使用合适的方式获取部署包，并解压，然后进入【部署包根目录】。具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.4.1和2.6.1等章节。
+
+
+```
+cd 【部署包根目录】
+```
+
+
+
+#### 4.4 配置
+
+##### 4.4.1 初始化配置
+
+- 步骤1：使用辅助脚本产生初始化配置
+
+```
+sh deploy/deploy.sh init -g="9999:192.168.0.1" -n=spark
+```
+
+- 步骤2： 按需修改配置
+
+```
+vim deploy/conf/setup.conf
+```
+
+```
+env: prod
+pname: fate
+ssh_port: 22
+deploy_user: app
+deploy_group: apps
+deploy_mode: deploy
+modules:
+  - mysql
+  - fate_flow
+  - fateboard
+roles:
+  - guest:9999
+host_ips: []
+host_special_routes: []
+guest_ips:
+  - default:192.168.0.1
+guest_special_routes:
+  - default:192.168.0.88:9370		//可以设置额外路由指向exchange
+default_engines: spark
+#host spark configuration information		//不部署host无需填写
+#compute_engine: spark
+host_compute_engine: spark
+host_spark_home: ""
+host_hadoop_home: ""
+#storage_engine: hive or hdfs or localfs
+host_storage_engine: hive
+host_hive_ips: ""
+host_hdfs_addr: ""
+#mq_engine: rabbitmq or pulsar
+host_mq_engine: rabbitmq
+host_rabbitmq_ips: ""
+host_pulsar_ips: ""
+#proxy
+host_nginx_ips: ""
+#
+#guest spark configuration information		//根据实际情况填写如下guest的配置
+#compute_engine: spark
+guest_compute_engine: spark
+guest_spark_home: ""
+guest_hadoop_home: ""
+#storage_engine: hive or hdfs or localfs
+guest_storage_engine: hive
+guest_hive_ips: ""
+guest_hdfs_addr: ""
+#mq_engine: rabbitmq or pulsar
+guest_mq_engine: rabbitmq
+guest_rabbitmq_ips: ""
+guest_pulsar_ips: ""
+#proxy
+guest_nginx_ips: ""
+```
+
+- 步骤3：执行辅助脚本产生配置
+
+```
+sh deploy/deploy.sh render 
+```
+
+##### 4.4.2 配置guest信息
+
+如需要自定义高级配置，可参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.5.3一节，修改如下文件，默认可以不修改。
+
+```
+vi var_files/prod/fate_guest
+```
+
+内容如下：
+
+```
+guest:	
+  partyid: 9999
+  fate_flow:
+    enable: True		
+    ips:
+    - 192.168.0.1		
+    grpcPort: 9360	
+    httpPort: 9380	
+    dbname: "fate_flow"	
+    proxy: rollsite	
+    http_app_key:
+    http_secret_key:
+    use_deserialize_safe_module: false
+    default_engines: spark
+    federation: rabbitmq
+    storage: hdfs
+  fateboard:
+    enable: True		
+    ips:
+    - 192.168.0.1		
+    port: 8080	
+    dbname: "fate_flow"	
+  mysql:
+    enable: True		
+    type: inside		
+    ips:
+    - 192.168.0.1		
+    port: 3306		
+    dbuser: "fate"	
+    dbpasswd: "fate_deV2999"	
+  zk:					
+    enable: False		
+    lists:			
+    - ip: 192.168.0.1		
+      port: 2181		
+    use_acl: false
+    user: "fate"		
+    passwd: "fate"	
+  servings:			
+    ips:				
+    - 192.168.0.1
+    port: 8000   
+  spark:
+    enable: true
+    home:
+    hadoop_home:
+    cores_per_node: 20
+    nodes: 2
+  hive:
+    enable: true
+    host: 127.0.0.1
+    port: 10000
+    auth:
+    configuration:
+    kerberos_service_name:
+    username:
+    password:
+  hdfs:
+    enable: False
+    name_node: hdfs://fate-cluster
+    path_prefix:
+  rabbitmq:
+    enable: true
+    host: 127.0.0.1
+    mng_port: 12345
+    port: 5672
+    user: fate
+    password: fate
+    route_table: []
+  pulsar:
+    enable: False
+    host: 127.0.0.1
+    port: 6650
+    mng_port: 8080
+    topic_ttl: 5
+    route_table: []
+  nginx:
+    enable: False
+    host: 127.0.0.1
+    http_port: 9300
+    grpc_port: 9310  
+```
+
+
+
+#### 4.5 执行部署
+
+- 部署所有服务
+
+```
+sh deploy/deploy.sh deploy
+```
+
+查看部署日志：`tailf logs/deploy-??.log`		
+
+
+
+
+#### 4.6 后置操作
+
+具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.6.8一节。
+
+
+
+#### 4.7 服务验证与测试
+
+具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.7一节。
+特别说明： 使用spark引擎的场景目前**不支持**进行2.7.2节的 Toy_example部署验证

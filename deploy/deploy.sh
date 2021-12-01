@@ -42,7 +42,7 @@ case $pname in
   ;;
 
   *)
-    echo "Usage: $0 [fate|fate-serving]"
+    echo "Error: not have deploy/deploy-${pname}.sh file"
   ;;
 
 esac
