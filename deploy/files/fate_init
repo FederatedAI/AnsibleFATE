@@ -5,14 +5,14 @@ deploy_modules: []
 deploy_roles: []
 default_engines: eggroll
 
-version: 1.7.1
+version: 1.7.1.1
 versions: {}
 
 python:
   version: 4.5.4
   dest: "miniconda3"
   venv: "common/python/venv"
-  pip: "pypi/1.7.0/pypi"
+  pip: "pypi/1.7.1/pypi"
   must:
   - setuptools-50.3.2-py3-none-any.whl
 java:
@@ -20,7 +20,7 @@ java:
   version: "8u192"
   path: "common/jdk"
 mysql:
-  version: "8.0.13"
+  version: "8.0.28"
   path: "common/mysql"
   user: "root"
   passwd: "fatE168dev"
