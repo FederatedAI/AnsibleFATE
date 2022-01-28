@@ -973,7 +973,7 @@ mysql:					---mysql部署信息
   passwd: "fatE168dev"	---mysql数据库管理密码，使用外部mysql需要修改此参数为实际使用密码
 ```
 
-
+**这个配置文件以及文档其余部分涉及的组件版本，以下载的部署包提供的版本为准。文档中的版本号仅用于展示配置的设置**
 
 ###### 2.5.3.3 配置Exchange信息
 
@@ -1944,7 +1944,7 @@ mysql:
 
 ```
 mysql:				
-  version: "8.0.13"
+  version: "8.0.28"
   path: "common/mysql"
   user: "root"			---mysql数据库管理账号，修改为实际使用的管理账号
   passwd: "fatE168dev"	---mysql数据库管理密码，修改为实际使用的管理密码
