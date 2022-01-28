@@ -1,4 +1,25 @@
 fate:
+  1.7.1.1:
+    fateboard:
+    - 1.7.1
+    fateflow:
+    - 1.7.1
+    eggroll:
+    - 2.4.3
+    - 2.4.2
+    - 2.2.1
+    spark:
+    - 1.2.1
+  1.7.1:
+    fateboard:
+    - 1.7.1
+    fateflow:
+    - 1.7.1
+    eggroll:
+    - 2.4.2
+    - 2.2.1
+    spark:
+    - 1.2.1
   1.7.0:
     fateboard:
     - 1.7.0

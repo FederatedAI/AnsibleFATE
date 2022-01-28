@@ -78,7 +78,7 @@ get_pinfo() {
 
 download() {
   url="https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com"
-  mysql="mysql-8.0.13.tar.gz"
+  mysql="mysql-8.0.28.tar.gz"
   python="fate_python.tar.gz"
   supervisor="fate_supervisor.tar.gz"
   rabbitmq="rabbitmq-server-generic-unix-3.6.15.tar" 
