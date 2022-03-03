@@ -580,3 +580,4 @@ sh deploy/deploy.sh deploy
 #### 4.7 服务验证与测试
 
 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.7一节。
+

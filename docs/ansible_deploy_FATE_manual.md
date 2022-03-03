@@ -598,7 +598,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   18，host_hive_ips：hive的IP地址。
   19，host_hdfs_addr：hdfs的address地址。示例：hdfs://fate-cluster
   20，host_mq_engine：需要部署的mq组件，取值（rabbitmq、pulsar）二选一。
-  21，host_rabbitmq_ips：需要部署rabbitmq的IP地址
+  21，host_rabbitmq_ips：需要部署rabbitmq的IP地址，若rabbitmq和fate分离部署，需要手动添加rabbitmq的IP至environment/prod/hosts文件的fate组下
   22，host_pulsar_ips：需要部署pulsar的IP地址
   23，host_nginx_ips：nginx代理IP，填写开启nginx配置
   ```
@@ -1480,14 +1480,14 @@ ansible_become_pass=
 192.168.0.1
 ```
 
-若需在ansible本机安装且不经过ssh，则在IP后面添加 ansible_connection=local，如下
+**若需在ansible本机安装且不经过ssh，则在IP后面添加 ansible_connection=local，如下**
 
 ```
 [fate]
 192.168.0.88 ansible_connection=local
 ```
 
-
+**若部署spark场景，rabbitmq和fate分离部署，需要手动添加rabbitmq的IP至fate组下**
 
 #### 2.6 部署流程
 
@@ -1558,7 +1558,7 @@ sh build/build.sh do
 
    说明： 2.6.1.3 和2.6.1.4 二选一。
 
-- 参考<< [编译模块资源包](https://github.com/FederatedAI/FATE-Flow/blob/feature-1.7.0-scheduling/cluster-deploy/build.md) >>编译
+- 参考<< [编译模块资源包](https://github.com/FederatedAI/FATE/blob/master/build/package-build/build.zh.md) >>编译，获取源代码后使用构建命令<< [编译模块资源包](https://github.com/FederatedAI/FATE/blob/master/build/package-build/build.zh.md) >>的第9小节 构建包含FATE系统软件和环境依赖的整体包，来完成构建fate软件包；注意构建时pip版本需大于21
 - 参考 2.9 节进行打包
 
 
