@@ -84,26 +84,26 @@ download() {
   rabbitmq="rabbitmq-server-generic-unix-3.6.15.tar" 
   if [ ! -f ${workdir}/../roles/python/files/setuptools-50.3.2-py3-none-any.whl ]; then
     echo "-------------Download python package-----------"
-    echo "wget -P ${workdir}/../roles/python/files/ ${url}/${python}"
+    echo "+++++++++download: ${workdir}/../roles/python/files/ -o ${url}/${python}"
     wget -P ${workdir}/../roles/python/files/ ${url}/${python}
     tar xf ${workdir}/../roles/python/files/${python} -C ${workdir}/../roles/python/files/
     rm ${workdir}/../roles/python/files/${python}
   fi
   if [ ! -f ${workdir}/../roles/mysql/files/$mysql ]; then
     echo "-------------Download mysql package---------"
-    echo "wget -P ${workdir}/../roles/mysql/files/ ${url}/${mysql}"
+    echo "+++++++++download: ${workdir}/../roles/mysql/files/ -o ${url}/${mysql}"
     wget -P ${workdir}/../roles/mysql/files/ ${url}/${mysql}
   fi
   if [ ! -f ${workdir}/../roles/supervisor/files/supervisord-conf-1.1.4.tar.gz ]; then
     echo "-------------Download supervisor package-----------"
-    echo "wget -P ${workdir}/../roles/supervisor/files/ ${url}/${supervisor}"
+    echo "+++++++++download: ${workdir}/../roles/supervisor/files/ -o ${url}/${supervisor}"
     wget -P ${workdir}/../roles/supervisor/files/ ${url}/${supervisor}
     tar xf  ${workdir}/../roles/supervisor/files/${supervisor} -C  ${workdir}/../roles/supervisor/files/
     rm ${workdir}/../roles/supervisor/files/${supervisor}
   fi
   if [ ! -f ${workdir}/../roles/rabbitmq/files/$rabbitmq ]; then
     echo "-------------Download rabbitmq package-----------"
-    echo "wget -P ${workdir}/../roles/rabbitmq/files/ ${url}/${rabbitmq}"
+    echo "++++++++++download: ${workdir}/../roles/rabbitmq/files/ -o ${url}/${rabbitmq}"
     wget -P ${workdir}/../roles/rabbitmq/files/ ${url}/${rabbitmq}
   fi
 
@@ -115,16 +115,21 @@ download() {
   fi
 
   if [ ! -f ../roles/python/files/pypi.tar.gz -o ! -f ../roles/python/files/requirements.txt ]; then
+     echo "+++++++++download: ${purl}/requirements.txt -o ../roles/python/files/requirements.txt"
      curl ${purl}/requirements.txt -o ../roles/python/files/requirements.txt
+     echo "++++++++++download: ${purl}/pypi.tar.gz -o ../roles/python/files/pypi.tar.gz"
      curl ${purl}/pypi.tar.gz -o ../roles/python/files/pypi.tar.gz
   fi
 
   if [ ! -f ../roles/check/files/deploy.tar.gz -o ! -f ../roles/check/files/build.tar.gz ]; then
+    echo "download: ${purl}/deploy.tar.gz -o ../roles/check/files/deploy.tar.gz"
     curl ${purl}/deploy.tar.gz -o ../roles/check/files/deploy.tar.gz
+    echo "+++++++++download: ${purl}/build.tar.gz -o ../roles/check/files/build.tar.gz"
     curl ${purl}/build.tar.gz -o ../roles/check/files/build.tar.gz
   fi
 
   if [ ! -f ../roles/java/files/jdk-8u192.tar.gz ]; then
+    echo "+++++++++download: ${purl}/jdk.tar.gz -o ../roles/java/files/jdk.tar.gz"
     curl ${purl}/jdk.tar.gz -o ../roles/java/files/jdk.tar.gz
     tar xf ../roles/java/files/jdk.tar.gz -C ../roles/java/files/
     cp ../roles/java/files/jdk/jdk-8u192.tar.gz ../roles/java/files/
@@ -142,9 +147,13 @@ download() {
         link="https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/${name}/${fversion/-//}/$src" 
       fi
       if [ "$name" == "fateflow" ]; then
+        echo "++++++++++download: ${purl}/examples.tar.gz -o ../roles/${name}/files/fate_examples-${fversion}.tar.gz"
         curl ${purl}/examples.tar.gz -o ../roles/${name}/files/fate_examples-${fversion}.tar.gz
+        echo "++++++++++download: ${purl}/fate.tar.gz -o ../roles/${name}/files/fate-${fversion}.tar.gz"
         curl ${purl}/fate.tar.gz -o ../roles/${name}/files/fate-${fversion}.tar.gz
+        echo "++++++++++download:  ${purl}/fate.env -o ../roles/${name}/files/fate.env"
         curl ${purl}/fate.env -o ../roles/${name}/files/fate.env
+        echo "++++++++++download: ${purl}/RELEASE.md -o ../roles/${name}/files/RELEASE.md"
         curl ${purl}/RELEASE.md -o ../roles/${name}/files/RELEASE.md
       fi
       echo "$link  ../roles/${name}/files/$dest"

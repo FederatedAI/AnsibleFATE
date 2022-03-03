@@ -493,9 +493,14 @@ def_render_fate_init() {
   local bversion="$( ./bin/yq  eval '.product_fate_versions.fateboard' ${base}/build/conf/setup.conf )"
   local eversion="$( ./bin/yq  eval '.product_fate_versions.eggroll' ${base}/build/conf/setup.conf )"
   local pversion="$( ./bin/yq  eval '.product_fate_version' ${base}/build/conf/setup.conf )"
-  local pip="pypi/${pversion}/pypi"
   local version=${pversion%-*}
-  echo "hello-------------${fversion} ${eversion}"
+  local version=${pversion}
+  if [ "${pversion#*-}" == "release" ]
+  then
+    local version=${pversion%-*}
+  fi
+  local pip="pypi/${version}/pypi"
+  #echo "-------------${fversion} ${eversion}"
   myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} pip=${pip} version=${version} fversion=${fversion} bversion=${bversion} eversion=${eversion} roles=${deploy_roles} ssl_roles=${ssl_roles} pname=${pname} default_engines=${default_engines}"
   eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
           " .pname \|\=env\(pname\) \| "\

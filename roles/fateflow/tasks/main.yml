@@ -10,6 +10,9 @@
 - include_tasks: config.yml
   when: "deploy_mode in [ 'deploy', 'config' ] and 'host' in deploy_roles and deploy_role == 'host' and ansible_ssh_host in fate_flow.get('ips',[]) and fate_flow.get('enable', False) == True"
 
+- include_tasks: config_for_eggroll.yml
+  when: "deploy_mode in [ 'deploy', 'config' ] and 'host' in deploy_roles and deploy_role == 'host' and ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True"
+
 - include_vars: "guest_vars.yml"
   when: deploy_mode in [ 'deploy', 'config' ] and 'guest' in deploy_roles
 
@@ -18,3 +21,7 @@
 
 - include_tasks: config.yml
   when: "deploy_mode in [ 'deploy', 'config' ] and 'guest' in deploy_roles and deploy_role == 'guest' and ansible_ssh_host in fate_flow.get('ips',[]) and fate_flow.get('enable', False) == True"
+
+- include_tasks: config_for_eggroll.yml
+  when: "deploy_mode in [ 'deploy', 'config' ] and 'guest' in deploy_roles and deploy_role == 'guest' and ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True"
+

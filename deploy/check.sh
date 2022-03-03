@@ -71,7 +71,7 @@ def_check_route() {
   local role=$1
   local temp=$2
 
-  echo "${temp}" | grep -Eq '^[a-zA-Z0-9]+:([0-9]+.[0-9]+.[0-9]+.[0-9]+|[a-z0-9.]+):[0-9]+?[a-z]?'
+  echo "${temp}" | grep -Eq '^[a-zA-Z0-9]+:([0-9]+.[0-9]+.[0-9]+.[0-9]+|[a-z0-9.-]+):[0-9]+?[a-z]?'
   if [ "$?" -eq 1 ]
   then
     echo "check ${role}_special route: \"$temp\" unvalid"
