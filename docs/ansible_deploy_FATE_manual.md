@@ -164,7 +164,6 @@ FATE官方网站：https://fate.fedai.org/
 
 - 删除： 删除软件和配置
 
-  
 
 ##### 2.4.4 部署角色、后端引擎和模块
 
@@ -181,8 +180,6 @@ FATE官方网站：https://fate.fedai.org/
 - 简单模式
 
   "default:192.168.0.1"
-
-  
 
 - 详细定制模式
 
@@ -208,7 +205,6 @@ FATE官方网站：https://fate.fedai.org/
 
   - 当没有设置的组件，会使用default值。
 
-    
 
 ##### 2.4.6 部署支持polling
 
@@ -256,7 +252,6 @@ FATE官方网站：https://fate.fedai.org/
 
 - 部署单边的情况，也支持配置证书。  用脚本只产生一方的证书。然后服务端和客户端的设置使用这个证书。  部署完成之后，用户手工按需替换其他证书。
 
-  
 
 ##### 2.4.9 配置Spark参数
 
@@ -295,15 +290,12 @@ FATE官方网站：https://fate.fedai.org/
   vim build/conf/setup.conf
   ```
 
-  
-
 - 执行下载
 
   ```
   bash build/build.sh do
   ```
 
-  
 
 ###### 2.5.1.2 下载配置文件
 
@@ -320,8 +312,7 @@ FATE官方网站：https://fate.fedai.org/
     fateboard: 1.7.0-release
     eggroll: 2.4.0-release
   ```
-  
-  
+
 
 ##### 2.5.2 部署辅助脚本和部署配置文件
 
@@ -391,8 +382,6 @@ sh deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
     ```
     bash deploy/deploy.sh init -h -g -e
     ```
-
-    
 
   - 初始化使用实际参数值
 
@@ -954,7 +943,7 @@ versions:				---各服务版本号
   fate_flow: 1.7.0-release
 
 python:					---python部署信息
-  version: 4.5.4
+  version: 4.5.4        --不同的包会随安全更新版本
   dest: "miniconda3"
   venv: "common/python/venv"
   pip: pip-packages-fate-1.7.0
@@ -967,7 +956,7 @@ java:					---java部署信息
   path: "common/jdk"
 
 mysql:					---mysql部署信息
-  version: "8.0.13"
+  version: "8.0.13"     --不同的包会随安全更新版本
   path: "common/mysql"
   user: "root"			---mysql数据库管理账号，使用外部mysql需要修改此参数为实际使用账号
   passwd: "fatE168dev"	---mysql数据库管理密码，使用外部mysql需要修改此参数为实际使用密码
@@ -1513,7 +1502,7 @@ wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/AnsibleFATE_${ve
 tar xzf AnsibleFATE_${version}_release-offline.tar.gz
 cd AnsibleFATE-${version}-release-offline
 
-//version>=1.7.0
+//version>=1.7.0，按需设置
 ```
 
 ###### 2.6.1.2下载非离线包
