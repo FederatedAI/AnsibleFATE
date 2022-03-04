@@ -5,14 +5,14 @@ deploy_modules: []
 deploy_roles: []
 default_engines: eggroll
 
-version: 1.7.1.1
+version: 1.7.2
 versions: {}
 
 python:
   version: 4.5.4
   dest: "miniconda3"
   venv: "common/python/venv"
-  pip: "pypi/1.7.1/pypi"
+  pip: "pypi/1.7.2/pypi"
   must:
   - setuptools-50.3.2-py3-none-any.whl
 java:

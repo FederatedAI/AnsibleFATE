@@ -1,0 +1,17 @@
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/bin/init_env.sh"
+  template: src=init_env.sh.jinja dest={{pbase}}/{{pname}}/bin/init_env.sh
+
+#- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/service_conf.yaml(not fate_flow)"
+#  template: src=service_conf.yaml.jinja dest={{pbase}}/{{pname}}/conf/service_conf.yaml
+#  when: " ( 'host' in deploy_roles and deploy_role == 'host' and ansible_ssh_host not in fate_flow['ips'] ) or ( 'guest' in deploy_roles and deploy_role == 'guest' and ansible_ssh_host not in fate_flow['ips'] )"
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/rabbitmq_route_table.yaml"
+  template: src=rabbitmq_route_table.yaml.jinja dest={{pbase}}/{{pname}}/conf/rabbitmq_route_table.yaml
+  when: ( ansible_ssh_host in fate_flow["ips"] and fate_flow['default_engines'] == 'spark' and rabbit['enable'] == True )
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/pulsar_route_table.yaml"
+  template: src=pulsar_route_table.yaml.jinja dest={{pbase}}/{{pname}}/conf/pulsar_route_table.yaml
+  when: ( ansible_ssh_host in fate_flow["ips"] and fate_flow['default_engines'] == 'spark' and pulsar['enable'] == True )
+
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/service_conf.yaml"
+  template: src=service_conf.yaml.jinja dest={{pbase}}/{{pname}}/conf/service_conf.yaml

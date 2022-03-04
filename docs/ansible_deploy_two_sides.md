@@ -249,7 +249,7 @@ sh deploy/deploy.sh deploy
 ```
 
 查看部署日志：`tailf logs/deploy-??.log`	
-	
+​	
 
 #### 2.6 后置操作
 
@@ -943,7 +943,8 @@ sh deploy/deploy.sh deploy
 #### 4.7 服务验证与测试
 
 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.7一节。
-特别说明： 使用spark引擎的场景目前**不支持**进行2.7.2节的 Toy_example部署验证
+
+
 
 
 

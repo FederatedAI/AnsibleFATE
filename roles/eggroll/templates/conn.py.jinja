@@ -73,9 +73,9 @@ def is_in(temp):
   sql=f'select count(*) from server_node where host="{ip}" and port="{port}" and node_type="{node_type}" and status="HEALTHY";'
   code=db_query(sql) 
   if code == 1:
-    print('not exists')
+    print(sql,'not exists')
   else:
-    print('exists')
+    print(sql,'exists')
   return code
 
 def db_insert(temp):
