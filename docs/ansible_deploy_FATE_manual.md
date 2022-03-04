@@ -956,7 +956,7 @@ java:					---java部署信息
   path: "common/jdk"
 
 mysql:					---mysql部署信息
-  version: "8.0.13"     --不同的包会随安全更新版本
+  version: "8.0.28"     --不同的包会随安全更新版本
   path: "common/mysql"
   user: "root"			---mysql数据库管理账号，使用外部mysql需要修改此参数为实际使用账号
   passwd: "fatE168dev"	---mysql数据库管理密码，使用外部mysql需要修改此参数为实际使用密码
