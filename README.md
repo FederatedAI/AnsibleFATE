@@ -1,12 +1,12 @@
-# AnsibleFATE
+[中文](./README_zh.md)
+ 
+## Overview 
 
-## 总览
+AnsibleFATE deploys FATE clusters via Ansible. AnsibleFATE provides scripts to optimize the process of deployment configuration. It helps users to quickly complete the deployment operations. 
 
-AnsibleFATE 支持通过Ansible进行部署FATE集群。我们提供了辅助脚本，优化部署配置的过程，有助于用户快速完成部署操作。部署是一件简单的事。
+## Project structure
 
-## 项目结构
-
-```
+````
 AnsibleFATE
 |-- build
 |-- docs
@@ -15,54 +15,39 @@ AnsibleFATE
 |-- roles
 |-- deploy
 |-- var_files
-```
+````
 
-说明：
+Description:
 
-   - build: 构建目录。使用辅助脚本和配置文件，按需构建产品的部署包。
+   - build: the build directory. It contains helper scripts and configuration files to build deployment packages.
 
-   -   docs: 文档目录。
+   - docs: Documentation directory.
 
-   - environments： ansbile部署的目标主机配置文件
+   - environments: Configuration files for the ansbile deployment on the target host.
 
-   - logs： 部署日志目录
+   - logs: The directory of the deployment logs.
 
-   - roles： ansible部署模块
+   - roles: Ansible deployment modules.
 
-   - deploy： 部署辅助脚本和配置文件
+   - deploy: Deployment scripts and configuration files
 
-   - var_files: ansible配置文件
+   - var_files: Ansible configuration files
 
      
 
-## AnsibleFATE 主要功能
+## Features
 
-- 优化部署配置体验，支持产品使用一致的风格进行部署。
-- 支持按需选择组合部署集群： 不同后端引擎和不同组件。
-- 支持多种形态的部署： 针对产品的全部或部分模块的多种部署方式。
-- 提供在线和离线2种部署包，可按需使用。
-- 提供从源码到输出部署离线包的打包脚本。
-
-
-## 部署文档
-
-- [部署手册](docs/ansible_deploy_FATE_manual.md)
-
-- 场景部署示例
-
-  - [示例一： 部署一方](docs/ansible_deploy_one_side.md)
-
-  - [示例二： 部署二方](docs/ansible_deploy_two_sides.md)
-
-  - [示例三： 部署三方](docs/ansible_deploy_three_sides.md)
+- Optimized the deployment configuration.
+- Customizable deployment of the clusters: a combination of different backend engines and components.
+- Multiple deployment methods for all or some of FATE's modules.
+- Provides both the online and offline deployment packages.
+- Provides packaging scripts for building the offline packages from source code.
 
 
+## Documentation
 
-## 了解更多
-
-- [FAQ](docs/ansible_deploy_fate_FAQ.md).
-- [issues](https://github.com/FederatedAI/AnsibleFATE/issues).
-- [pull requests](https://github.com/FederatedAI/AnsibleFATE/pulls)
+- [Deployment Guide](docs/ansible_deploy_FATE_manual.md)
+- [FAQ](docs/ansible_deploy_fate_FAQ.md)
 
 ## License
 [Apache License 2.0](LICENSE)
