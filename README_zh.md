@@ -33,7 +33,7 @@ AnsibleFATE
 
    - var_files: ansible配置文件
 
-     
+
 
 ## AnsibleFATE 主要功能
 

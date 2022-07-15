@@ -16,7 +16,7 @@
 
 ​        本章是通过ansible 部署FATE集群单边场景之一：单独部署exchange。
 
-​		 在进行部署之前请确认已经执行前置操作.（ 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.2 章节） 
+​		 在进行部署之前请确认已经执行前置操作.（ 具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.2 章节）
 
 
 
@@ -46,7 +46,7 @@ cd 【部署包根目录】
 - 步骤1：使用辅助脚本产生初始化配置
 
 ```
-sh deploy/deploy.sh init -e="192.168.0.88"
+bash deploy/deploy.sh init -e="192.168.0.88"
 ```
 
 - 步骤2： 按需修改配置
@@ -86,7 +86,7 @@ default_engines: eggroll
 - 步骤3：执行辅助脚本产生配置
 
 ```
-sh deploy/deploy.sh render 
+bash deploy/deploy.sh render
 ```
 
 ##### 2.4.2 配置exchange信息
@@ -102,7 +102,7 @@ vi var_files/prod/fate_exchange
 ```
 exchange:
   rollsite
-    enable: True	
+    enable: True
     coordinator: fate
     ips:
     - 192.168.0.88
@@ -136,10 +136,10 @@ exchange:
 - 执行部署命令
 
 ```
-sh deploy/deploy.sh deploy
+bash deploy/deploy.sh deploy
 ```
 
-查看部署日志：`tailf logs/deploy-??.log`	
+查看部署日志：`tailf logs/deploy-??.log`
 
 
 
@@ -171,7 +171,7 @@ sh deploy/deploy.sh deploy
 | rollsite       | 192.168.0.1 | 9370      | 跨站点或者说跨party通讯组件            |
 | fate_flow      | 192.168.0.1 | 9360;9380 | 联合学习任务流水线管理模块             |
 | clustermanager | 192.168.0.1 | 4670      | cluster manager管理集群                |
-| nodemanger     | 192.168.0.1 | 4671      | node manager管理每台机器资源           |
+| nodemanager     | 192.168.0.1 | 4671      | node manager管理每台机器资源           |
 | fateboard      | 192.168.0.1 | 8080      | 联合学习过程可视化模块                 |
 | mysql          | 192.168.0.1 | 3306      | 数据存储，clustermanager和fateflow依赖 |
 
@@ -193,7 +193,7 @@ cd 【部署包根目录】
 - 步骤1：使用辅助脚本产生初始化配置
 
 ```
-sh deploy/deploy.sh init -h="10000:192.168.0.1"
+bash deploy/deploy.sh init -h="10000:192.168.0.1"
 ```
 
 - 步骤2： 按需修改配置
@@ -220,7 +220,7 @@ ssl_roles: []
 polling: {}
 host_ips:
   - default:192.168.0.1
-host_special_routes:	
+host_special_routes:
   - default:192.168.0.88:9370		//可以设置额外路由指向exchange
 guest_ips: []
 guest_special_routes: []
@@ -232,7 +232,7 @@ default_engines: eggroll
 - 步骤3：执行辅助脚本产生配置
 
 ```
-sh deploy/deploy.sh render 
+bash deploy/deploy.sh render
 ```
 
 ##### 3.4.2 配置host信息
@@ -240,94 +240,94 @@ sh deploy/deploy.sh render
 如需要自定义高级配置，可参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.5.3一节，修改如下文件，默认可以不修改。
 
 ```
-vi var_files/prod/fate_host
+vim var_files/prod/fate_host
 ```
 
 内容如下：
 
 ```
 host:
-  partyid: 10000  
+  partyid: 10000
   rollsite:
-    enable: True      
+    enable: True
     coordinator: fate
-    ips:			
+    ips:
     - 192.168.0.1
     port: 9370
-    secure_port: 9371	
-    server_secure: False	
-    client_secure: False	
-    polling:		
-      enable: False		
-    route_tables:	
-    - id: default		
-      routes:
-      - name: default	
-        ip: 192.168.0.88	
-        port: 9370		
-        is_secure: False
-    - id: 10000		
+    secure_port: 9371
+    server_secure: False
+    client_secure: False
+    polling:
+      enable: False
+    route_tables:
+    - id: default
       routes:
       - name: default
-        ip: 192.168.0.1	
+        ip: 192.168.0.88
+        port: 9370
+        is_secure: False
+    - id: 10000
+      routes:
+      - name: default
+        ip: 192.168.0.1
         port: 9370
         is_secure: false
       - name: fateflow
-        ip: 192.168.0.1	
+        ip: 192.168.0.1
         port: 9360
   clustermanager:
-    enable: True		
+    enable: True
     ips:
-    - 192.168.0.1		
-    port: 4670		
-    cores_per_node: 16	
-  nodemanager:		
-    enable: True		
-    ips:		
+    - 192.168.0.1
+    port: 4670
+    cores_per_node: 16
+  nodemanager:
+    enable: True
+    ips:
     - 192.168.0.1
     - 192.168.0.x
-    port: 4671	
+    port: 4671
   eggroll:
-    dbname: "eggroll_meta"	
-    egg: 4					
+    dbname: "eggroll_meta"
+    egg: 4
   fate_flow:
-    enable: True		
+    enable: True
     ips:
-    - 192.168.0.1		
-    grpcPort: 9360	
-    httpPort: 9380	
-    dbname: "fate_flow"	
-    proxy: rollsite	
+    - 192.168.0.1
+    grpcPort: 9360
+    httpPort: 9380
+    dbname: "fate_flow"
+    proxy: rollsite
     http_app_key:
     http_secret_key:
     use_deserialize_safe_module: false
     default_engines: eggroll
   fateboard:
-    enable: True		
+    enable: True
     ips:
-    - 192.168.0.1		
-    port: 8080	
-    dbname: "fate_flow"	
-  mysql:
-    enable: True		
-    type: inside		
-    ips:
-    - 192.168.0.1		
-    port: 3306		
-    dbuser: "fate"	
-    dbpasswd: "fate_deV2999"	
-  zk:					
-    enable: False		
-    lists:			
-    - ip: 192.168.0.1		
-      port: 2181		
-    use_acl: false
-    user: "fate"		
-    passwd: "fate"	
-  servings:			
-    ips:				
     - 192.168.0.1
-    port: 8000   
+    port: 8080
+    dbname: "fate_flow"
+  mysql:
+    enable: True
+    type: inside
+    ips:
+    - 192.168.0.1
+    port: 3306
+    dbuser: "fate"
+    dbpasswd: "fate_deV2999"
+  zk:
+    enable: False
+    lists:
+    - ip: 192.168.0.1
+      port: 2181
+    use_acl: false
+    user: "fate"
+    passwd: "fate"
+  servings:
+    ips:
+    - 192.168.0.1
+    port: 8000
 ```
 
 
@@ -337,10 +337,10 @@ host:
 - 部署所有服务
 
 ```
-sh deploy/deploy.sh deploy
+bash deploy/deploy.sh deploy
 ```
 
-查看部署日志：`tailf logs/deploy-??.log`		
+查看部署日志：`tailf logs/deploy-??.log`
 
 
 
@@ -372,7 +372,7 @@ sh deploy/deploy.sh deploy
 | rollsite       | 192.168.0.1 | 9370      | 跨站点或者说跨party通讯组件            |
 | fate_flow      | 192.168.0.1 | 9360;9380 | 联合学习任务流水线管理模块             |
 | clustermanager | 192.168.0.1 | 4670      | cluster manager管理集群                |
-| nodemanger     | 192.168.0.1 | 4671      | node manager管理每台机器资源           |
+| nodemanager     | 192.168.0.1 | 4671      | node manager管理每台机器资源           |
 | fateboard      | 192.168.0.1 | 8080      | 联合学习过程可视化模块                 |
 | mysql          | 192.168.0.1 | 3306      | 数据存储，clustermanager和fateflow依赖 |
 
@@ -394,7 +394,7 @@ cd 【部署包根目录】
 - 步骤1：使用辅助脚本产生初始化配置
 
 ```
-sh deploy/deploy.sh init -g="9999:192.168.0.1" -n=spark
+bash deploy/deploy.sh init -g="9999:192.168.0.1" -n=spark
 ```
 
 - 步骤2： 按需修改配置
@@ -459,7 +459,7 @@ guest_nginx_ips: ""
 - 步骤3：执行辅助脚本产生配置
 
 ```
-sh deploy/deploy.sh render 
+bash deploy/deploy.sh render
 ```
 
 ##### 4.4.2 配置guest信息
@@ -473,16 +473,16 @@ vi var_files/prod/fate_guest
 内容如下：
 
 ```
-guest:	
+guest:
   partyid: 9999
   fate_flow:
-    enable: True		
+    enable: True
     ips:
-    - 192.168.0.1		
-    grpcPort: 9360	
-    httpPort: 9380	
-    dbname: "fate_flow"	
-    proxy: rollsite	
+    - 192.168.0.1
+    grpcPort: 9360
+    httpPort: 9380
+    dbname: "fate_flow"
+    proxy: rollsite
     http_app_key:
     http_secret_key:
     use_deserialize_safe_module: false
@@ -490,31 +490,31 @@ guest:
     federation: rabbitmq
     storage: hdfs
   fateboard:
-    enable: True		
+    enable: True
     ips:
-    - 192.168.0.1		
-    port: 8080	
-    dbname: "fate_flow"	
-  mysql:
-    enable: True		
-    type: inside		
-    ips:
-    - 192.168.0.1		
-    port: 3306		
-    dbuser: "fate"	
-    dbpasswd: "fate_deV2999"	
-  zk:					
-    enable: False		
-    lists:			
-    - ip: 192.168.0.1		
-      port: 2181		
-    use_acl: false
-    user: "fate"		
-    passwd: "fate"	
-  servings:			
-    ips:				
     - 192.168.0.1
-    port: 8000   
+    port: 8080
+    dbname: "fate_flow"
+  mysql:
+    enable: True
+    type: inside
+    ips:
+    - 192.168.0.1
+    port: 3306
+    dbuser: "fate"
+    dbpasswd: "fate_deV2999"
+  zk:
+    enable: False
+    lists:
+    - ip: 192.168.0.1
+      port: 2181
+    use_acl: false
+    user: "fate"
+    passwd: "fate"
+  servings:
+    ips:
+    - 192.168.0.1
+    port: 8000
   spark:
     enable: true
     home:
@@ -553,7 +553,7 @@ guest:
     enable: False
     host: 127.0.0.1
     http_port: 9300
-    grpc_port: 9310  
+    grpc_port: 9310
 ```
 
 
@@ -563,10 +563,10 @@ guest:
 - 部署所有服务
 
 ```
-sh deploy/deploy.sh deploy
+bash deploy/deploy.sh deploy
 ```
 
-查看部署日志：`tailf logs/deploy-??.log`		
+查看部署日志：`tailf logs/deploy-??.log`
 
 
 

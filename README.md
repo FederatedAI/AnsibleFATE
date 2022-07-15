@@ -1,8 +1,8 @@
 [中文](./README_zh.md)
- 
-## Overview 
 
-AnsibleFATE deploys FATE clusters via Ansible. AnsibleFATE provides scripts to optimize the process of deployment configuration. It helps users to quickly complete the deployment operations. 
+## Overview
+
+AnsibleFATE deploys FATE clusters via Ansible. AnsibleFATE provides scripts to optimize the process of deployment configuration. It helps users to quickly complete the deployment operations.
 
 ## Project structure
 
@@ -33,7 +33,7 @@ Description:
 
    - var_files: Ansible configuration files
 
-     
+
 
 ## Features
 

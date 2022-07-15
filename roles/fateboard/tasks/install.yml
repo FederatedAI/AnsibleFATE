@@ -9,22 +9,22 @@
     path: "{{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{version}}.jar"
   register: fateboard_stat
 
-- name: "untar({{deploy_mode}}): {{role_name}}-{{versions.get(role_name)}}.tar.gz"
+- name: "untar({{deploy_mode}}): {{role_name}}.tar.gz"
   unarchive:
-    src: "{{role_name}}-{{versions.get(role_name)}}.tar.gz"
+    src: "{{role_name}}.tar.gz"
     dest: "{{pbase}}/{{pname}}/"
   when: fateboard_stat.stat.exists == False
 
-- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/fateboard/logs"
+- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/logs"
   file:
-    path: "{{pbase}}/{{pname}}/fateboard/logs"
+    path: "{{pbase}}/{{pname}}/{{role_name}}/logs"
     state: absent
   when: fateboard_stat.stat.exists == False
 
-- name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/fateboard"
+- name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/{{role_name}}"
   file:
-    src: "{{lbase}}/{{pname}}/fateboard"
-    dest: "{{pbase}}/{{pname}}/fateboard/logs"
+    src: "{{lbase}}/{{pname}}/{{role_name}}"
+    dest: "{{pbase}}/{{pname}}/{{role_name}}/logs"
     state: link
   when: fateboard_stat.stat.exists == False
 

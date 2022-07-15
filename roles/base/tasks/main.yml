@@ -3,7 +3,7 @@
     msg: "Please setup ansible_become_pass first"
   when: ansible_become_pass is undefined
 
- 
+
 - name: "mkdir({{deploy_mode}}): project base dir"
   become: yes
   file:
@@ -46,8 +46,8 @@
 - name: "Waring({{deploy_mode}}): owner"
   fail:
     msg: "{{tbase}} not exists"
-  when: tst.stat.exists == False 
- 
+  when: tst.stat.exists == False
+
 
 - name: "mkdir({{deploy_mode}}): log base dir"
   become: yes
@@ -60,7 +60,7 @@
   stat:
     path: "{{lbase}}"
   register: lst
- 
+
 - name: "Waring({{deploy_mode}}): check owner"
   fail:
     msg: "{{lbase}} owner is wrong"
@@ -71,7 +71,7 @@
     msg: "{{lbase}} not exist"
   when: lst.stat.exists == False
 
- 
+
 - name: "mkdir({{deploy_mode}}): base dirs"
   file:
     path: "{{item}}"
@@ -124,34 +124,7 @@
     - psmisc
     - iperf3
     - erlang
-    - python-setuptools
   when: ansible_distribution == "CentOS"
-
-#- name: "untar({{deploy_mode}}): supervisor-3.4.0.rpm.tar.gz"
-#  unarchive:
-#    src: "supervisor-3.4.0.rpm.tar.gz"
-#    dest: "{{tbase}}/{{pname}}/"
-#  when: ansible_distribution in [ "CentOS" ]
-
-#- name: "install({{deploy_mode}}): supervisor rpm package"
-#  shell: /usr/bin/rpm -i /data/temp/fate/supervisor/*.rpm --nofiledigest --nosignature  --replacepkgs
-#  become: yes
-#  register: install_msg
-#  when: ansible_distribution in [ "CentOS" ]
-
-#- name: "show({{deploy_mode}}): install supervisor"
-#  debug:
-#    var: install_msg
-#  when: ansible_distribution in [ "CentOS" ]
-
-
-#- name: "stop({{deploy_mode}}): origin supervisor service(centos)"
-#  service:
-#    name: supervisord
-#    state: stopped
-#    enabled: no
-#  become: yes
-#  when: ansible_distribution in [ "CentOS" ]
 
 - name: "apt({{deploy_mode}}): install dependency packages"
   apt:
@@ -185,7 +158,6 @@
     - lsof
     - iperf3
     - erlang
-    - python-setuptools
   when: ansible_distribution in [ "Ubuntu" ]
 
 - name: "stop({{deploy_mode}}): origin supervisor service(ubuntu)"
@@ -221,6 +193,6 @@
     src: "/usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0"
     dest: "/usr/lib/x86_64-linux-gnu/libcrypto.so.10"
     state: link
-  when: ansible_distribution in [ "Ubuntu" ] and  crypto_stat.stat.exists == False 
+  when: ansible_distribution in [ "Ubuntu" ] and  crypto_stat.stat.exists == False
 
 

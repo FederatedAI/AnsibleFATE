@@ -1,4 +1,3 @@
-
 - name: "Warning({{deploy_mode}}):"
   fail:
     msg: "Please setup deploy_mode variable in the file whose name is fate_init first."
@@ -42,7 +41,7 @@
 
 - name: "copy({{deploy_mode}}): makeVirtualDisk.sh"
   copy:
-    src: "{{item}}" 
+    src: "{{item}}"
     dest: "{{pbase}}/{{pname}}/tools/{{item}}"
   with_items:
   - makeVirtualDisk.sh
@@ -54,7 +53,7 @@
   register: checkOutputInstall
 
 - name: "output({{deploy_mode}}): check results"
-  debug: msg={{checkOutputInstall.stdout_lines}} 
+  debug: msg={{checkOutputInstall.stdout_lines}}
   when: deploy_mode in [ 'deploy', 'install' ]
 
 - name: "Waring({{deploy_mode}}):"

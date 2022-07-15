@@ -30,14 +30,14 @@
   when: miniconda_self_reg.stat.exists == False and miniconda_package_reg.stat.exists == False
 
 - name: "commit({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
-  shell: "/bin/bash ./Miniconda3-{{python['version']}}-Linux-x86_64.sh  -b -p {{cbase}}/{{python['dest']}}"
+  shell: "/bin/bash ./Miniconda3-{{python['version']}}-Linux-x86_64.sh -b -f -p {{cbase}}/{{python['dest']}}"
   args:
     chdir: "{{tbase}}/{{pname}}"
   when: miniconda_self_reg.stat.exists == False
 
-- name: "copy({{deploy_mode}}): supervisor-4.2.1.tar.gz"
+- name: "copy({{deploy_mode}}): supervisor-4.2.4-py2.py3-none-any.whl"
   copy:
-    src: "supervisor-4.2.1.tar.gz"
+    src: "supervisor-4.2.4-py2.py3-none-any.whl"
     dest: "{{tbase}}/{{pname}}"
   when: supervisord_self_reg.stat.exists == False
 
@@ -45,24 +45,24 @@
   shell: "{{cbase}}/miniconda3/bin/pip list |grep -wq PyMySQL && echo 0 || echo 1"
   register: pymysql_reg
 
-- name: "copy({{deploy_mode}}): PyMySQL-1.0.2.tar.gz"
+- name: "copy({{deploy_mode}}): PyMySQL-1.0.2-py3-none-any.whl"
   copy:
-    src: "PyMySQL-1.0.2.tar.gz" 
+    src: "PyMySQL-1.0.2-py3-none-any.whl"
     dest: "{{tbase}}/{{pname}}"
   when: pymysql_reg['stdout'] == "1"
 
 - name: "pip({{deploy_mode}}): install pymysql"
   pip:
-    extra_args: "--no-index --find-links={{tbase}}/{{pname}}/"
+    extra_args: "-f {{tbase}}/{{pname}} --no-index"
     executable: "{{supervisord_path}}/pip"
-    name: "file://{{tbase}}/{{pname}}/PyMySQL-1.0.2.tar.gz"
+    name: "PyMySQL"
   when: pymysql_reg['stdout'] == "1"
 
 - name: "pip({{deploy_mode}}): install supervisor"
   pip:
-    extra_args: "--no-index --find-links={{tbase}}/{{pname}}/"
+    extra_args: "-f {{tbase}}/{{pname}} --no-index"
     executable: "{{supervisord_path}}/pip"
-    name: "file://{{tbase}}/{{pname}}/supervisor-4.2.1.tar.gz"
+    name: "supervisor"
   when: supervisord_self_reg.stat.exists == False
 
 - name: "check({{deploy_mode}}): supervisord conf file"
