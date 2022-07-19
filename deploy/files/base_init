@@ -1,4 +1,3 @@
-
 base_dir: "/etc/ansible"
 
 base: "/data"
@@ -27,4 +26,3 @@ supervisord:
     group: "apps"
     ip: "127.0.0.1"
     port: 9001
-

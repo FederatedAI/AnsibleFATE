@@ -8,23 +8,23 @@ def_check_setup() {
     tvar=( $( ${workdir}/bin/yq eval '.'"${cname}"'[]' ${workdir}/conf/setup.conf ) )
     ttvar="$( ${workdir}/bin/yq eval '.'"${cname}"'' ${workdir}/conf/setup.conf )"
     if [ "${tvar[*]}" == "" -a "$ttvar" != "[]" -a "$ttvar" != "" ]
-    then 
+    then
       echo "$cname:${tvar[*]}|${ttvar} unvaid"
       return 1
-    fi 
+    fi
   done
 }
 
 def_get_base_data() {
   def_check_setup || exit 1
-  
+
   pname=( $( ${workdir}/bin/yq eval '.pname' ${workdir}/conf/setup.conf ) )
   ssh_port=( $( ${workdir}/bin/yq eval '.ssh_port' ${workdir}/conf/setup.conf ) )
   base_roles=( $( ${workdir}/bin/yq eval '.roles[]' ${workdir}/conf/setup.conf ) )
   ssl_roles=( $( ${workdir}/bin/yq eval '.ssl_roles[]' ${workdir}/conf/setup.conf ) )
   deploy_user=( $( ${workdir}/bin/yq eval '.deploy_user' ${workdir}/conf/setup.conf ) )
   deploy_group=( $( ${workdir}/bin/yq eval '.deploy_group' ${workdir}/conf/setup.conf ) )
-  
+
   roles=()
   for rinf in ${base_roles[*]};
   do
@@ -93,7 +93,7 @@ def_get_role_ips() {
   eval local tips\=\( \${${role}_default_ips[*]} \)
   if [ ${#tips[*]} == 0 ]
   then
-    eval ${role}_default_ips\=\( \${${role}_rollsite_ips[0]} \) 
+    eval ${role}_default_ips\=\( \${${role}_rollsite_ips[0]} \)
   fi
 
   local role_modules=( "rollsite" "clustermanager" "nodemanager" "fate_flow" "fateboard" "mysql" )
@@ -129,14 +129,14 @@ def_package_route() {
   for temp in ${temps[*]};
   do
     party_id="${temp%%:*}"
-    eval local list_${party_id}\=\( $temp \${list_${party_id}} \) 
+    eval local list_${party_id}\=\( $temp \${list_${party_id}} \)
     code=$( echo "${party_ids[@]}" | grep -wq "${party_id}" &&  echo 0 || echo 1 )
     if [ $code -eq 1 ]
     then
       party_ids=( ${party_ids[*]} ${temp%%:*} )
-    fi 
+    fi
   done
-  i=1 
+  i=1
   n=${#party_ids[*]}
   if [ $n -gt 0 ]
   then
@@ -207,9 +207,9 @@ def_package_route() {
   done
   if [ -z "${role_routes}" ]
   then
-    echo "[]" 
+    echo "[]"
   else
-    echo "${role_routes}" 
+    echo "${role_routes}"
   fi
 }
 
@@ -239,8 +239,8 @@ def_get_default_route() {
     3)
       if [ "$role" == "exchange" ]
       then
-        local tdroute1=( $(def_get_info_role_default_route host ${host_pid}) ) 
-        local tdroute2=( $(def_get_info_role_default_route guest ${guest_pid}) ) 
+        local tdroute1=( $(def_get_info_role_default_route host ${host_pid}) )
+        local tdroute2=( $(def_get_info_role_default_route guest ${guest_pid}) )
         echo "${tdroute1%]*},${tdroute2#*[}"
       else
         eval local has_default_route\=\${is_${role}_has_default_route}
@@ -249,10 +249,10 @@ def_get_default_route() {
           local tdroute=( $(def_get_info_role_default_route exchange "default") )
           local code=$( echo ${ssl_roles[*]} | grep -wq "$role" && echo 0 || echo 1 )
           if [ $code -eq 0 ]
-          then 
+          then
             echo "${tdroute}"
           else
-            echo "${tdroute}"|sed 's#true#false#g;s#9371#9370#g' 
+            echo "${tdroute}"|sed 's#true#false#g;s#9371#9370#g'
           fi
         else
           echo "[]"
@@ -270,18 +270,18 @@ def_get_default_route() {
           code=$( echo ${roles[*]} | grep -wq "host" &&  echo 0 || echo 1 )
           if [ $code -eq 0 ]
           then
-            local tdroute=( $(def_get_info_role_default_route host ${host_pid}) ) 
+            local tdroute=( $(def_get_info_role_default_route host ${host_pid}) )
             echo "${tdroute}"
-          else 
+          else
             code=$( echo ${roles[*]} | grep -wq "guest" &&  echo 0 || echo 1 )
             if [ $code -eq 0 ]
             then
-              local tdroute=( $(def_get_info_role_default_route guest ${guest_pid} ) ) 
+              local tdroute=( $(def_get_info_role_default_route guest ${guest_pid} ) )
               echo "${tdroute}"
             else
               echo "[]"
-            fi 
-          fi 
+            fi
+          fi
         else
           code=$( echo ${roles[*]} | grep -wq "$role" &&  echo 0 || echo 1 )
           if [ $code -eq 0 ]
@@ -289,7 +289,7 @@ def_get_default_route() {
             eval local has_default_route\=\${is_${role}_has_default_route}
             if [ "${has_default_route}" == "false" ]
             then
-              local tdroute=( $(def_get_info_role_default_route exchange default ) ) 
+              local tdroute=( $(def_get_info_role_default_route exchange default ) )
               echo "${tdroute}"
             else
               echo "[]"
@@ -305,7 +305,7 @@ def_get_default_route() {
             eval local has_default_route\=\${is_${role}_has_default_route}
             if [ "${has_default_route}" == "false" ]
             then
-              local tdroute=( $(def_get_info_role_default_route guest default ) ) 
+              local tdroute=( $(def_get_info_role_default_route guest default ) )
               echo "${tdroute}"
             else
               echo "[]"
@@ -316,7 +316,7 @@ def_get_default_route() {
               eval local has_default_route\=\${is_${role}_has_default_route}
               if [ "${has_default_route}" == "false" ]
               then
-                local tdroute=( $(def_get_info_role_default_route host default ) ) 
+                local tdroute=( $(def_get_info_role_default_route host default ) )
                 echo "${tdroute}"
               else
                 echo "[]"
@@ -325,19 +325,19 @@ def_get_default_route() {
           fi
         fi
       fi
- 
+
     ;;
 
     1)
-      echo "" 
+      echo ""
 
     ;;
-  
+
     *)
       echo "roles data wrong"
     ;;
 
-esac  
+esac
 }
 
 def_format_special_routes() {
@@ -365,7 +365,7 @@ def_format_special_routes() {
       port=${tips[1]}
       local is_secure=true
     fi
-    if [ "${is_secure}" == "true" ]; then 
+    if [ "${is_secure}" == "true" ]; then
       eval temp_${role}_special_routes\=\( \${temp_${role}_special_routes[*]} "${party_id}:${ip}:${port}:${is_secure}" \)
     else
       eval temp_${role}_special_routes\=\( \${temp_${role}_special_routes[*]} "${party_id}:${ip}:${port}" \)
@@ -385,8 +385,8 @@ def_format_role_self_routes() {
   then
     eval ${role}_fate_flow_ips\=\( \${${role}_rollsite_ips[*]} \)
   fi
- 
-  local self_routes="" 
+
+  local self_routes=""
   role_modules=( "rollsite" "fate_flow" )
   local i=1
   for role_module in ${role_modules[*]}
@@ -405,7 +405,7 @@ def_format_role_self_routes() {
       eval ${role}_${role_module}_routes\=\( \${${role}_${role_module}_routes[*]}  "${party_id}:${ip}:${port}" \)
     done
     eval local name="${role}_${role_module}_routes"
-  
+
     local is_ssl_role="false"
     local tdroute=$( def_package_route "${name}" "${is_ssl_role}" )
     if [ $i == 1 ]
@@ -416,9 +416,9 @@ def_format_role_self_routes() {
       local t2=$( echo ${tdroute} | sed 's#.*routes\"\:\[\(.*\)#\1#' | tr -s '"' '\"' |tr -s '[' '\[' | tr -s ']' '\]' |tr -s '{' '\{' | tr -s '}' '\}' )
       self_routes="$t1,$t2"
     fi
-    i=$( expr $i + 1 ) 
+    i=$( expr $i + 1 )
   done
-  eval ${role}_self_routes\=\'$( echo ${self_routes} | tr -s '"' '\"' |tr -s '[' '\[' | tr -s ']' '\]' |tr -s '{' '\{' | tr -s '}' '\}' )\' 
+  eval ${role}_self_routes\=\'$( echo ${self_routes} | tr -s '"' '\"' |tr -s '[' '\[' | tr -s ']' '\]' |tr -s '{' '\{' | tr -s '}' '\}' )\'
   eval echo "${role}_self_routes: \${${role}_self_routes}"
 }
 
@@ -443,7 +443,7 @@ def_render_hosts() {
         do
           eval tips\=\(\${${role}_${role_module}_ips[*]}\)
           for tip in ${tips[*]};
-          do 
+          do
             code=$( echo ${all_ips[*]} | grep -wq $tip && echo 0 || echo 1 )
             if [ $code -eq 1 ]
             then
@@ -454,7 +454,7 @@ def_render_hosts() {
       else
         eval tips\=\(\${${role}_${module}_ips[*]}\)
         for tip in ${tips[*]};
-        do 
+        do
           code=$( echo ${all_ips[*]} | grep -wq $tip && echo 0 || echo 1 )
           if [ $code -eq 1 ]
           then
@@ -462,15 +462,15 @@ def_render_hosts() {
           fi
         done
       fi
-    done 
+    done
   done
   echo "all_ips: ${all_ips[*]}"
-   
+
   for tip in ${all_ips[*]};
   do
-    sed -i '$i '"$tip"'\n' $dfile  
+    sed -i '$i '"$tip"'\n' $dfile
   done
-  sed -i '/^$/d' $dfile  
+  sed -i '/^$/d' $dfile
 }
 def_render_base_init() {
   echo "def_render_base_init"
@@ -481,7 +481,7 @@ def_render_base_init() {
           " .supervisord.service.group \=env\(deploy_group\)  "\
           " \' ${workdir}/files/base_init -I 2 -P " > $dfile
 }
- 
+
 def_render_fate_init() {
   echo "def_render_fate_init"
 
@@ -489,64 +489,47 @@ def_render_fate_init() {
   local deploy_roles="[$( echo ${roles[*]} | tr -s ' ' ',' )]"
   local deploy_modules="[$( echo ${modules[*]} | tr -s ' ' ',' )]"
   local ssl_roles="[$( echo ${ssl_roles[*]} | tr -s ' ' ',' )]"
-  local fversion="$( ./bin/yq  eval '.product_fate_versions.fateflow' ${base}/build/conf/setup.conf )"
-  local bversion="$( ./bin/yq  eval '.product_fate_versions.fateboard' ${base}/build/conf/setup.conf )"
-  local eversion="$( ./bin/yq  eval '.product_fate_versions.eggroll' ${base}/build/conf/setup.conf )"
-  local pversion="$( ./bin/yq  eval '.product_fate_version' ${base}/build/conf/setup.conf )"
-  local version=${pversion%-*}
-  local version=${pversion}
-  if [ "${pversion#*-}" == "release" ]
-  then
-    local version=${pversion%-*}
-  fi
-  local pip="pypi/${version}/pypi"
-  #echo "-------------${fversion} ${eversion}"
-  myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} pip=${pip} version=${version} fversion=${fversion} bversion=${bversion} eversion=${eversion} roles=${deploy_roles} ssl_roles=${ssl_roles} pname=${pname} default_engines=${default_engines}"
+
+  myvars="deploy_mode=${deploy_mode} deploy_modules=${deploy_modules} roles=${deploy_roles} ssl_roles=${ssl_roles} default_engines=${default_engines}"
   eval eval  ${myvars} "${workdir}/bin/yq  e  \' "\
-          " .pname \|\=env\(pname\) \| "\
           " .deploy_mode \|\=env\(deploy_mode\) \| "\
           " .deploy_modules \|\=env\(deploy_modules\) \| "\
           " .deploy_roles \|\=env\(roles\) \| "\
           " .ssl_roles \|\=env\(ssl_roles\) \| "\
-          " .default_engines\|\=env\(default_engines\) \| "\
-          " .python.pip \|\=env\(pip\) \| "\
-          " .version \|\=env\(version\) \| "\
-          " .versions.eggroll \|\=env\(eversion\) \| "\
-          " .versions.fate_flow \|\=env\(fversion\) \| "\
-          " .versions.fateboard \|\=env\(fversion\) "\
+          " .default_engines\|\=env\(default_engines\)  "\
           " \' ${workdir}/files/fate_init -I 2 -P " > $dfile
 }
 
 def_render_playbook() {
   echo "def_render_playbook"
 
-  dfile="$1"  
+  dfile="$1"
   case "${deploy_mode}" in
-  
+
     "install"|"uninstall"|"deploy"|"config")
       if [ "${deploy_mode}" == "uninstall" ]; then
         if [ "${default_engines}" != "spark" ]; then
           cp ${workdir}/files/project-uninstall.yaml $dfile
         else
-          cp ${workdir}/files/spark-project-uninstall.yaml $dfile 
+          cp ${workdir}/files/spark-project-uninstall.yaml $dfile
         fi
       else
         if [ "${default_engines}" != "spark" ]; then
           cp ${workdir}/files/project-install.yaml $dfile
         else
-          cp ${workdir}/files/spark-project-install.yaml $dfile 
+          cp ${workdir}/files/spark-project-install.yaml $dfile
         fi
       fi
-      sed -i 's#ENV#'"${deploy_env}"'#g;s#PNAME#'"${pname}"'#g' $dfile 
+      sed -i 's#ENV#'"${deploy_env}"'#g;s#PNAME#'"${pname}"'#g' $dfile
       for role in "host" "guest" "exchange";
       do
         code=$( echo ${roles[*]} | grep -wq "$role" && echo 0 || echo 1 )
         if [ $code -eq 1 ]
         then
-          sed -i '/var_files\/'"${deploy_env}"'\/'"${pname}"'_'"$role"'/d' $dfile 
+          sed -i '/var_files\/'"${deploy_env}"'\/'"${pname}"'_'"$role"'/d' $dfile
         fi
       done
-      
+
       local i=0
       [ "${default_engines}" != "spark" ] && all_modules=( "mysql" "eggroll" "fateflow" "fateboard" ) || all_modules=( "mysql" "fateflow" "fateboard" )
       if [ "${deploy_mode}" == "uninstall" ]; then
@@ -572,10 +555,10 @@ def_render_playbook() {
           then
             i=$( expr $i + 1 )
           fi
-          sed -i '/role: "'"${tmodule}"'"/d' $dfile 
+          sed -i '/role: "'"${tmodule}"'"/d' $dfile
         fi
-      done 
-      if [ ${deploy_mode} != "uninstall" ]; then 
+      done
+      if [ ${deploy_mode} != "uninstall" ]; then
         if [ $i -eq 2 -o "${deploy_mode}" != "deploy" ]
         then
           sed -i '/role: "python",/d' $dfile
@@ -596,6 +579,8 @@ def_render_playbook() {
 }
 
 def_render_setup() {
+  mkdir -p ${workdir}/conf
+
   local deploy_host_ips="[$( echo ${host_ips[*]} | tr -s ' ' ',' )]"
   local deploy_guest_ips="[$( echo ${guest_ips[*]} | tr -s ' ' ',' )]"
   if [ ${#exchange_ips[*]} -gt 1 ]
@@ -605,7 +590,7 @@ def_render_setup() {
     local deploy_exchange_ips="[\"$( echo ${exchange_ips[*]} | tr -s ' ' ',' )\"]"
   fi
   local deploy_roles="[$( echo ${roles[*]} | tr -s ' ' ',' )]"
-  local deploy_ssl_roles="[$( echo ${ssl_roles[*]} | tr -s ' ' ',' )]"  
+  local deploy_ssl_roles="[$( echo ${ssl_roles[*]} | tr -s ' ' ',' )]"
   myvars="deploy_mode\=\${deploy_mode}  \
         host_ips\=${deploy_host_ips} \
         guest_ips\=${deploy_guest_ips} \
@@ -653,15 +638,15 @@ def_render_roles_core() {
   then
     local server_secure=true
     local client_secure=true
-  else  
+  else
     local server_secure=false
     local client_secure=false
   fi
 
-  case $role in 
+  case $role in
     "host"|"guest")
       myvars=""
-      local role_enable="true" 
+      local role_enable="true"
       eval local trole_ips=( \${${role}_ips[*]} )
       local role_modules=( "rollsite" "clustermanager" "nodemanager" "fate_flow" "fateboard" "mysql" )
       for role_module in ${role_modules[*]};
@@ -676,7 +661,7 @@ def_render_roles_core() {
           eval local ${role_module}_ips\="[$( echo \${${role}_${role_module}_ips[*]} | tr -s ' ' ',' )]"
         fi
         if [ "${role_module}" == "rollsite" -o "${role_module}" == "clustermanager" -o "${role_module}" == "nodemanager" ]
-        then 
+        then
           code=$( echo ${modules[*]} | grep -wq "eggroll" && echo 0 || echo 1 )
         else
           code=$( echo ${modules[*]} | grep -wq "${role_module}" && echo 0 || echo 1 )
@@ -688,7 +673,7 @@ def_render_roles_core() {
           eval local ${role_module}_enable=false
         fi
       done
- 
+
       eval local special_routes=\'$( echo \${${role}_special_routes} | tr -s '"' '\"' | tr -s '[' '\[' | tr -s ']' '\]')\'
       eval local default_routes=\'$( echo \${${role}_default_routes} | tr -s '"' '\"' | tr -s '[' '\[' | tr -s ']' '\]')\'
       eval local self_routes=\'$( echo \${${role}_self_routes} | tr -s '"' '\"' | tr -s '[' '\[' | tr -s ']' '\]')\'
@@ -712,7 +697,7 @@ def_render_roles_core() {
       if [ ${len_default_routes} -eq 0 ]
       then
         default_routes='[]'
-      fi 
+      fi
       if [ ${len_special_routes} -eq 0 ]
       then
         special_routes='[]'
@@ -880,7 +865,7 @@ def_render_roles_core() {
     rollsite_polling_ids=${polling_ids} \
     special_route_tables=${exchange_special_routes} \
     default_route_tables="${exchange_default_routes}" \
-    rollsite_ips="[$(echo ${exchange_rollsite_ips[*]}|tr -s ' ' ',')]"  ${workdir}/bin/yq  e ' 
+    rollsite_ips="[$(echo ${exchange_rollsite_ips[*]}|tr -s ' ' ',')]"  ${workdir}/bin/yq  e '
       .exchange.rollsite.client_secure|=env(client_secure) |
       .exchange.rollsite.server_secure|=env(server_secure) |
       .exchange.rollsite.route_tables |=env(special_route_tables) |
@@ -906,7 +891,7 @@ def_process_file_core() {
     case $role in
       "host")
         echo '-----default_special_routes(host)----'
-        def_format_special_routes host 
+        def_format_special_routes host
         echo "temp_host_special_routes: ${temp_host_special_routes[*]}"
         host_special_routes=$( def_package_route temp_host_special_routes )
         echo "host_special_routes: ${host_special_routes[*]}"
@@ -917,7 +902,7 @@ def_process_file_core() {
 	if [ "$?" -eq 0 ]
 	then
           echo "warning: default routes number wrong"
-	  exit 1 
+	  exit 1
 	fi
         echo "is_host_has_default_route:${is_host_has_default_route}"
         echo '-----role_self_routes(host)----------'
@@ -927,10 +912,10 @@ def_process_file_core() {
         def_render_roles_core $role ${pname} $base
         echo "def_render_roles_core $role ${pname} ok"
       ;;
- 
+
       "guest")
         echo '------default_special_routes(guest)---'
-        def_format_special_routes guest 
+        def_format_special_routes guest
         echo "temp_guest_special_routes: ${temp_guest_special_routes[*]}"
         guest_special_routes=$( def_package_route temp_guest_special_routes )
         echo "guest_special_routes: ${guest_special_routes[*]}"
@@ -941,9 +926,9 @@ def_process_file_core() {
 	if [ "$?" -eq 0 ]
 	then
           echo "warning: default routes number wrong"
-	  exit 1 
+	  exit 1
 	fi
-	
+
         echo "is_guest_has_default_route:${is_guest_has_default_route}"
         echo '------role_self_routes(guest)----------'
         def_format_role_self_routes guest
@@ -952,7 +937,7 @@ def_process_file_core() {
         def_render_roles_core $role ${pname} $base
         echo "def_render_roles_core $role ${pname} ok"
       ;;
-      "exchange") 
+      "exchange")
         echo '------default_special_routes(exchange)---'
         def_format_special_routes exchange
         echo "temp_exchange_special_routes: ${temp_exchange_special_routes[*]}"
@@ -970,15 +955,15 @@ def_process_file_core() {
 
 def_backup_configs() {
  local base=$1
- 
+
  now=$( date "+%s" )
  bbase="${base}/backups/$now"
  [ ! -d "${bbase}" ] && mkdir -p ${bbase}/{environments,var_files}
- 
+
  local num=$( ls ${base}/project-*.yaml 2>/dev/null |wc -l )
  [ $num -gt 0 ] && mv ${base}/project-*.yaml $bbase
- [ -d ${base}/environments/${deploy_env} ] && mv ${base}/environments/${deploy_env}  ${bbase}/environments/ 
- [ -d ${base}/var_files/${deploy_env} ] && mv ${base}/var_files/${deploy_env} ${bbase}/var_files 
+ [ -d ${base}/environments/${deploy_env} ] && mv ${base}/environments/${deploy_env}  ${bbase}/environments/
+ [ -d ${base}/var_files/${deploy_env} ] && mv ${base}/var_files/${deploy_env} ${bbase}/var_files
  mkdir -p ${base}/environments/${deploy_env}
  mkdir -p ${base}/var_files/${deploy_env}
 }
@@ -1003,8 +988,8 @@ def_simple_mode() {
 
   echo "-------------------4 count fate data------------------------------"
   echo "-----deploy-----"
-  echo "deploy_mode: ${deploy_mode}"  
-  echo "modules: ${modules[*]}"  
+  echo "deploy_mode: ${deploy_mode}"
+  echo "modules: ${modules[*]}"
   echo "-----partyid-----"
   echo "host: ${host_pid}"
   echo "guest: ${guest_pid}"
@@ -1017,7 +1002,7 @@ def_simple_mode() {
   echo ${info_exchange_ips[*]}
   echo "exchange: ${exchange_rollsite_ips[*]}"
 
-  
+
   echo "-----node ips-----"
   for tt in  "rollsite" "clustermanager" "nodemanager" "fate_flow" "fateboard" "mysql";
   do
@@ -1026,16 +1011,16 @@ def_simple_mode() {
   done
   echo "exchange_rollsite_ips: ${exchange_rollsite_ips[*]}"
   echo "exchange_rollsite_ips: ${exchange_default_ips[*]}"
-  
- 
-  
+
+
+
   echo "-------------------5 deal with route data--------------------------"
   for role in ${roles[*]};
   do
     echo "+++++++++++++++ deal with $role  +++++++++++++++"
     fbase="${base}/var_files/${deploy_env}"
     def_process_file_core $role $fbase
-    
+
   done
 
   echo "-----------------6 render hosts  ------------------------------"
@@ -1066,7 +1051,7 @@ def_simple_mode() {
 def_check_args() {
   local type=$1;
   local args=$2;
-  case $type in 
+  case $type in
     "host")
       echo $args | grep -qE '^(-h=*[0-9]*:*[0-9.]*|-h)$'
       if [ "$?" -eq 1 ]
@@ -1127,22 +1112,22 @@ def_check_args() {
 	  return 0
 	fi
         local troles=( $( echo  ${args#*=} | tr -s '|' ' ' ) )
-        for trole in ${troles[*]} 
+        for trole in ${troles[*]}
         do
           echo ${roles[*]} | grep -wq ${trole}
           if [ $? -eq 1 ]
           then
             echo "check key:  $args unvid"
             return 1
-          fi 
+          fi
         done
-        
+
       else
         return 1
-      fi 
+      fi
     ;;
   esac
- 
+
 }
 
 def_assist_mode() {
@@ -1151,15 +1136,15 @@ def_assist_mode() {
   local roles=()
   deploy_mode="deploy"
   engines="eggroll"
- 
+
   if [ ${#args[*]} == 0 ]; then
     args=( "--help" )
   fi
- 
+
   last_check_arg=""
   for arg in ${args[*]};
   do
-    case ${arg%=*} in 
+    case ${arg%=*} in
       "-h")
         local trole_info=${arg#*=}
         if [ "${arg#*=}" == "${arg%=*}" -o ${trole_info} == "-h" ]
@@ -1203,7 +1188,7 @@ def_assist_mode() {
         then
           exchange_ips=( "default:192.168.0.99" )
         else
-          def_check_args exchange $arg || return 
+          def_check_args exchange $arg || return
           if [ "${trole_info}" != "-e" ]
           then
             exchange_ips=( "default:${trole_info#*:}" )
@@ -1246,7 +1231,7 @@ def_assist_mode() {
         then
           engines="${arg#*=}"
         fi
-      ;; 
+      ;;
       "--help")
         echo "Usage: $0 init -h|-g|-e|-m|-k"
         echo "     args:  "
@@ -1265,7 +1250,7 @@ def_assist_mode() {
       ;;
     esac
   done
-      
+
   if [ -n "$last_check_arg" ]
   then
     def_check_args key $last_check_arg || return
@@ -1284,7 +1269,7 @@ then
   exit 1
 fi
 
-case $name in 
+case $name in
   "host-guest"|"host-exchange"|"guest-host"|"guest-exchange"|"exchange-host"|"exchange-guest")
     rm -rf ${workdir}/keys/* && echo "clean ${workdir}/keys/*"
     aside=${name%-*}
@@ -1292,23 +1277,23 @@ case $name in
 
     echo $name
     curdir=${workdir}/keys/$name
-    mkdir -p $curdir 
+    mkdir -p $curdir
     cd ${curdir}
     tpl="$( cat ${workdir}/tpl/ca-csr.json.tpl )"
     variables="ca_name=fate_$name"
     printf "$variables\ncat << EOF\n$tpl\nEOF" | bash > ca-csr.json
     cp ${workdir}/files/ca-config.json ${curdir}
     ${workdir}/bin/cfssl gencert -initca ca-csr.json | ${workdir}/bin/cfssljson -bare ca
-    
+
     for side in $aside $bside
     do
       echo $side
       curdir=${workdir}/keys/$side
-      mkdir -p $curdir 
+      mkdir -p $curdir
       cd ${curdir}
       cp -rf ${workdir}/keys/${name}/* .
-     
-      eval echo "**********${side}_rollsite_ips: \${${side}_rollsite_ips[0]}"  
+
+      eval echo "**********${side}_rollsite_ips: \${${side}_rollsite_ips[0]}"
       tpl="$( cat ${workdir}/tpl/server-csr.json.tpl )"
       eval variables="\"server_cn=${side}-server.fate.fedai.org server_host=\${${side}_rollsite_ips[0]}\""
       echo "---------------$variables--------------"
@@ -1326,14 +1311,14 @@ case $name in
   "host"|"guest"|"exchange")
     echo $name
     curdir=${workdir}/keys/$name
-    mkdir -p $curdir 
+    mkdir -p $curdir
     cd ${curdir}
     tpl="$( cat ${workdir}/tpl/ca-csr.json.tpl )"
     variables="ca_name=fate_$name"
     printf "$variables\ncat << EOF\n$tpl\nEOF" | bash > ca-csr.json
     cp ${workdir}/files/ca-config.json ${curdir}
     ${workdir}/bin/cfssl gencert -initca ca-csr.json | ${workdir}/bin/cfssljson -bare ca
-  
+
     tpl="$( cat ${workdir}/tpl/server-csr.json.tpl )"
     eval variables="\"server_cn=${name}-server.fate.fedai.org server_host=\${${name}_rollsite_ips[0]}\""
     echo "---------------$variables--------------"
@@ -1347,7 +1332,7 @@ case $name in
     ${workdir}/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=client client-csr.json | ${workdir}/bin/cfssljson -bare client
     openssl pkcs8 -topk8 -inform PEM -in client-key.pem     -outform PEM -out client.key -nocrypt
   ;;
-  
+
   *)
     echo "Usage: $0 host|guest|exchange|polling --server=polling_server_ip --client=polling_client_ip "
   ;;
@@ -1359,7 +1344,7 @@ def_ssl_roles_adjust() {
   if [ ${#ssl_roles[*]} != 1 ]
   then
     echo "only support ssl_roles has one member"
-    exit 1 
+    exit 1
   fi
 
   case ${ssl_roles[0]} in
@@ -1374,26 +1359,26 @@ def_ssl_roles_adjust() {
 
 def_main_process() {
   local action=$1
-  
-  case $action in 
+
+  case $action in
 
     "init")
       shift
       def_assist_mode $@
-       
+
     ;;
 
     "render")
       echo "-------------------1 get base data--------------------------------"
       def_get_base_data || exit 1
-     
-       
+
+
       shift
-      sh ${workdir}/check.sh &&  def_simple_mode $@
+      bash ${workdir}/check.sh &&  def_simple_mode $@
     ;;
     "ping")
       echo "-------------------1 get base data--------------------------------"
-      def_get_base_data || exit 1 
+      def_get_base_data || exit 1
       echo "ping"
       ansible -i ${base}/environments/${deploy_env} $pname  -m ping
 
@@ -1434,7 +1419,7 @@ def_main_process() {
               def_make_keys ${ssl_roles[0]}-${ssl_roles[1]} &&  /bin/bash ${workdir}/cp-keys.sh ${ssl_roles[0]} ${ssl_roles[1]}
 	    fi
            ;;
-          2) 
+          2)
             def_make_keys ${ssl_roles[0]}-${ssl_roles[1]} &&  /bin/bash ${workdir}/cp-keys.sh ${ssl_roles[0]} ${ssl_roles[1]}
            ;;
           *)
@@ -1442,7 +1427,7 @@ def_main_process() {
             echo "Usage: /bin/bash $0 keys [host|guest|exchange]"
             ;;
         esac
-      fi 
+      fi
     ;;
     "--help")
       echo "Usage: deploy.sh init|render|deloy|install|config|uninstall|keys|ping|help args"

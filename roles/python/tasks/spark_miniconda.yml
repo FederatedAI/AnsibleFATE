@@ -11,7 +11,7 @@
   - "{{pbase}}/{{pname}}/common"
 
 - name: "commit({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
-  shell: "/bin/bash ./Miniconda3-{{python['version']}}-Linux-x86_64.sh  -b -p {{pbase}}/{{pname}}/common/{{python['dest']}}"
+  shell: "/bin/bash ./Miniconda3-{{python['version']}}-Linux-x86_64.sh -b -f -p {{pbase}}/{{pname}}/common/{{python['dest']}}"
   args:
     chdir: "{{tbase}}/{{pname}}"
   when: spy_reg.stat.exists == False

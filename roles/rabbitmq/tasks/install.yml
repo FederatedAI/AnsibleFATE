@@ -27,9 +27,9 @@
     path: "{{pbase}}/{{pname}}/{{rabbitmq['path']}}/rabbitmq_server-{{rabbitmq['version']}}/etc/rabbitmq"
   register: rabbitmq_stat
 
-- name: "untar({{deploy_mode}}): rabbitmq-server-generic-unix-{{rabbitmq['version']}}.tar"
+- name: "untar({{deploy_mode}}): rabbitmq-server-generic-unix-{{rabbitmq['version']}}.tar.xz"
   unarchive:
-    src: "rabbitmq-server-generic-unix-{{rabbitmq['version']}}.tar"
+    src: "rabbitmq-server-generic-unix-{{rabbitmq['version']}}.tar.xz"
     dest: "{{pbase}}/{{pname}}/{{rabbitmq['path']}}"
   when: rabbitmq_stat.stat.exists == False
 

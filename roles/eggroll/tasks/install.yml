@@ -39,34 +39,33 @@
   unarchive:
     src: "debug.tar.gz"
     dest: "{{pbase}}/{{pname}}/bin"
-  when: eggroll_debug_stat.stat.exists == False  
+  when: eggroll_debug_stat.stat.exists == False
 
 - name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}"
   stat:
     path: "{{pbase}}/{{pname}}/{{role_name}}/conf/eggroll.properties"
   register: eggroll_stat
 
-- name: "untar({{deploy_mode}}): eggroll-{{versions['eggroll']}}.tar.gz"
+- name: "untar({{deploy_mode}}): {{role_name}}.tar.gz"
   unarchive:
-    src: "eggroll-{{versions['eggroll']}}.tar.gz"
+    src: "{{role_name}}.tar.gz"
     dest: "{{pbase}}/{{pname}}/"
-  when: eggroll_stat.stat.exists == False  
+  when: eggroll_stat.stat.exists == False
 
-- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/eggroll/logs"
+- name: "delete({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/logs"
   file:
-    path: "{{pbase}}/{{pname}}/eggroll/logs"
+    path: "{{pbase}}/{{pname}}/{{role_name}}/logs"
     state: absent
-  when: eggroll_stat.stat.exists == False 
+  when: eggroll_stat.stat.exists == False
 
-- name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/eggroll"
+- name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/{{role_name}}"
   file:
-    src: "{{lbase}}/{{pname}}/eggroll"
-    dest: "{{pbase}}/{{pname}}/eggroll/logs"
+    src: "{{lbase}}/{{pname}}/{{role_name}}"
+    dest: "{{pbase}}/{{pname}}/{{role_name}}/logs"
     state: link
-  when: eggroll_stat.stat.exists == False 
+  when: eggroll_stat.stat.exists == False
 
-- name: "Copy: fate-eggroll.sh {{pbase}}/{{pname}}/eggroll/bin"
+- name: "Copy: fate-eggroll.sh {{pbase}}/{{pname}}/{{role_name}}/bin"
   copy:
     src: "eggroll.sh"
     dest: "{{pbase}}/{{pname}}/eggroll/bin/fate-eggroll.sh"
-

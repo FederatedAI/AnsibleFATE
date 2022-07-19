@@ -9,4 +9,3 @@
 
 - name: restart {{pname}}-mysql
   shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-mysql
-
