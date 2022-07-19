@@ -8,7 +8,6 @@ AnsibleFATE 支持通过Ansible进行部署FATE集群。我们提供了辅助脚
 
 ```
 AnsibleFATE
-|-- build
 |-- docs
 |-- environments
 |-- logs
@@ -19,9 +18,7 @@ AnsibleFATE
 
 说明：
 
-   - build: 构建目录。使用辅助脚本和配置文件，按需构建产品的部署包。
-
-   -   docs: 文档目录。
+   - docs: 文档目录。
 
    - environments： ansbile部署的目标主机配置文件
 
@@ -41,7 +38,7 @@ AnsibleFATE
 - 支持按需选择组合部署集群： 不同后端引擎和不同组件。
 - 支持多种形态的部署： 针对产品的全部或部分模块的多种部署方式。
 - 提供在线和离线2种部署包，可按需使用。
-- 提供从源码到输出部署离线包的打包脚本。
+
 
 
 ## 部署文档

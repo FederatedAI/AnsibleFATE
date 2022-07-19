@@ -8,7 +8,6 @@ AnsibleFATE deploys FATE clusters via Ansible. AnsibleFATE provides scripts to o
 
 ````
 AnsibleFATE
-|-- build
 |-- docs
 |-- environments
 |-- logs
@@ -18,8 +17,6 @@ AnsibleFATE
 ````
 
 Description:
-
-   - build: the build directory. It contains helper scripts and configuration files to build deployment packages.
 
    - docs: Documentation directory.
 
@@ -41,7 +38,7 @@ Description:
 - Customizable deployment of the clusters: a combination of different backend engines and components.
 - Multiple deployment methods for all or some of FATE's modules.
 - Provides both the online and offline deployment packages.
-- Provides packaging scripts for building the offline packages from source code.
+
 
 
 ## Documentation
