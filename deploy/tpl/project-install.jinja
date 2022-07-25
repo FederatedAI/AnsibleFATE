@@ -1,12 +1,10 @@
-
-
 - hosts: {{data.get('pname','fate')}}
   any_errors_fatal: True
   vars:
 {%- raw %}
     jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
     pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
-    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+    pypath: "{{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fateflow/python:{{pbase}}/{{pname}}/eggroll/python"
  {%- endraw %}
   vars_files:
   - var_files/prod/base_init
@@ -32,5 +30,3 @@
   - { role: "fateboard_check", when: "( ansible_ssh_host in host['fateboard']['ips'] and host['fateboard']['enable'] == True ) or ( ansible_ssh_host in guest['fateboard']['ips'] and guest['fateboard']['enable'] == True )" }
 {%- endif %}
 {%- endfor %}
-
-

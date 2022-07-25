@@ -90,8 +90,8 @@ fi
 if [[ -d "{{pbase}}/{{pname}}/fateboard" && "${check_arg[@]}" =~ "fateboard" ]]; then
   echo "Warning: please rename {{pbase}}/{{pname}}/fateboard"
 fi
-if [[ ( -d "{{pbase}}/{{pname}}/python" ||  -d "{{pbase}}/{{pname}}/example" || -d "{{pbase}}/{{pname}}/{{python['venv']}}" ) && "${check_arg[@]}" =~ "fate_flow" ]]; then
-  echo "Warning: please rename {{pbase}}/{{pname}}{python|example}"
+if [[ ( -d "{{pbase}}/{{pname}}/fate" || -d "{{pbase}}/{{pname}}/fateflow" ||  -d "{{pbase}}/{{pname}}/example" || -d "{{pbase}}/{{pname}}/{{python['venv']}}" ) && "${check_arg[@]}" =~ "fate_flow" ]]; then
+  echo "Warning: please rename {{pbase}}/{{pname}}{fate|fateflow|example}"
 fi
 
 #check supervisor conf

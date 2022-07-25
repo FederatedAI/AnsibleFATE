@@ -1340,7 +1340,7 @@ spark引擎场景配置project_prod.yaml内容如下：
   vars:
     jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
     pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
-    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+    pypath: "{{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fateflow/python:{{pbase}}/{{pname}}/eggroll/python"
   vars_files:
   - var_files/prod/base_init
   - var_files/prod/fate_init
@@ -1364,7 +1364,7 @@ spark引擎场景配置project_prod.yaml内容如下：
   vars:
     jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
     pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
-    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+    pypath: "{{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fateflow/python:{{pbase}}/{{pname}}/eggroll/python"
   vars_files:
   - var_files/prod/base_init
   - var_files/prod/fate_init
