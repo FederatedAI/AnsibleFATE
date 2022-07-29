@@ -11,6 +11,26 @@ dependent_distribution: true
 {% else %}
 dependent_distribution: false
 {% endif %}
+encrypt_password: false
+encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
+private_key:
+party_id: {{partyid}}
+hook_module:
+  client_authentication: fate_flow.hook.flow.client_authentication
+  site_authentication: fate_flow.hook.flow.site_authentication
+  permission: fate_flow.hook.flow.permission
+hook_server_name:
+authentication:
+  client:
+    switch: false
+    http_app_key:
+    http_secret_key:
+  site:
+    switch: false
+permission:
+  switch: false
+  component: false
+  dataset: false
 fateflow:
   host: {{fate_flow.get('ips',['127.0.0.1'])[0]}}
   http_port: {{fate_flow.get('httpPort',9380)}}
