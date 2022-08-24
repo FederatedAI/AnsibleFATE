@@ -22,10 +22,10 @@ hook_module:
 hook_server_name:
 authentication:
   client:
-{% if fate_flow.get('http_app_key','') == '' or fate_flow.get('http_secret_key','') == '' %}
-    switch: false
-{% else %}
+{% if fate_flow.get('http_app_key') and fate_flow.get('http_secret_key') %}
     switch: true
+{% else %}
+    switch: false
 {% endif %}
     http_app_key: {{fate_flow.get('http_app_key','')}}
     http_secret_key: {{fate_flow.get('http_secret_key','')}}
