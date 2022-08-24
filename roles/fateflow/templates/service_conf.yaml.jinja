@@ -1,9 +1,9 @@
-{% if zk.get('enable',False) == True %}
+{% if zk.get('enable',false) == true %}
 use_registry: true
 {% else %}
 use_registry: false
 {% endif %}
-{% if fate_flow.get('use_deserialize_safe_module',false) == true or fate_flow.get('use_deserialize_safe_module',false) == True %}
+{% if fate_flow.get('use_deserialize_safe_module',false) == true or fate_flow.get('use_deserialize_safe_module',false) == true %}
 use_deserialize_safe_module: true
 {% endif %}
 {% if fate_flow.get('default_engines','eggroll') == 'spark' and spark.get('home','') != '' %}
@@ -22,9 +22,13 @@ hook_module:
 hook_server_name:
 authentication:
   client:
+{% if fate_flow.get('http_app_key','') == '' or fate_flow.get('http_secret_key','') == '' %}
     switch: false
-    http_app_key:
-    http_secret_key:
+{% else %}
+    switch: true
+{% endif %}
+    http_app_key: {{fate_flow.get('http_app_key','')}}
+    http_secret_key: {{fate_flow.get('http_secret_key','')}}
   site:
     switch: false
 permission:
@@ -35,8 +39,15 @@ fateflow:
   host: {{fate_flow.get('ips',['127.0.0.1'])[0]}}
   http_port: {{fate_flow.get('httpPort',9380)}}
   grpc_port: {{fate_flow.get('grpcPort',9360)}}
-  http_app_key: {{fate_flow.get('http_app_key','')}}
-  http_secret_key: {{fate_flow.get('http_secret_key','')}}
+  # when you have multiple fateflow server on one party,
+  # we suggest using nginx for load balancing.
+{% if nginx.get('enable',False) == True %}
+  nginx:
+    host: {{nginx.get('host','127.0.0.1')}}
+    http_port: {{nginx.get('http_port',9380)}}
+    grpc_port: {{nginx.get('grpc_port',9360)}}
+{% endif %}
+
   # support rollsite/nginx/fateflow as a coordination proxy
   # rollsite support fate on eggroll, use grpc protocol
   # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
@@ -159,7 +170,11 @@ fateboard:
   host: {{fateboard.get('ips',['127.0.0.1'])[0]}}
   port: {{fateboard.get('port',8080)}}
 
+{% if model_store.get('enable',False) == True %}
+enable_model_store: true
+{% else %}
 enable_model_store: false
+{% endif %}
 model_store_address:
   # use tencent cos as model store engine
 # storage: tencent_cos
@@ -167,8 +182,8 @@ model_store_address:
 # SecretId:
 # SecretKey:
 # Bucket:
-  storage: mysql
-  database: fate_model
+  storage: {{model_store.get('storage','mysql')}}
+  database: {{fate_flow.get('dbname','fate_flow')}}
   user: {{db.get('dbuser','fate')}}
   passwd: {{db.get('dbpasswd','fate_dev')}}
   host: {{db['ips'][0]}}
