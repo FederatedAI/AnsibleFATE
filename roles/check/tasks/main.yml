@@ -17,11 +17,6 @@
     owner: "{{ansible_ssh_user}}"
   when: deploy_mode in [ 'deploy', 'install' ]
 
-- name: "untar({{deploy_mode}}): build.tar.gz"
-  unarchive:
-    src: "build.tar.gz"
-    dest: "{{pbase}}/{{pname}}/"
-
 - name: "untar({{deploy_mode}}): deploy.tar.gz"
   unarchive:
     src: "deploy.tar.gz"
