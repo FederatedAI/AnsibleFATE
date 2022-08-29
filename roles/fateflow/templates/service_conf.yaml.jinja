@@ -1,9 +1,9 @@
-{% if zk.get('enable',False) == True %}
+{% if zk.get('enable',false) == true %}
 use_registry: true
 {% else %}
 use_registry: false
 {% endif %}
-{% if fate_flow.get('use_deserialize_safe_module',false) == true or fate_flow.get('use_deserialize_safe_module',false) == True %}
+{% if fate_flow.get('use_deserialize_safe_module',false) == true or fate_flow.get('use_deserialize_safe_module',false) == true %}
 use_deserialize_safe_module: true
 {% endif %}
 {% if fate_flow.get('default_engines','eggroll') == 'spark' and spark.get('home','') != '' %}
@@ -11,12 +11,43 @@ dependent_distribution: true
 {% else %}
 dependent_distribution: false
 {% endif %}
+encrypt_password: false
+encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
+private_key:
+party_id: {{partyid}}
+hook_module:
+  client_authentication: fate_flow.hook.flow.client_authentication
+  site_authentication: fate_flow.hook.flow.site_authentication
+  permission: fate_flow.hook.flow.permission
+hook_server_name:
+authentication:
+  client:
+{% if fate_flow.get('http_app_key') and fate_flow.get('http_secret_key') %}
+    switch: true
+{% else %}
+    switch: false
+{% endif %}
+    http_app_key: {{fate_flow.get('http_app_key','')}}
+    http_secret_key: {{fate_flow.get('http_secret_key','')}}
+  site:
+    switch: false
+permission:
+  switch: false
+  component: false
+  dataset: false
 fateflow:
   host: {{fate_flow.get('ips',['127.0.0.1'])[0]}}
   http_port: {{fate_flow.get('httpPort',9380)}}
   grpc_port: {{fate_flow.get('grpcPort',9360)}}
-  http_app_key: {{fate_flow.get('http_app_key','')}}
-  http_secret_key: {{fate_flow.get('http_secret_key','')}}
+  # when you have multiple fateflow server on one party,
+  # we suggest using nginx for load balancing.
+{% if nginx.get('enable',False) == True %}
+  nginx:
+    host: {{nginx.get('host','127.0.0.1')}}
+    http_port: {{nginx.get('http_port',9380)}}
+    grpc_port: {{nginx.get('grpc_port',9360)}}
+{% endif %}
+
   # support rollsite/nginx/fateflow as a coordination proxy
   # rollsite support fate on eggroll, use grpc protocol
   # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
@@ -139,31 +170,20 @@ fateboard:
   host: {{fateboard.get('ips',['127.0.0.1'])[0]}}
   port: {{fateboard.get('port',8080)}}
 
-# on API `/model/load` and `/model/load/do`
-# automatic upload models to the model store if it exists locally but does not exist in the model storage
-# or download models from the model store if it does not exist locally but exists in the model storage
-# this config will not affect API `/model/store` or `/model/restore`
+{% if model_store.get('enable',False) == True %}
+enable_model_store: true
+{% else %}
 enable_model_store: false
+{% endif %}
 model_store_address:
-  # other optional configs send to the engine
-#  max_connections: 10
-#  stale_timeout: 10
-  # use redis as the model store engine
-#  storage: redis
-#  host: 127.0.0.1
-#  port: 6379
-#  db: 0
-#  password:
-  # the expiry time of keys, in seconds. defaults None (no expiry time)
-#  ex:
   # use tencent cos as model store engine
 # storage: tencent_cos
 # Region:
 # SecretId:
 # SecretKey:
 # Bucket:
-  storage: mysql
-  ame: model
+  storage: {{model_store.get('storage','mysql')}}
+  database: {{fate_flow.get('dbname','fate_flow')}}
   user: {{db.get('dbuser','fate')}}
   passwd: {{db.get('dbpasswd','fate_dev')}}
   host: {{db['ips'][0]}}

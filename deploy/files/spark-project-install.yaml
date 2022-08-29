@@ -1,9 +1,9 @@
-- hosts: PNAME 
+- hosts: PNAME
   any_errors_fatal: True
   vars:
     jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
     pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
-    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+    pypath: "{{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fateflow/python:{{pbase}}/{{pname}}/eggroll/python"
   vars_files:
   - var_files/ENV/base_init
   - var_files/ENV/PNAME_init

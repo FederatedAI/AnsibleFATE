@@ -5,16 +5,12 @@ deploy_modules: []
 deploy_roles: []
 default_engines: eggroll
 
-version: 1.7.2
-versions: {}
+version: "#VERSION#"
 
 python:
-  version: 4.5.4
+  version: py38_4.12.0
   dest: "miniconda3"
   venv: "common/python/venv"
-  pip: "pypi/1.7.2/pypi"
-  must:
-  - setuptools-50.3.2-py3-none-any.whl
 java:
   name: "jdk"
   version: "8u192"
@@ -28,5 +24,5 @@ redis:
   version: "5.0.2"
   path: "common/redis"
 rabbitmq:
-  version: "3.6.15"
+  version: "3.9.14"
   path: "common/rabbitmq"

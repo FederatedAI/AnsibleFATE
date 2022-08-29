@@ -58,3 +58,6 @@ host:
     ips:
     - 127.0.0.1
     port: 8000
+  model_store:
+    enable: false
+    storage: mysql

@@ -1,7 +1,3 @@
-
-
-
-
 # ansible 部署FATE集群手册
 
 <!-- TOC -->
@@ -65,17 +61,11 @@
         - [**2.7.3.2 快速模式**](#2732-快速模式)
         - [**2.7.3.3 正常模式**](#2733-正常模式)
 - [2.8 服务运维](#28-服务运维)
-- [2.9 打包](#29-打包)
-    - [2.9.1 下载在线包](#291-下载在线包)
-    - [2.9.2 执行脚本进行打包](#292-执行脚本进行打包)
 - [3.1 使用自签证书](#31-使用自签证书)
 - [3.2 单边部署使用证书场景](#32-单边部署使用证书场景)
 - [3.3 mysql使用外部数据库](#33-mysql使用外部数据库)
 
 <!-- /TOC -->
-
-
-
 
 
 
@@ -100,7 +90,7 @@ FATE官方网站：https://fate.fedai.org/
 | 名称     | 说明                             |
 | -------- | -------------------------------- |
 | 系统     | Centos 7.6                       |
-| 开发语言 | Python 3.6.5、Java 1.8           |
+| 开发语言 | Python 3.8、Java 1.8           |
 | 软件组件 | fate  eggroll  fateboard   mysql |
 
 
@@ -115,7 +105,7 @@ FATE官方网站：https://fate.fedai.org/
 - host_id: 10000
 - guest_id: 9999
 
- 前置操作请参考： <<[部署fate集群的前置操作](action_before_deploy_fate_cluster.md)>> 一文。 
+ 前置操作请参考： <<[部署fate集群的前置操作](action_before_deploy_fate_cluster.md)>> 一文。
 
 
 
@@ -126,7 +116,7 @@ FATE官方网站：https://fate.fedai.org/
 | rollsite       | 9370      | /data/logs/fate/eggroll/   | 跨站点或者说跨party通讯组件            |
 | fate_flow      | 9360;9380 | /data/logs/fate/fateflow/  | 联合学习任务流水线管理模块             |
 | clustermanager | 4670      | /data/logs/fate/eggroll/   | cluster manager管理集群                |
-| nodemanger     | 4671      | /data/logs/fate/eggroll/   | node manager管理每台机器资源           |
+| nodemanager     | 4671      | /data/logs/fate/eggroll/   | node manager管理每台机器资源           |
 | fateboard      | 8080      | /data/logs/fate/fateboard/ | 联合学习过程可视化模块                 |
 | mysql          | 3306      | /data/logs/mysql/          | 数据存储，clustermanager和fateflow依赖 |
 
@@ -141,7 +131,7 @@ FATE官方网站：https://fate.fedai.org/
 - 离线包： 可以直接进行部署的包。
    - 部署包名称：`AnsibleFATE_${version}_release-offline.tar.gz`
    - 部署包根目录名称：`AnsibleFATE-${version}-release-offline`
-- 在线包： 部署的包，但不包括模块的资源包，不能直接进行部署。 可通过下载(可参考2.6.1.3一节）或者自编译模块(可参考2.6.1.4一节）的资源包，组装成离线包。
+- 在线包： 部署的包，但不包括模块的资源包，不能直接进行部署。 可通过下载资源包（参考2.6.1.3一节），组装成离线包。
 
   - 部署包名称： `AnsibleFATE_${version}_release-online.tar.gz`
   - 部署包根目录名称：   `AnsibleFATE-${version}-release-online`
@@ -152,7 +142,7 @@ FATE官方网站：https://fate.fedai.org/
 
 - 进行部署
 
-​         
+​
 
 ##### 2.4.3 部署形态
 
@@ -195,7 +185,7 @@ FATE官方网站：https://fate.fedai.org/
 
   - 非exchange情景，必须设置default值
 
-  - nodemanger按需设置一个或多个IP
+  - nodemanager按需设置一个或多个IP
 
   - exchange的rollsite按需设置一个或多个IP
 
@@ -234,7 +224,7 @@ FATE官方网站：https://fate.fedai.org/
 
 ###### 2.4.7.3 路由地址
 
-​          支持ip也支持域名。	
+​          支持ip也支持域名。
 
 
 
@@ -262,58 +252,6 @@ FATE官方网站：https://fate.fedai.org/
 
 #### 2.5 辅助脚本和配置文件
 
-##### 2.5.1 下载脚本和下载配置文件
-
-脚本：**build/build.sh**
-
-文件：**build/conf/setup.conf**
-
-###### 2.5.1.1 下载脚本的使用
-
-- 初始化下载配置文件
-
-  ```
-  命令格式：bash build/build.sh init pname version minversion
-  参数说明：
-          pname： 项目名称
-          version： 资源包大版本号
-          minversion： 资源包小版本号
-  使用示例：	
-  bash build/build.sh init fate 1.7.0 release
-  ```
-
-​        
-
-- 按需编辑下载配置文件
-
-  ```
-  vim build/conf/setup.conf
-  ```
-
-- 执行下载
-
-  ```
-  bash build/build.sh do
-  ```
-
-
-###### 2.5.1.2 下载配置文件
-
-- 部署fate的下载配置文件
-
-  ```
-  project: fate
-  products:
-  - fate
-  - eggroll
-  product_fate_version: 1.7.0
-  product_fate_versions:
-    fateflow: 1.7.0-release
-    fateboard: 1.7.0-release
-    eggroll: 2.4.0-release
-  ```
-
-
 ##### 2.5.2 部署辅助脚本和部署配置文件
 
 部署辅助脚本：   deploy/deploy.sh
@@ -325,12 +263,12 @@ ansible配置文件： var_files/prod/*
 ###### 2.5.2.1 部署辅助脚本使用指引
 
 ```
-sh deploy/deploy.sh --help
+bash deploy/deploy.sh --help
 Usage: deploy/deploy.sh init|render|deploy|install|config|uninstall|keys|help args
 
-sh deploy/deploy.sh init --help
+bash deploy/deploy.sh init --help
 Usage: deploy/deploy.sh -h|-g|-e|-m|-k
-     args:  
+     args:
          -h=ip
          -g=ip
          -e=ip
@@ -346,10 +284,10 @@ Usage: deploy/deploy.sh -h|-g|-e|-m|-k
 - 生成部署配置文件
 
 ```
-sh deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
+bash deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
 ```
 
-参数说明： 
+参数说明：
 
 ​        -g：表示部署guest，可不填参数值；格式“partyid:ip”，使用示例： -g="9999:192.168.1.1" 或  -g
 
@@ -359,9 +297,9 @@ sh deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
 
 ​        -m：部署模式，-m=deploy|install|config|uninstall，默认deploy（安装+配置）
 
-​        -k：开启证书，支持部署单边证书、双边或三边使用，使用示例：-k="host|guest" 或 -k  
+​        -k：开启证书，支持部署单边证书、双边或三边使用，使用示例：-k="host|guest" 或 -k
 
-​                 默认规则： 
+​                 默认规则：
 
 ​                          部署2方，-k无需带参数，默认会把2方角色都自动设置为开启证书。
 
@@ -373,7 +311,7 @@ sh deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
 
 ​          ***上述参数可以混合使用，多个表示部署多方。***
 
-​        
+​
 
 - 使用示例
 
@@ -386,7 +324,7 @@ sh deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
   - 初始化使用实际参数值
 
     ```
-    sh deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1" 
+    bash deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1"
        -e="192.168.0.88"  -k="host|guest"
     ```
 
@@ -395,7 +333,7 @@ sh deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
 - 使用部署辅助脚本生成ansible配置文件
 
 ```
-sh deploy/deploy.sh render 
+bash deploy/deploy.sh render
 ```
 
 
@@ -405,7 +343,7 @@ sh deploy/deploy.sh render
 - 使用以下命令生产同一个ca的的证书
 
   ```
-  sh deploy/deploy.sh keys
+  bash deploy/deploy.sh keys
   ```
 
 
@@ -414,7 +352,7 @@ sh deploy/deploy.sh render
 
   ```
   /bin/bash deploy/deploy.sh keys [host|guest|exchange]  // |表示或，只能选择一个执行脚本
-  
+
   所有不同ca的证书生成后需要执行cp-keys.sh脚本
   /bin/bash deploy/cp-keys.sh $arg1 $arg2	//arg1、arg2为证书的角色方[host|guest|exchange]
   ```
@@ -447,7 +385,7 @@ modules:				//调整需要部署或卸载的模块
   - eggroll
   - fate_flow
   - fateboard
-  
+
 2）/bin/bash deploy/deploy.sh render		//生成配置
 3）/bin/bash deploy/deploy.sh deploy|uninstall	//执行部署或卸载
 ```
@@ -476,7 +414,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   deploy_user: app	---部署目标服务的远程连接用户
   deploy_group: apps	---部署目标服务的远程连接用户的用户组
   deploy_mode: deploy
-  
+
   modules:
     - mysql
     - fate_flow
@@ -484,14 +422,14 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   roles:
     - host:10000
     - guest:9999
-  
+
   host_ips:
     - default:192.168.0.1
   host_special_routes: []
   guest_ips:
     - default:192.168.1.1
   guest_special_routes: []
-  
+
   default_engines: spark
   #host spark configuration information
   #compute_engine: spark
@@ -508,7 +446,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   host_pulsar_ips: ""
   #proxy
   host_nginx_ips: ""
-  
+
   #
   #guest spark configuration information
   #compute_engine: spark
@@ -526,7 +464,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   #proxy
   guest_nginx_ips: ""
   ```
-  
+
 - **非spark引擎部署配置文件**
 
   文件：`deploy/conf/setup.conf`
@@ -538,7 +476,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   deploy_user: app	---部署目标服务的远程连接用户
   deploy_group: apps	---部署目标服务的远程连接用户的用户组
   deploy_mode: deploy
-  
+
   modules:
     - mysql
     - eggroll
@@ -549,7 +487,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
     - guest:9999
   ssl_roles: []
   polling: {}
-  
+
   host_ips:
     - default:192.168.0.1
   host_special_routes: []
@@ -564,33 +502,33 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
 
 
 - **部署配置文件讲解参数说明：**
-  
+
   ```
   1，deploy_mode： 部署模式。 取值有： deploy、install、config、uninstall，设置方式： 默认deploy表示安装软件并配置服务，install只安装软件，config只更新配置服务，uninstall表示卸载。
-   
+
   2，modules：需要的部署的模块。取值有：mysql、eggroll 、fate_flow、fateboard，设置方式： 单独一个，多个或者全部。例：modules: ['mysql','eggroll']
-   
+
   3，roles：需要部署的某一端的角色。取值有： host、 guest、exchange，设置方式： 3个任意组合。
-  
+
   4，ssl_roles： 使用证书的角色。取值有： host、 guest、exchange，设置方式： 空值或三选二。 三边部署不支持-k="host|guest"；不支持spark场景
-  
+
   5，polling： polling的角色。取值有： 字典，包含服务端的角色和客户端的角色，格式： { "server_role": "exchange", "client_role": "host" }，设置方式： 空值或字典。（部署2方或者3方才支持）
-  
+
   6，host_ips：host端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
-  
+
   7，host_special_routes： host端额外路由。取值有： 数组，成员格式：party_id:ip:port,设置方式：可以设置零个、一个或多个。例：- 8888:192.168.1.2:9370（支持证书方式: - 8888:192.168.1.2:9371:secure），额外路由指向exchange示例为： - default:192.168.1.2:9370
-  
+
   8，guest_ips：guest端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
-  
+
   9，guest_special_routes： guest端额外路由。取值有： 数组，成员格式：party_id:ip:port, 设置方式： 可以设置零个、一个或多个。（支持证书方式：- 8888:192.168.1.2:9371:secure），指向exchange示例为： - default:192.168.1.2:9370
-  
+
   10，exchange_ips： exchange端机器列表，取值："default:ip列表"、"rollsite:ip列表" ，设置方式： 二选一。多个exchange_ip使用|分割。
-  
+
   11，exchange_special_routes：exchange端额外路由。取值有： 数组，成员格式：party_id:ip:port, 设置方式： 可以设置零个、一个或多个。（支持配置使用证书方式： - 8888:192.168.1.2:9371:secure）
-  
+
   12，默认路由的设置，请参考2.4.8“路由支持”一节的介绍。
   13，default_engines：fate使用的引擎，默认为eggroll，取值列表（eggroll、standalone、spark）
-  	
+
   14，host_compute_engine：计算引擎，取值：（spark）；设置spark可启动spark配置。
   15，host_spark_home：spark目录，默认使用环境变量的SPARK_HOME。
   16，host_hadoop_home: hadoop服务目录
@@ -608,10 +546,10 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
 
 - **场景1：单部署host**
 
-  命令： `sh deploy/deploy.sh init -h="10000:192.168.0.1"` 
+  命令： `sh deploy/deploy.sh init -h="10000:192.168.0.1"`
 
   配置文件：`vim deploy/conf/setup.conf`
-  
+
   ```
   env: prod
   pname: fate
@@ -644,7 +582,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
 
 ​		host_special_routes：host端额外路由，一般指向exchange，数组格式：party_id:ip:port，指向exchange				例：host_special_routes: [ 'default:192.168.0.88:9370' ]
 
-​		default_engines: eggroll,默认后端引擎	
+​		default_engines: eggroll,默认后端引擎
 
 - **场景2：单部署exchange**
 
@@ -742,7 +680,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   roles:
     - host:10000
     - guest:9999
-  
+
   host_ips:
     - default:192.168.0.1
   host_special_routes: []
@@ -765,7 +703,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   host_pulsar_ips: ""
   #proxy
   host_nginx_ips: ""
-  
+
   #
   #guest spark configuration information
   #compute_engine: spark
@@ -783,7 +721,7 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   #proxy
   guest_nginx_ips: ""
   ```
-  
+
 - **场景5：部署两方host-guest（非spark）**
 
   命令： `sh deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1" -k`
@@ -877,7 +815,7 @@ vi var_files/prod/base_init
 base_dir: "/etc/ansible"
 
 //目录可以根据实际情况调整
-base: "/data"						
+base: "/data"
 pbase: "/data/projects"				---项目根目录
 dbase: "/data/projects/data"		---数据目录
 cbase: "/data/projects/common"		---工具类部署目录（包含supervisor和miniconda的路径）
@@ -925,30 +863,23 @@ deploy_modules:		---部署模块
   - eggroll
   - fate_flow
   - fateboard
-  
+
 deploy_roles:		---部署角色
   - exchange
   - guest
   - host
-  
+
 ssl_roles:			---证书角色
   - host
   - exchange
 
 default_engines: eggroll	---默认后端引擎
 pname: "fate"			---项目名称
-versions:				---各服务版本号
-  fateboard: 1.7.0-release
-  eggroll: 2.4.0-release
-  fate_flow: 1.7.0-release
 
 python:					---python部署信息
   version: 4.5.4        --不同的包会随安全更新版本
   dest: "miniconda3"
   venv: "common/python/venv"
-  pip: pip-packages-fate-1.7.0
-  must:
-  - setuptools-50.3.2-py3-none-any.whl
 
 java:					---java部署信息
   name: "jdk"
@@ -975,8 +906,8 @@ vi var_files/prod/fate_exchange
 内容如下：
 
 ```
-exchange:		
-  rollsite: 
+exchange:
+  rollsite:
     enable: True
     coordinator: fate
     ips:			---rollsite IP列表
@@ -1051,7 +982,7 @@ host:
   zk:					---不支持部署zk，配置信息用于fateflow
     enable: False		---true为开启zk配置信息，False则否
     lists:			---zk集群IP列表
-    - ip: 192.168.0.1		
+    - ip: 192.168.0.1
       port: 2181		---zk服务端口
     use_acl: false	---zk是否启动acl
     user: "fate"		---acl用户
@@ -1117,7 +1048,7 @@ host:
 host:
   partyid: 10000   ---host端partyid，根据实际规划修改
   rollsite:
-    enable: True   ---true为需要部署此模块，False则否  
+    enable: True   ---true为需要部署此模块，False则否
     coordinator: fate
     ips:			---IP列表，目前rollsite只支持部署到一台服务器
     - 192.168.0.1
@@ -1125,9 +1056,9 @@ host:
     secure_port: 9371		---开启证书通讯时对外的端口
     server_secure: False	---作为服务端，使用证书验证，开启True
     client_secure: False	---作为客户端，使用证书验证，开启True
-    polling:		
+    polling:
       enable: False		---polling设置开关，开启设置为True
-    route_tables:	---host端路由表				
+    route_tables:	---host端路由表
     - id: default		------本party指向exchange或者其他party的IP，端口路由配置
       routes:
       - name: default	---默认路由表，目前支持一个默认路由。如果有exchange，则指向exchange，如无，则指向对端party。
@@ -1187,7 +1118,7 @@ host:
   zk:					---不支持部署zk，配置信息用于fateflow
     enable: False		---true为开启zk配置信息，False则否
     lists:			---zk集群IP列表
-    - ip: 192.168.0.1		
+    - ip: 192.168.0.1
       port: 2181		---zk服务端口
     use_acl: false	---zk是否启动acl
     user: "fate"		---acl用户
@@ -1211,7 +1142,7 @@ vi var_files/prod/fate_guest
 - spark引擎场景配置请参考如下：
 
 ```
-guest:  
+guest:
   partyid: 9999   ---guest端partyid，根据实际规划修改
   fate_flow:
     enable: True		---true为需要部署此模块，False则否
@@ -1244,7 +1175,7 @@ guest:
   zk:					---不支持部署zk，配置信息用于fateflow
     enable: False		---true为开启zk配置信息，False则否
     lists:			---zk集群IP列表
-    - ip: 192.168.1.1		
+    - ip: 192.168.1.1
       port: 2181		---zk服务端口
     use_acl: false	---zk是否启动acl
     user: "fate"		---acl用户
@@ -1318,9 +1249,9 @@ guest:
     secure_port: 9371		---开启证书通讯时对外的端口
     server_secure: False	---作为服务端，使用证书验证，开启True
     client_secure: False	---作为客户端，使用证书验证，开启True
-    polling:		
+    polling:
       enable: False		---polling设置开关，开启设置为True
-    route_tables:	---host端路由表				
+    route_tables:	---host端路由表
     - id: default		------本party指向exchange或者其他party的IP，端口路由配置
       route:
       - name: default	---默认路由表，目前支持一个默认路由。如果有exchange，则指向exchange，如无，则指向对端party。
@@ -1380,7 +1311,7 @@ guest:
   zk:					---不支持部署zk，配置信息用于fateflow
     enable: False		---true为开启zk配置信息，False则否
     lists:			---zk集群IP列表
-    - ip: 192.168.1.1		
+    - ip: 192.168.1.1
       port: 2181		---zk服务端口
     use_acl: false	---zk是否启动acl
     user: "fate"		---acl用户
@@ -1388,7 +1319,7 @@ guest:
   servings:			---serving-server配置信息
     ips:				---serving集群IP列表，配置guest端serving
     - 192.168.1.1
-    port: 8000		---服务端口    
+    port: 8000		---服务端口
 ```
 
 
@@ -1409,7 +1340,7 @@ spark引擎场景配置project_prod.yaml内容如下：
   vars:
     jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
     pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
-    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+    pypath: "{{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fateflow/python:{{pbase}}/{{pname}}/eggroll/python"
   vars_files:
   - var_files/prod/base_init
   - var_files/prod/fate_init
@@ -1433,7 +1364,7 @@ spark引擎场景配置project_prod.yaml内容如下：
   vars:
     jbase: "{{pbase}}/{{pname}}/{{java['path']}}/{{java['name']}}-{{java['version']}}"
     pybase: "{{pbase}}/{{pname}}/{{python['venv']}}"
-    pypath: "{{pbase}}/{{pname}}/python:{{pbase}}/{{pname}}/eggroll/python"
+    pypath: "{{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fateflow/python:{{pbase}}/{{pname}}/eggroll/python"
   vars_files:
   - var_files/prod/base_init
   - var_files/prod/fate_init
@@ -1498,69 +1429,23 @@ ansible_become_pass=
 - 离线包解压后初始化配置后可直接部署
 
 ```
-wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/AnsibleFATE_${version}_release-offline.tar.gz
+wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release-offline.tar.gz
 tar xzf AnsibleFATE_${version}_release-offline.tar.gz
 cd AnsibleFATE-${version}-release-offline
 
 //version>=1.7.0，按需设置
 ```
 
-###### 2.6.1.2下载非离线包
 
-- 方法1 git获取
-  
-```
-git clone -b ${version} https://github.com/FederatedAI/AnsibleFATE
-cd AnsibleFATE
-
-//${version}表示代码的版本分支
-```
-
-- 方法2 下载在线包
+###### 2.6.1.2下载在线包
 
 ```
-wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/AnsibleFATE_${version}_release-online.tar.gz
+wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release-online.tar.gz
 tar xzf AnsibleFATE_${version}_release-online.tar.gz
 cd AnsibleFATE-${version}-release-online
 
 //version>=1.7.0
 ```
-
-说明： 下载非离线包后，在2.6.1.3 和2.6.1.4 中二选一。
-
-
-
-###### 2.6.1.3 按需下载模块的资源包
-
-​	说明： 2.6.1.3 和2.6.1.4 二选一。
-
-- 初始化配置（使用最新版本的包）
-
-```
-sh build/build.sh init pname [version] [minversion]
-// pname表示项目，如fate, version表示项目的大版本号，minversion表示小版本号
-// 例：sh build/build.sh init fate 1.7.0 release
-```
-
-- 按需调整配置（默认无需修改）
-
-```
-vi build/conf/setup.conf
-```
-
-- 执行下载
-
-```
-sh build/build.sh do
-```
-
-###### 2.6.1.4 按需自编译模块的资源包
-
-   说明： 2.6.1.3 和2.6.1.4 二选一。
-
-- 参考<< [编译模块资源包](https://github.com/FederatedAI/FATE/blob/master/build/package-build/build.zh.md) >>编译，获取源代码后使用构建命令<< [编译模块资源包](https://github.com/FederatedAI/FATE/blob/master/build/package-build/build.zh.md) >>的第9小节 构建包含FATE系统软件和环境依赖的整体包，来完成构建fate软件包；注意构建时pip版本需大于21
-- 参考 2.9 节进行打包
-
 
 
 ##### 2.6.2 使用初始化脚本生成部署配置文件
@@ -1569,7 +1454,7 @@ sh build/build.sh do
 
 ```
 Usage:  /bin/bash deploy/deploy.sh init -h|-g|-e|-m|-k
-     args:  
+     args:
          -h=ip
          -g=ip
          -e=ip or ips
@@ -1608,7 +1493,7 @@ vi deploy/conf/setup.conf
 
 ```
  /bin/bash deploy/deploy.sh keys							---生成同一ca证书
- 
+
  /bin/bash deploy/deploy.sh keys [host|guest|exchange]		---生成不同ca证书，选择一方执行
  不同ca的证书生成后需要执行cp-keys.sh脚本
  /bin/bash deploy/cp-keys.sh $arg1 $arg2	//arg1、arg2为证书的角色方[host|guest|exchange]
@@ -1682,7 +1567,7 @@ lsof -i :9370
 
 ```
 source /data/projects/fate/bin/init_env.sh
-flow test toy -gid 10000 -hid 10000 
+flow test toy -gid 10000 -hid 10000
 ```
 
 类似如下结果表示成功：
@@ -1775,13 +1660,13 @@ cd /data/projects/common/supervisord
 启动/关闭/查看所有：
 
 ```
-sh service.sh start/stop/status all 
+bash service.sh start/stop/status all
 ```
 
 启动/关闭/查看单个模块(可选：clustermanager，nodemanager，rollsite，fateflow，fateboard，mysql)：
 
 ```
-sh service.sh start/stop/status fate-clustermanager
+bash service.sh start/stop/status fate-clustermanager
 ```
 
 **服务日志**
@@ -1792,36 +1677,6 @@ sh service.sh start/stop/status fate-clustermanager
 | fate_flow | fate_flow_server                      | /data/logs/fate/fateflow/  |
 | mysql     | mysql                                 | /data/logs/mysql/          |
 | fateboard | fateboard                             | /data/logs/fate/fateboard/ |
-
-
-
-#### 2.9 打包
-
-##### 2.9.1 下载在线包
-
-​     参考2.6.1.2一节。
-
-
-
-##### 2.9.2 执行脚本进行打包
-
-```
-bash tools/fate_package.sh $args
-
-Usage: tools/fate_package.sh --version|--minversion|--type|--dir|--archive
-     args:  
-         --version=1.7.0
-         --minversion=release
-         --type=local(default) or online
-         --dir=/data/temp
-         --archive
-```
-
-- --version参数表示大版本号，例如1.7.0
-- --minversion参数表示小版本号，例如rc2、release
-- --type参数表示获取包的方式，默认为local是本地获取，需要指定包路径--dir； online从网络下载，可以通过--dir指定下载包路径（临时路径）
-- --dir参数表示资源包路径，也可以指定归档的存放路径
-- --archive 开启归档，产生离线包存放在脚本目录的packages目录；默认不归档压缩； 
 
 
 
@@ -1857,7 +1712,7 @@ scp exchange/* app@exchangeip:/data/projects/data/fate/keys/
 3）重启guest和exchange的rollsite服务
 
 ```
-sh /data/projects/common/supervisord/service.sh restart fate-rollsite
+bash /data/projects/common/supervisord/service.sh restart fate-rollsite
 ```
 
 
@@ -1871,7 +1726,7 @@ sh /data/projects/common/supervisord/service.sh restart fate-rollsite
 1）部署单边host（假设证书方为exchange-host）
 
 ```
-1、sh deploy/deploy.sh init -h -k	
+1、sh deploy/deploy.sh init -h -k
 //修改conf/setup.conf的hostip，并设置额外路由为exchange，路由格式为（default:ip:证书端口:secure）
 2、sh deploy/deploy.sh keys			//证书制作拷贝
 3、将deploy/keys/host/目录下的ca.pem、client.pem、client.key文件远程拷贝到exchange服务器的/data/projects/data/fate/keys/目录下，拷贝对应的名称分别为exchange-client-ca.pem、exchange-client-client.pem、exchange-client-client.key
@@ -1884,7 +1739,7 @@ sh /data/projects/common/supervisord/service.sh restart fate-rollsite
 2）部署单边exchange（假设证书方为exchange-host）
 
 ```
-1、sh deploy/deploy.sh init -e -k	
+1、sh deploy/deploy.sh init -e -k
 //修改conf/setup.conf的exchangeip，并设置额外路由为host，路由格式为（host_party:ip:证书端口:secure）
 2、sh deploy/deploy.sh keys			//证书制作拷贝
 3、将deploy/keys/exchange/目录下的ca.pem、client.pem、client.key文件远程拷贝到host服务器的/data/projects/data/fate/keys/目录下，拷贝对应的名称分别为host-client-ca.pem、host-client-client.pem、host-client-client.key
@@ -1920,22 +1775,19 @@ flush privileges;
 mysql:
     enable: True
     type: outside			--修改为outside，表示外部
-    ips: 
+    ips:
       - 192.168.0.1			--填写外部mysql的实际IP
     port: 3306				--填写外部mysql的实际端口
-    dbuser: fate	
+    dbuser: fate
     dbpasswd: fate_deV2999
 ```
 
 3）修改var_files/prod/fate_init
 
 ```
-mysql:				
+mysql:
   version: "8.0.28"
   path: "common/mysql"
   user: "root"			---mysql数据库管理账号，修改为实际使用的管理账号
   passwd: "fatE168dev"	---mysql数据库管理密码，修改为实际使用的管理密码
 ```
-
-
-

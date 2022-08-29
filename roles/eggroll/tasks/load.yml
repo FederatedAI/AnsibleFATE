@@ -11,7 +11,7 @@
       admin_user: "{{mysql.get('user','root')}}"
       admin_passwd: "{{mysql.get('passwd','fate')}}"
       db_name: "{{eggroll.get('dbname','eggroll_meta')}}"
-      db_host: "{{db.get('ips',[])[0]}}"
+      db_host: "{{db.get('ips',['127.0.0.1'])[0]}}"
       db_port: "{{db.get('port',3306)}}"
 
   - name: "commit({{deploy_mode}}): check.py"
@@ -19,19 +19,16 @@
     register: mysql_load
 
   - debug: var=mysql_load.get('stdout_lines')
-  
-  - name: "update({{deploy_mode}}): {{tbase}}/load.py"
-    template: src=templates/load.py.jinja dest={{tbase}}/db_create.py
-    vars:
-      fname: "{{pbase}}/{{pname}}/sql/create-eggroll-meta-tables.sql"
-      db_name: "{{eggroll.get('dbname','eggroll_meta')}}"
-      db_host: "{{db.get('ips',[])[0]}}"
-      db_port: "{{db.get('port',3306)}}"
-      admin_user: "{{mysql.get('user','root')}}"
-      admin_passwd: "{{mysql.get('passwd','fate')}}"
 
-  - name: "commit({{deploy_mode}}): db_create.py"
-    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/db_create.py"
+  - name: "commit({{deploy_mode}}): create {{eggroll.get('dbname','eggroll_meta')}}"
+    shell: "{{pbase}}/{{pname}}/{{mysql['path']}}/mysql-{{mysql['version']}}/bin/mysqladmin -h '{{db.get('ips',['127.0.0.1'])[0]}}' -P {{db.get('port',3306)}} -u'{{mysql.get('user','root')}}' -p'{{mysql.get('passwd','fate')}}' create '{{eggroll.get('dbname','eggroll_meta')}}'"
+    register: mysql_load
+
+  - debug: var=mysql_load.get('stderr_lines')
+  - debug: var=mysql_load.get('stdout_lines')
+
+  - name: "commit({{deploy_mode}}): import create-eggroll-meta-tables.sql"
+    shell: "{{pbase}}/{{pname}}/{{mysql['path']}}/mysql-{{mysql['version']}}/bin/mysql -h '{{db.get('ips',['127.0.0.1'])[0]}}' -P {{db.get('port',3306)}} -u'{{mysql.get('user','root')}}' -p'{{mysql.get('passwd','fate')}}' '{{eggroll.get('dbname','eggroll_meta')}}' < {{pbase}}/{{pname}}/sql/create-eggroll-meta-tables.sql"
     register: mysql_load
 
   - debug: var=mysql_load.get('stderr_lines')
@@ -47,7 +44,7 @@
       admin_user: "{{mysql.get('user','root')}}"
       admin_passwd: "{{mysql.get('passwd','fate')}}"
       db_name: "{{eggroll.get('dbname','eggroll_meta')}}"
-      db_host: "{{db.get('ips',[])[0]}}"
+      db_host: "{{db.get('ips',['127.0.0.1'])[0]}}"
       db_port: "{{db.get('port',3306)}}"
       db_user: "{{db.get('dbuser','fate')}}"
       db_passwd: "{{db.get('dbpasswd','fate')}}"
@@ -62,15 +59,15 @@
 - when: "ansible_ssh_host in nodemanager.get('ips',[]) and nodemanager.get('enable', False) == True"
   block:
   - name: "update({{deploy_mode}}): {{tbase}}/node_conn.py"
-    template: src=templates/conn.py.jinja dest={{tbase}}/node_conn.py
+    template: "src=templates/conn.py.jinja dest={{tbase}}/node_conn_{{item}}.py"
     vars:
-      rrole: nodemanager
+      rrole: "nodemanager"
       rip: "{{item}}"
       rport: "{{nodemanager.get('port')}}"
       admin_user: "{{mysql.get('user','root')}}"
       admin_passwd: "{{mysql.get('passwd','fate')}}"
       db_name: "{{eggroll.get('dbname','eggroll_meta')}}"
-      db_host: "{{db.get('ips',[])[0]}}"
+      db_host: "{{db.get('ips',['127.0.0.1'])[0]}}"
       db_port: "{{db.get('port',3306)}}"
       db_user: "{{db.get('dbuser','fate')}}"
       db_passwd: "{{db.get('dbpasswd','fate')}}"
@@ -78,10 +75,10 @@
     - "{{nodemanager.get('ips',[])}}"
 
   - name: "commit({{deploy_mode}}): node_conn.py"
-    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/node_conn.py"
+    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/node_conn_{{item}}.py"
     register: mysql_load
+    with_items:
+    - "{{nodemanager.get('ips',[])}}"
 
   - debug: var=mysql_load.get('stderr_lines')
   - debug: var=mysql_load.get('stdout_lines')
-
-

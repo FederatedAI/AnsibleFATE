@@ -1,4 +1,3 @@
-
 - name: "mkdir: java directory"
   file:
     path: "{{item}}"
@@ -14,7 +13,7 @@
   register: java_stat
   when: deploy_mode in [ 'deploy', 'install' ]
 
-- name: "untar: java-{{java['version']}}.tar"
+- name: "untar: java-{{java['version']}}.tar.gz"
   unarchive:
     src: "{{java['name']}}-{{java['version']}}.tar.gz"
     dest: "{{pbase}}/{{pname}}/{{java['path']}}"

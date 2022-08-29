@@ -6,7 +6,7 @@
 
 ​     示例操作用户：超级用户root、有sudo权限用户 和普通权限用户app
 
-​      示例操作主机：192.168.0.1    
+​      示例操作主机：192.168.0.1
 
 
 
@@ -42,7 +42,7 @@ echo '/data/swapfile128G swap swap defaults 0 0' >> /etc/fstab
 - 方法2：使用ansible部署包中的脚本
 
 ```
-sh /data/projects/fate/tools/makeVirtualDisk.sh
+bash /data/projects/fate/tools/makeVirtualDisk.sh
 Waring: please make sure has enough space of your disk first!!! （请确认有足够的存储空间）
 current user has sudo privilege(yes|no):yes      （是否有sudo权限，输入yes，不能简写）
 Enter store directory:/data    （设置虚拟内存文件的存放路径，确保目录存在和不要设置在根目录）
