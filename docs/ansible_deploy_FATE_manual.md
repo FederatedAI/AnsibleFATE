@@ -90,7 +90,7 @@ FATE官方网站：https://fate.fedai.org/
 | 名称     | 说明                             |
 | -------- | -------------------------------- |
 | 系统     | Centos 7.6                       |
-| 开发语言 | Python 3.6.5、Java 1.8           |
+| 开发语言 | Python 3.8、Java 1.8           |
 | 软件组件 | fate  eggroll  fateboard   mysql |
 
 
@@ -1429,7 +1429,7 @@ ansible_become_pass=
 - 离线包解压后初始化配置后可直接部署
 
 ```
-wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/AnsibleFATE_${version}_release-offline.tar.gz
+wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release-offline.tar.gz
 tar xzf AnsibleFATE_${version}_release-offline.tar.gz
 cd AnsibleFATE-${version}-release-offline
 
@@ -1440,7 +1440,7 @@ cd AnsibleFATE-${version}-release-offline
 ###### 2.6.1.2下载在线包
 
 ```
-wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/AnsibleFATE_${version}_release-online.tar.gz
+wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release-online.tar.gz
 tar xzf AnsibleFATE_${version}_release-online.tar.gz
 cd AnsibleFATE-${version}-release-online
 
