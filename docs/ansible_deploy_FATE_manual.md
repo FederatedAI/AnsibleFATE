@@ -129,12 +129,12 @@ FATE官方网站：https://fate.fedai.org/
 - 版本：大于等于1.7.0
 
 - 离线包： 可以直接进行部署的包。
-   - 部署包名称：`AnsibleFATE_${version}_release-offline.tar.gz`
-   - 部署包根目录名称：`AnsibleFATE-${version}-release-offline`
-- 在线包： 部署的包，但不包括模块的资源包，不能直接进行部署。 可通过下载资源包（参考2.6.1.3一节），组装成离线包。
+   - 部署包名称：`AnsibleFATE_${version}_release_offline.tar.gz`
+   - 部署包根目录名称：`AnsibleFATE_${version}_release_offline`
 
-  - 部署包名称： `AnsibleFATE_${version}_release-online.tar.gz`
-  - 部署包根目录名称：   `AnsibleFATE-${version}-release-online`
+- 在线包： 部署的包，但不包括模块的资源包，不能直接进行部署。 可通过下载资源包（参考2.6.1.3一节），组装成离线包。
+  - 部署包名称： `AnsibleFATE_${version}_release_online.tar.gz`
+  - 部署包根目录名称：   `AnsibleFATE_${version}_release_online`
 
 ##### 2.4.2 部署流程
 
@@ -1429,9 +1429,9 @@ ansible_become_pass=
 - 离线包解压后初始化配置后可直接部署
 
 ```
-wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release-offline.tar.gz
-tar xzf AnsibleFATE_${version}_release-offline.tar.gz
-cd AnsibleFATE-${version}-release-offline
+wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release_offline.tar.gz
+tar xzf AnsibleFATE_${version}_release_offline.tar.gz
+cd AnsibleFATE_${version}_release_offline
 
 //version>=1.7.0，按需设置
 ```
@@ -1440,9 +1440,9 @@ cd AnsibleFATE-${version}-release-offline
 ###### 2.6.1.2下载在线包
 
 ```
-wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release-online.tar.gz
-tar xzf AnsibleFATE_${version}_release-online.tar.gz
-cd AnsibleFATE-${version}-release-online
+wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release_online.tar.gz
+tar xzf AnsibleFATE_${version}_release_online.tar.gz
+cd AnsibleFATE_${version}_release_online
 
 //version>=1.7.0
 ```
