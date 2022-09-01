@@ -1411,8 +1411,6 @@ cd AnsibleFATE_${version}_release_offline
 wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release_online.tar.gz
 tar xzf AnsibleFATE_${version}_release_online.tar.gz
 cd AnsibleFATE_${version}_release_online
-
-//version>=1.7.0
 ```
 
 按需下载模块
