@@ -1402,9 +1402,9 @@ ansible_become_pass=
 wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release_offline.tar.gz
 tar xzf AnsibleFATE_${version}_release_offline.tar.gz
 cd AnsibleFATE_${version}_release_offline
-
-# version>=1.7.0，按需设置
 ```
+
+`$version >= 1.7.0`，各版本下载链接可在 [wiki](https://github.com/FederatedAI/FATE/wiki/Download) 查看
 
 
 ###### 2.6.1.2 下载在线包
