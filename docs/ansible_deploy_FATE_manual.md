@@ -1396,7 +1396,7 @@ ansible_become_pass=
 
 - 离线包解压后初始化配置后可直接部署
 
-- 离线包与在线包的唯一区别是在线包缺少部分不常更新的文件，可按需下载
+- 离线包与在线包的唯一区别是在线包缺少部分不常更新的大文件，可按需下载
 
 ```bash
 wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release_offline.tar.gz
@@ -1415,7 +1415,7 @@ tar xzf AnsibleFATE_${version}_release_online.tar.gz
 cd AnsibleFATE_${version}_release_online
 ```
 
-- 按需下载文件，全部下载后的在线包与解压后的离线包目录结构完全一致
+- 按需下载文件，全部下载后的在线包与离线包的目录结构完全一致
 
 - 更新在线包时，只需直接解压覆盖原有文件，下列文件如无更新，可不再下载
 
@@ -1430,10 +1430,6 @@ wget -P roles/java/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.
 wget -P roles/mysql/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/mysql-8.0.28.tar.gz
 # 按需
 wget -P roles/rabbitmq/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/rabbitmq-server-generic-unix-3.9.14.tar.xz
-# 必需
-wget -P roles/supervisor/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/supervisor-4.2.4-py2.py3-none-any.whl
-# 必需
-wget -P roles/supervisor/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/PyMySQL-1.0.2-py3-none-any.whl
 ```
 
 
