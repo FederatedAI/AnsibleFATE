@@ -1398,12 +1398,12 @@ ansible_become_pass=
 
 - 离线包与在线包的唯一区别是在线包缺少部分不常更新的文件，可按需下载
 
-```
+```bash
 wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release_offline.tar.gz
 tar xzf AnsibleFATE_${version}_release_offline.tar.gz
 cd AnsibleFATE_${version}_release_offline
 
-//version>=1.7.0，按需设置
+# version>=1.7.0，按需设置
 ```
 
 
@@ -1419,20 +1419,20 @@ cd AnsibleFATE_${version}_release_online
 
 - 更新在线包时，只需直接解压覆盖原有文件，下列文件如无更新，可不再下载
 
-```
-// 必需
+```bash
+# 必需
 wget -P roles/python/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/Miniconda3-py38_4.12.0-Linux-x86_64.sh
-// fateflow 和 eggroll 需要
+# fateflow 和 eggroll 需要
 wget -O roles/python/files/pypi.tar.gz https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/pip_packages_fate_${version}.tar.gz
-// fateboard 和 eggroll 需要
+# fateboard 和 eggroll 需要
 wget -P roles/java/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/jdk-8u192.tar.gz
-// 按需
+# fateflow 和 eggroll 都需要连接数据库，fateboard 不需要数据库
 wget -P roles/mysql/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/mysql-8.0.28.tar.gz
-// 按需
+# 按需
 wget -P roles/rabbitmq/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/rabbitmq-server-generic-unix-3.9.14.tar.xz
-// 必需
+# 必需
 wget -P roles/supervisor/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/supervisor-4.2.4-py2.py3-none-any.whl
-// 必需
+# 必需
 wget -P roles/supervisor/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/PyMySQL-1.0.2-py3-none-any.whl
 ```
 
