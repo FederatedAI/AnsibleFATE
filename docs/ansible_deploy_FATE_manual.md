@@ -1394,18 +1394,17 @@ ansible_become_pass=
 
 ###### 2.6.1.1 下载离线包
 
-- 离线包解压后初始化配置后可直接部署
-
-- 离线包与在线包的唯一区别是在线包缺少部分不常更新的大文件，可按需下载
-
 ```bash
 wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release_offline.tar.gz
 tar xzf AnsibleFATE_${version}_release_offline.tar.gz
 cd AnsibleFATE_${version}_release_offline
 ```
 
-`$version >= 1.7.0`，各版本下载链接可在 [wiki](https://github.com/FederatedAI/FATE/wiki/Download) 查看
+- `$version >= 1.7.0`，各版本下载链接可在 [wiki](https://github.com/FederatedAI/FATE/wiki/Download) 查看
 
+- 离线包解压后初始化配置后可直接部署
+
+- 离线包与在线包的唯一区别是在线包缺少部分不常更新的大文件，可按需下载
 
 ###### 2.6.1.2 下载在线包
 
