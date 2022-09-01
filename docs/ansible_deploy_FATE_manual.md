@@ -1414,6 +1414,8 @@ tar xzf AnsibleFATE_${version}_release_online.tar.gz
 cd AnsibleFATE_${version}_release_online
 ```
 
+- `$version >= 1.9.0`
+
 - 按需下载文件，全部下载后的在线包与离线包的目录结构完全一致
 
 - 更新在线包时，只需直接解压覆盖原有文件，下列文件如无更新，可不再下载
