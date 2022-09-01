@@ -40,9 +40,7 @@
 - [2.6 部署流程](#26-部署流程)
     - [2.6.1 下载](#261-下载)
         - [2.6.1.1 下载离线包](#2611-下载离线包)
-        - [2.6.1.2下载非离线包](#2612下载非离线包)
-        - [2.6.1.3 按需下载模块的资源包](#2613-按需下载模块的资源包)
-        - [2.6.1.4 按需自编译模块的资源包](#2614-按需自编译模块的资源包)
+        - [2.6.1.2 下载在线包](#2612-下载在线包)
     - [2.6.2 使用初始化脚本生成部署配置文件](#262-使用初始化脚本生成部署配置文件)
     - [2.6.3 调整参数并生成ansible配置文件](#263-调整参数并生成ansible配置文件)
     - [2.6.4 执行ping测试(可选)](#264-执行ping测试可选)
@@ -68,7 +66,6 @@
 <!-- /TOC -->
 
 
-
 ### 1概述
 
 #### 1.1 FATE简介
@@ -78,10 +75,7 @@ FATE (Federated AI Technology Enabler) 是微众银行AI部门发起的开源项
 FATE官方网站：https://fate.fedai.org/
 
 
-
 本文将介绍使用通过Ansible进行部署FATE集群。我们提供了辅助脚本，优化部署配置的过程，有助于用户快速完成部署操作。部署是一件简单的事。。
-
-
 
 
 ### 2 部署手册
@@ -92,7 +86,6 @@ FATE官方网站：https://fate.fedai.org/
 | 系统     | Centos 7.6                       |
 | 开发语言 | Python 3.8、Java 1.8           |
 | 软件组件 | fate  eggroll  fateboard   mysql |
-
 
 
 #### 2.2 依赖条件和前置操作
@@ -108,7 +101,6 @@ FATE官方网站：https://fate.fedai.org/
  前置操作请参考： <<[部署fate集群的前置操作](action_before_deploy_fate_cluster.md)>> 一文。
 
 
-
 #### 2.3 组件信息
 
 | 角色           | 端口      | 日志目录                   | 介绍                                   |
@@ -119,7 +111,6 @@ FATE官方网站：https://fate.fedai.org/
 | nodemanager     | 4671      | /data/logs/fate/eggroll/   | node manager管理每台机器资源           |
 | fateboard      | 8080      | /data/logs/fate/fateboard/ | 联合学习过程可视化模块                 |
 | mysql          | 3306      | /data/logs/mysql/          | 数据存储，clustermanager和fateflow依赖 |
-
 
 
 #### 2.4 基本概念与原理
@@ -142,7 +133,6 @@ FATE官方网站：https://fate.fedai.org/
 
 - 进行部署
 
-​
 
 ##### 2.4.3 部署形态
 
@@ -162,7 +152,6 @@ FATE官方网站：https://fate.fedai.org/
 | standalone      | host、guest、exchange | mysql、eggroll、fate_flow、fateboard  |
 | eggroll（默认） | host、guest、exchange | mysql、eggroll、fate_flow、fateboard  |
 | spark           | host、guest           | mysql、fate_flow、fateboard、rabbitmq |
-
 
 
 ##### 2.4.5 配置模块组件
@@ -203,7 +192,6 @@ FATE官方网站：https://fate.fedai.org/
 ​         本节内容适用于后端引擎为非spark的场景。
 
 
-
 ##### 2.4.7 路由支持
 
 ​        本节内容适用于后端引擎为非spark的场景。
@@ -227,7 +215,6 @@ FATE官方网站：https://fate.fedai.org/
 ​          支持ip也支持域名。
 
 
-
 ##### 2.4.8 证书支持
 
 ​       本节内容目前仅适用于后端引擎为非spark的场景。
@@ -247,7 +234,6 @@ FATE官方网站：https://fate.fedai.org/
 
 - 支持spark、plusar/rabbitmq、hdfs/hive等应用场景
 - spark只有host&guest场景适用
-
 
 
 #### 2.5 辅助脚本和配置文件
@@ -276,7 +262,6 @@ Usage: deploy/deploy.sh -h|-g|-e|-m|-k
          -k=both roles of keys(eg: host|guest)
          -n=standalone or eggroll or spark（default： eggroll）
 ```
-
 
 
 ###### 2.5.2.2 使用部署辅助脚本进行初始化
@@ -329,13 +314,11 @@ bash deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
     ```
 
 
-
 - 使用部署辅助脚本生成ansible配置文件
 
 ```
 bash deploy/deploy.sh render
 ```
-
 
 
 ###### 2.5.2.3 使用部署辅助脚本生成证书
@@ -347,7 +330,6 @@ bash deploy/deploy.sh render
   ```
 
 
-
 - 按需使用以下命令生产不同ca的的证书
 
   ```
@@ -356,8 +338,6 @@ bash deploy/deploy.sh render
   所有不同ca的证书生成后需要执行cp-keys.sh脚本
   /bin/bash deploy/cp-keys.sh $arg1 $arg2	//arg1、arg2为证书的角色方[host|guest|exchange]
   ```
-
-
 
 
 ###### 2.5.2.4 使用部署辅助脚本进行部署或卸载
@@ -391,14 +371,12 @@ modules:				//调整需要部署或卸载的模块
 ```
 
 
-
 - 查看部署、卸载日志
 
 ```
 tailf logs/deploy-??.log				---部署服务的日志，执行部署命令会提示查看
 tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会提示查看
 ```
-
 
 
 ###### 2.5.2.5 配置文件场景示例
@@ -500,7 +478,6 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   ```
 
 
-
 - **部署配置文件讲解参数说明：**
 
   ```
@@ -540,8 +517,6 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   22，host_pulsar_ips：需要部署pulsar的IP地址
   23，host_nginx_ips：nginx代理IP，填写开启nginx配置
   ```
-
-
 
 
 - **场景1：单部署host**
@@ -797,8 +772,6 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
   ```
 
 
-
-
 ##### 2.5.3 ansible配置文件
 
 ###### 2.5.3.1 配置base信息
@@ -843,7 +816,6 @@ supervisord:
     port: 9001		---supervisor启动端口
 
 ```
-
 
 
 ###### 2.5.3.2 配置fate基础信息
@@ -935,7 +907,6 @@ exchange:
         port: 9370			---开启证书设置为9371
         is_secure: False	---开启证书设置为true，并把上面的port端口设置为9371
 ```
-
 
 
 ###### 2.5.3.4  配置Host信息
@@ -1130,7 +1101,6 @@ host:
 ```
 
 
-
 ###### 2.5.3.5 配置Guest信息
 
 按需修改，不部署则跳过此步骤
@@ -1323,7 +1293,6 @@ guest:
 ```
 
 
-
 ###### 2.5.3.6 配置任务列表
 
 修改文件：(默认不需要修改)
@@ -1382,7 +1351,6 @@ spark引擎场景配置project_prod.yaml内容如下：
 ```
 
 
-
 ###### 2.5.3.7 配置主机列表
 
 修改文件：(默认不需要修改)
@@ -1437,7 +1405,7 @@ cd AnsibleFATE_${version}_release_offline
 ```
 
 
-###### 2.6.1.2下载在线包
+###### 2.6.1.2 下载在线包
 
 ```
 wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/AnsibleFATE_${version}_release_online.tar.gz
@@ -1445,6 +1413,18 @@ tar xzf AnsibleFATE_${version}_release_online.tar.gz
 cd AnsibleFATE_${version}_release_online
 
 //version>=1.7.0
+```
+
+按需下载模块
+
+```
+wget -P roles/python/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/Miniconda3-py38_4.12.0-Linux-x86_64.sh
+wget -O roles/python/files/pypi.tar.gz https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/pip_packages_fate_${version}.tar.gz
+wget -P roles/java/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/jdk-8u192.tar.gz
+wget -P roles/mysql/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/mysql-8.0.28.tar.gz
+wget -P roles/rabbitmq/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/rabbitmq-server-generic-unix-3.9.14.tar.xz
+wget -P roles/supervisor/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/supervisor-4.2.4-py2.py3-none-any.whl
+wget -P roles/supervisor/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/PyMySQL-1.0.2-py3-none-any.whl
 ```
 
 
@@ -1464,7 +1444,6 @@ Usage:  /bin/bash deploy/deploy.sh init -h|-g|-e|-m|-k
 ```
 
 
-
 ##### 2.6.3 调整参数并生成ansible配置文件
 
 - 手工修改配置文件
@@ -1480,13 +1459,11 @@ vi deploy/conf/setup.conf
 ```
 
 
-
 ##### 2.6.4 执行ping测试(可选)
 
 ```
  /bin/bash deploy/deploy.sh ping
 ```
-
 
 
 ##### 2.6.5 生成证书(可选)
@@ -1500,13 +1477,11 @@ vi deploy/conf/setup.conf
 ```
 
 
-
 ##### 2.6.6 执行部署（按需）
 
 ```
  /bin/bash deploy/deploy.sh deploy|install|config|uninstall
 ```
-
 
 
 ##### 2.6.7 检查服务
@@ -1555,7 +1530,6 @@ lsof -i :9370
 ```
 
 
-
 ##### 2.7.2 Toy_example部署验证
 -----------------------
 
@@ -1599,7 +1573,6 @@ flow test toy -gid 9999 -hid 10000
 类似如下结果表示成功：
 
 "2020-04-28 18:26:20,789 - secure_add_guest.py[line:126] - INFO: success to calculate secure_sum, it is 1999.9999999999998"
-
 
 
 ##### 2.7.3 最小化测试
@@ -1646,7 +1619,6 @@ python run_task.py -gid 9999 -hid 10000 -aid 10000 -f fast
 只需在命令中将“fast”替换为“normal”，其余部分与快速模式相同。
 
 
-
 #### 2.8 服务运维
 
 **服务管理**
@@ -1677,7 +1649,6 @@ bash service.sh start/stop/status fate-clustermanager
 | fate_flow | fate_flow_server                      | /data/logs/fate/fateflow/  |
 | mysql     | mysql                                 | /data/logs/mysql/          |
 | fateboard | fateboard                             | /data/logs/fate/fateboard/ |
-
 
 
 ### 3 特定操作指引
@@ -1716,7 +1687,6 @@ bash /data/projects/common/supervisord/service.sh restart fate-rollsite
 ```
 
 
-
 #### 3.2 单边部署使用证书场景
 
 部署单边的情况，也支持配置证书。  用脚本只产生一方的证书。然后服务端和客户端的设置使用这个证书。  部署完成之后，用户手工按需替换其他证书
@@ -1735,7 +1705,6 @@ bash /data/projects/common/supervisord/service.sh restart fate-rollsite
 ```
 
 
-
 2）部署单边exchange（假设证书方为exchange-host）
 
 ```
@@ -1746,7 +1715,6 @@ bash /data/projects/common/supervisord/service.sh restart fate-rollsite
 4、sh deploy/deploy.sh render		//生成ansible配置
 5、sh deploy/servicec.sh deploy		//执行部署
 ```
-
 
 
 #### 3.3 mysql使用外部数据库
