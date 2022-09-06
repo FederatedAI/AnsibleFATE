@@ -4,6 +4,10 @@
 
 AnsibleFATE deploys FATE clusters via Ansible. AnsibleFATE provides scripts to optimize the process of deployment configuration. It helps users to quickly complete the deployment operations.
 
+## Download
+
+See [wiki](https://github.com/FederatedAI/FATE/wiki/Download).
+
 ## Project structure
 
 ````

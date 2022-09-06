@@ -2,7 +2,11 @@
 
 ## 总览
 
-AnsibleFATE 支持通过Ansible进行部署FATE集群。我们提供了辅助脚本，优化部署配置的过程，有助于用户快速完成部署操作。部署是一件简单的事。
+AnsibleFATE 支持通过 Ansible 进行部署 FATE 集群。我们提供了辅助脚本，优化部署配置的过程，有助于用户快速完成部署操作。
+
+## 下载
+
+参见 [wiki](https://github.com/FederatedAI/FATE/wiki/Download)。
 
 ## 项目结构
 
