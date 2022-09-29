@@ -1,0 +1,6 @@
+/backups/
+/deploy/conf/
+/environments/
+/logs/
+/var_files/
+/project_prod.yaml

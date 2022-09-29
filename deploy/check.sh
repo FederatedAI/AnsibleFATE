@@ -11,7 +11,7 @@ def_is_in() {
   then
     #echo "check $module: unvid(format)"
     #return 1
- 
+
     code=$( echo ${barray[*]} | grep -wq "${key%:*}" && echo 0 || echo 1 )
     if [ $code -eq 1 ]
     then
@@ -19,14 +19,14 @@ def_is_in() {
       return 1
     fi
   fi
-  
+
 }
 
 def_check_role_ips() {
 
     local role=$1
     local temp=$2
-    case ${temp%:*} in 
+    case ${temp%:*} in
       "rollsite")
 	if [ "$role" == "exchange" ]
 	then
@@ -40,7 +40,7 @@ def_check_role_ips() {
           return 1
         fi
       ;;
-      "default"|"fateboard"|"clustermanager"|"fate_flow"|"mysql")
+      "default"|"fateboard"|"clustermanager"|"mysql")
         echo "${temp#*:}" | grep -Eq '^[0-9]+.[0-9]+.[0-9]+.[0-9]+$'
         if [ "$?" -eq 1 ]
         then
@@ -48,9 +48,9 @@ def_check_role_ips() {
           return 1
         fi
       ;;
-      "nodemanager")
-        for ip in $( echo "${temp#*:}" | tr -s '|' ' ' ) 
-        do 
+      "fate_flow"|"nodemanager")
+        for ip in $( echo "${temp#*:}" | tr -s '|' ' ' )
+        do
           echo "${ip}" | grep -Eq '^[0-9]+.[0-9]+.[0-9]+.[0-9]+$'
           if [ "$?" -eq 1 ]
           then
@@ -91,7 +91,7 @@ def_check_main() {
     return
   fi
   echo "check deploy mode: valid"
- 
+
   local bmodules=( "mysql" "eggroll" "fate_flow" "fateboard" )
   local modules=( $( ./bin/yq eval '.modules[]'  conf/setup.conf ) )
   for module in ${modules[*]};
@@ -109,7 +109,7 @@ def_check_main() {
   local roles=( $( ./bin/yq eval '.roles[]'  conf/setup.conf ) )
   for role in ${roles[*]};
   do
-    def_is_in broles ${role} 
+    def_is_in broles ${role}
     if [ "$?" -eq 1 ]
     then
       echo "check roles: $role unvalid"
@@ -122,7 +122,7 @@ def_check_main() {
   local ssl_roles=( $( ./bin/yq eval '.ssl_roles[]'  conf/setup.conf ) )
   for ssl_role in ${ssl_roles[*]};
   do
-    def_is_in roles "${ssl_role}" 
+    def_is_in roles "${ssl_role}"
     if [ "$?" -eq 1 ]
     then
       echo "check ssl_roles: ${ssl_role} unvalid"
@@ -137,15 +137,15 @@ def_check_main() {
     #echo "check ${trole%:*} ips"
     eval local t_ips\=\( \"$( ./bin/yq eval '.'"${trole%:*}"'_ips[]'  conf/setup.conf )\"  \)
 
-    echo ${t_ips[*]} | grep -qw "default" 
+    echo ${t_ips[*]} | grep -qw "default"
     if [ "$?" -ne 0 ]
     then
       if [ "${trole%:*}" != "exchange" ]
       then
         echo "check ${trole%:*}_ips: unvalid(no default setting)"
         return
-      else	
-        echo ${t_ips[*]} | grep -qw "rollsite" 
+      else
+        echo ${t_ips[*]} | grep -qw "rollsite"
         if [ "$?" -ne 0 ]
         then
           echo "check ${trole%:*}_ips: unvalid(no rollsite or default setting)"
@@ -155,13 +155,13 @@ def_check_main() {
     fi
     for temp in ${t_ips[*]};
     do
-      def_check_role_ips ${trole%:*} $temp || return 
+      def_check_role_ips ${trole%:*} $temp || return
     done
     eval is_in\=\${is_${trole%:*}_in}
     if [ "${is_in}" -eq 1 -a "${#t_ips}" -eq 0 ]
     then
       echo "check ${trole%:*}_ips: unvalid(no ips)"
-      return 
+      return
     fi
     echo "check ${trole%:*}_ips: valid"
 

@@ -491,11 +491,11 @@ tailf logs/uninstall-??.log				---卸载服务的日志，执行卸载命令会�
 
   5，polling： polling的角色。取值有： 字典，包含服务端的角色和客户端的角色，格式： { "server_role": "exchange", "client_role": "host" }，设置方式： 空值或字典。（部署2方或者3方才支持）
 
-  6，host_ips：host端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
+  6，host_ips：host端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。fate_flow和nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
 
   7，host_special_routes： host端额外路由。取值有： 数组，成员格式：party_id:ip:port,设置方式：可以设置零个、一个或多个。例：- 8888:192.168.1.2:9370（支持证书方式: - 8888:192.168.1.2:9371:secure），额外路由指向exchange示例为： - default:192.168.1.2:9370
 
-  8，guest_ips：guest端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
+  8，guest_ips：guest端机器列表。取值有： "default:ip"、"rollsite:ip"、"nodemanager:ip"、"clustermanager:ip"、"fate_flow:ip"、"fateboard:ip"，设置方式： 只设default:ip,  或多个，或全部。fate_flow和nodemanager设置的多个ip使用|分割，其他组件不支持设置多个ip。
 
   9，guest_special_routes： guest端额外路由。取值有： 数组，成员格式：party_id:ip:port, 设置方式： 可以设置零个、一个或多个。（支持证书方式：- 8888:192.168.1.2:9371:secure），指向exchange示例为： - default:192.168.1.2:9370
 

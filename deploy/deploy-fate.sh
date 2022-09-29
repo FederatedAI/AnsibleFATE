@@ -82,7 +82,7 @@ def_get_role_ips() {
   for temp in ${tinfo_ips[*]};
   do
     local role_module=${temp%:*}
-    if [ "${role_module}" == "rollsite" -o "${role_module}" == "nodemanager" ]
+    if [ "${role_module}" == "fate_flow" -o "${role_module}" == "rollsite" -o "${role_module}" == "nodemanager" ]
     then
       temps=( $( echo ${temp#*:} | tr -s '|' ' ' ) )
       eval ${role}_${role_module}_ips\=\( ${temps[*]} \)
