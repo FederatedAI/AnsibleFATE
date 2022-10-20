@@ -855,7 +855,7 @@ python:					---python部署信息
 
 java:					---java部署信息
   name: "jdk"
-  version: "8u192"
+  version: "8u345"
   path: "common/jdk"
 
 mysql:					---mysql部署信息
@@ -1426,7 +1426,7 @@ wget -P roles/python/files https://webank-ai-1251170195.cos.ap-guangzhou.myqclou
 # fateflow 和 eggroll 需要
 wget -O roles/python/files/pypi.tar.gz https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate/${version}/release/pip_packages_fate_${version}.tar.gz
 # fateboard 和 eggroll 需要
-wget -P roles/java/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/jdk-8u192.tar.gz
+wget -P roles/java/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/jdk-8u345.tar.xz
 # fateflow 和 eggroll 都需要连接数据库，fateboard 不需要数据库
 wget -P roles/mysql/files https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/resources/mysql-8.0.28.tar.gz
 # 按需

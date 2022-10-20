@@ -1,29 +1,32 @@
-- name: "mkdir({{deploy_mode}}): {{lbase}}/{{pname}}/eggroll"
+- name: "mkdir({{deploy_mode}}): {{lbase}}/{{pname}}/{{role_name}}"
   file:
-    path: "{{lbase}}/{{pname}}/eggroll"
+    path: "{{lbase}}/{{pname}}/{{role_name}}"
     state: directory
-    mode: 0755
+    mode: 0750
 
 - name: "mkdir({{deploy_mode}}): {{dbase}}/{{pname}}/{keys,eggroll}"
   file:
     path: "{{dbase}}/{{pname}}/{{item}}"
     state: directory
-    mode: 0755
+    mode: 0750
   with_items:
   - keys
   - eggroll
 
-- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/bin"
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/{bin,sql}"
   file:
     path: "{{pbase}}/{{pname}}/{{item}}"
     state: directory
-    mode: 0755
+    mode: 0750
   with_items:
   - bin
   - sql
 
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/bin/init_env.sh"
-  template: src=init_env.sh.jinja dest={{pbase}}/{{pname}}/bin/init_env.sh
+  template:
+    src: "init_env.sh.jinja"
+    dest: "{{pbase}}/{{pname}}/bin/init_env.sh"
+    mode: 0755
 
 - name: "Copy: jcheck.py {{pbase}}/{{pname}}/tools/jcheck.py"
   copy:
@@ -69,3 +72,4 @@
   copy:
     src: "eggroll.sh"
     dest: "{{pbase}}/{{pname}}/eggroll/bin/fate-eggroll.sh"
+    mode: 0755

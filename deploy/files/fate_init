@@ -13,7 +13,7 @@ python:
   venv: "common/python/venv"
 java:
   name: "jdk"
-  version: "8u192"
+  version: "8u345"
   path: "common/jdk"
 mysql:
   version: "8.0.28"

@@ -2,7 +2,7 @@
   file:
     path: "{{lbase}}/{{pname}}/{{role_name}}"
     state: directory
-    mode: 0755
+    mode: 0750
 
 - name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{version}}.jar"
   stat:
@@ -28,21 +28,14 @@
     state: link
   when: fateboard_stat.stat.exists == False
 
-- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/logs"
-  file:
-    path: "{{pbase}}/{{pname}}/{{role_name}}/{{item}}"
-    state: directory
-    mode: 0755
-  with_items:
-  - conf
-
 - name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/bin"
   file:
-    path: "{{pbase}}/{{pname}}/{{item}}"
+    path: "{{pbase}}/{{pname}}/bin"
     state: directory
-    mode: 0755
-  with_items:
-  - bin
+    mode: 0750
 
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/bin/init_env.sh"
-  template: src=init_env.sh.jinja dest={{pbase}}/{{pname}}/bin/init_env.sh
+  template:
+    src: init_env.sh.jinja
+    dest: "{{pbase}}/{{pname}}/bin/init_env.sh"
+    mode: 0755

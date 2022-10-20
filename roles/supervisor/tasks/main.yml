@@ -27,6 +27,7 @@
   copy:
     src: "Miniconda3-{{python['version']}}-Linux-x86_64.sh"
     dest: "{{tbase}}/{{pname}}/Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+    mode: 0755
   when: miniconda_self_reg.stat.exists == False and miniconda_package_reg.stat.exists == False
 
 - name: "commit({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
@@ -107,6 +108,7 @@
   template:
     src: check.sh.jinja
     dest: "{{cbase}}/supervisord/check.sh"
+    mode: 0755
 
 - name: "mkdir({{deploy_mode}}): project common dir"
   file:
