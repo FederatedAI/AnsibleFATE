@@ -2,11 +2,15 @@
 
 source {{pbase}}/{{pname}}/bin/init_env.sh
 
-cd {{pbase}}/{{pname}}/{{pname}}/python/fate_client
+cd {{pbase}}/{{pname}}/fate/python/fate_client
 python setup.py install
 
-cd {{pbase}}/{{pname}}/{{pname}}/python/fate_test
+cd {{pbase}}/{{pname}}/fate/python/fate_test
 python setup.py install
+
+cd {{pbase}}/{{pname}}
 
 flow init -c {{pbase}}/{{pname}}/conf/service_conf.yaml
 flow init --ip {{ansible_ssh_host}} --port {{fate_flow.get('httpPort',9380)}}
+
+fate_test data upload -t min_test -y
