@@ -33,7 +33,3 @@
 
   - debug: var=mysql_load.get('stderr_lines')
   - debug: var=mysql_load.get('stdout_lines')
-
-
-
-
