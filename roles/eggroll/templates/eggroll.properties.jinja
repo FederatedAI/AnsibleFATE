@@ -3,7 +3,7 @@
 #eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=org.h2.Driver
 eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=com.mysql.cj.jdbc.Driver
 #eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:h2:./data/meta_h2/eggroll_meta.h2;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;SCHEMA=eggroll_meta;
-eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{db.get('ips',['127.0.0.1'])[0]}}:{{db.get('port',3306)}}/{{eggroll.get('dbname','eggroll_meta')}}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{db.get('ips',['127.0.0.1'])[0]}}:{{db.get('port',3306)}}/{{eggroll.get('dbname','eggroll_meta')}}?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
 eggroll.resourcemanager.clustermanager.jdbc.username={{db.get('dbuser','fate')}}
 eggroll.resourcemanager.clustermanager.jdbc.password={{db.get('dbpasswd','faet_dev')}}
 
@@ -102,3 +102,6 @@ eggroll.rollsite.adapter.sendbuf.size=100000
 
 eggroll.resourcemanager.clustermanager.jdbc.password.decryptor=
 eggroll.resourcemanager.clustermanager.jdbc.password.decryptor.args=
+
+# deepspeed
+eggroll.resourcemanager.nodemanager.containers.data.dir={{pbase}}/data/{{pname}}/eggroll/containers
