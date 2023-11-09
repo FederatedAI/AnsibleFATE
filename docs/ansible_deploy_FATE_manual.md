@@ -296,7 +296,7 @@ bash deploy/deploy.sh  init [-g|-h|-e|-m|-k|-n]
 
 ​          ***上述参数可以混合使用，多个表示部署多方。***
 
-​
+
 
 - 使用示例
 
@@ -1582,20 +1582,7 @@ flow test toy -gid 9999 -hid 10000
 
 
 ##### 2.7.3 最小化测试
---------------
-
-###### **2.7.3.1 上传预设数据**
-
-分别在192.168.0.1和192.168.0.2上执行：
-
-```
-source /data/projects/fate/bin/init_env.sh
-fate_test data upload -t min_test
-```
-
-更多细节信息，敬请参考[脚本README](../../../../examples/scripts/README.rst)
-
-###### **2.7.3.2 快速模式**
+###### **2.7.3.1 快速模式**
 
 请确保guest和host两方均已分别通过给定脚本上传了预设数据。
 
@@ -1605,17 +1592,16 @@ fate_test data upload -t min_test
 
 ```
 source /data/projects/fate/bin/init_env.sh
-cd /data/projects/fate/examples/min_test_task/
 #单边测试
-python run_task.py -gid 9999 -hid 9999 -aid 9999 -f fast
+flow test min -gid 9999 -hid 9999 -aid 9999
 #双边测试
-python run_task.py -gid 9999 -hid 10000 -aid 10000 -f fast
+flow test min -gid 9999 -hid 10000 -aid 10000
 ```
 
 其他一些可能有用的参数包括：
 
-1. -f: 使用的文件类型. "fast" 代表 breast数据集, "normal" 代表 default credit 数据集.
-2. --add_sbt: 如果被设置为1, 将在运行完lr以后，启动secureboost任务，设置为0则不启动secureboost任务，不设置此参数系统默认为1。
+1. -t: 使用的文件类型. "fast" 代表 breast数据集, "normal" 代表 default credit 数据集.
+2. --sbt: 如果被设置为--sbt, 将在运行完lr以后，启动secureboost任务，设置为0则不启动secureboost任务，不设置此参数系统默认为--sbt。
 
 若数分钟后在结果中显示了“success”字样则表明该操作已经运行成功了。若出现“FAILED”或者程序卡住，则意味着测试失败。
 
@@ -1764,3 +1750,4 @@ mysql:
   user: "root"			---mysql数据库管理账号，修改为实际使用的管理账号
   passwd: "fatE168dev"	---mysql数据库管理密码，修改为实际使用的管理密码
 ```
+
