@@ -31,6 +31,11 @@
     path: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/.init"
   register: stat_mysql_init
 
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/sql/grant_fate.sql"
+  template:
+    src: grant_fate.sql.jinja
+    dest: "{{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/sql/grant_fate.sql"
+
 - name: "commit({{deploy_mode}}):   init.sh"
   shell: /bin/bash {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/init.sh
   register: mysql_init

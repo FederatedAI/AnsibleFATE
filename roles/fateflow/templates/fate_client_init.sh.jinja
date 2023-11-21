@@ -8,7 +8,12 @@ python setup.py install
 cd {{pbase}}/{{pname}}/fate/python/fate_test
 python setup.py install
 
+cd {{pbase}}/{{pname}}/eggroll/python/client
+python setup.py install
+
 cd {{pbase}}/{{pname}}
+
+eggroll init --ip {{ansible_ssh_host}} --port 4670
 
 flow init -c '{{pbase}}/{{pname}}/conf/service_conf.yaml'
 pipeline init --ip '{{ansible_ssh_host}}' --port '{{fate_flow.get("httpPort", 9380)}}' --app-key '{{fate_flow.get("http_app_key", "")}}' --secret-key '{{fate_flow.get("http_secret_key", "")}}'

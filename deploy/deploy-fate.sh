@@ -468,7 +468,7 @@ def_render_hosts() {
 
   for tip in ${all_ips[*]};
   do
-    sed -i '$i '"$tip"'\n' $dfile
+    sed -i '$i '"$tip ansible_ssh_host=$tip"'\n' $dfile
   done
   sed -i '/^$/d' $dfile
 }

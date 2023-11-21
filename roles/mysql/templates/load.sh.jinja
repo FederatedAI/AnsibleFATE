@@ -8,4 +8,5 @@ npasswd="{{mysql['passwd']}}"
 
 
 $base/bin/mysql -h 127.0.0.1 -P {{db['port']}} -S {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/run/mysql.sock -u{{mysql['user']}} -p"$npasswd" < $base/sql/grant.sql
+$base/bin/mysql -h 127.0.0.1 -P {{db['port']}} -S {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/run/mysql.sock -u{{mysql['user']}} -p"$npasswd" < $base/sql/grant_fate.sql
 touch $base/.load

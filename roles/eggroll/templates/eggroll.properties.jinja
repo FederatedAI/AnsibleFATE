@@ -11,6 +11,7 @@ eggroll.resourcemanager.clustermanager.host={{clustermanager.get('ips',['127.0.0
 eggroll.resourcemanager.clustermanager.port={{clustermanager.get('port',4670)}}
 eggroll.resourcemanager.nodemanager.port={{nodemanager.get('port',4671)}}
 eggroll.resourcemanager.process.tag=DEFAULT
+#eggroll.resourcemanager.nodemanager.net.device=
 
 # for roll site. rename in the next round
 eggroll.rollsite.coordinator={{rollsite.get('coordinator','fate')}}
@@ -105,3 +106,11 @@ eggroll.resourcemanager.clustermanager.jdbc.password.decryptor.args=
 
 # deepspeed
 eggroll.resourcemanager.nodemanager.containers.data.dir={{pbase}}/data/{{pname}}/eggroll/containers
+## which python exec that deepspeed container used, fallback to eggpair venv/bin/python
+eggroll.container.deepspeed.python.exec=/data/projects/fate/common/python/venv/bin/python3.8
+### provide by submit option for now
+##eggroll.container.deepspeed.script.path=
+eggroll.container.deepspeed.distributed.backend=nccl
+### defaults to cluster manager endpoint
+##eggroll.container.deepspeed.distributed.store.host=
+##eggroll.container.deepspeed.distributed.store.port=

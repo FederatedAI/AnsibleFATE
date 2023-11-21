@@ -66,6 +66,6 @@
   template: src=fate_client_init.sh.jinja dest={{tbase}}/{{pname}}/fate_client_init.sh
   when: client_check['stdout'] == "1"
 
-- name: "commit({{deploy_mode}}): Install and Initial Configuration FATE Client"
+- name: "commit({{deploy_mode}}): Install and Initial Configuration FATE Client&FATE TEST&EGGROLL Client"
   shell: "/bin/bash {{tbase}}/{{pname}}/fate_client_init.sh"
   when: client_check['stdout'] == "1"

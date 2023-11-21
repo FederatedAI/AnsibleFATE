@@ -11,6 +11,13 @@
   with_items:
   - "requirements.txt"
 
+- name: "copy({{deploy_mode}}): requirementsi-fate-llm.txt"
+  copy:
+    src: "{{item}}"
+    dest: "{{tbase}}/{{pname}}/{{item}}"
+  with_items:
+  - "requirements-fate-llm.txt"
+
 - name: "check({{deploy_mode}}): python"
   stat: path="{{cbase}}/{{python['dest']}}/bin/python"
   register: py_reg
@@ -78,6 +85,13 @@
     virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
   when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
 
+- name: "pip({{deploy_mode}}): venv install packages"
+  pip:
+    extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
+    requirements: "{{tbase}}/{{pname}}/requirements-fate-llm.txt"
+    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
+  when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
+
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/tools/check_pip.sh"
   template: src=check_pip.sh.jinja dest={{pbase}}/{{pname}}/tools/check_pip.sh
 
@@ -89,6 +103,13 @@
   pip:
     extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
     requirements: "{{tbase}}/{{pname}}/requirements.txt"
+    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
+  when: pip_check.stdout.find("fate_pip_check_pass") != -1
+
+- name: "pip({{deploy_mode}}): venv reinstall packages"
+  pip:
+    extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
+    requirements: "{{tbase}}/{{pname}}/requirements-fate-llm.txt"
     virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
   when: pip_check.stdout.find("fate_pip_check_pass") != -1
 
