@@ -95,3 +95,11 @@ if stype == "clustermanager":
   print("grant")
   db_grant()
 
+datas=make_data()
+
+tcode=is_in(datas)
+if tcode == 1:
+  print("insert")
+  db_insert(datas)
+else:
+  print("not insert")

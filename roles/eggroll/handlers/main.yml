@@ -2,6 +2,8 @@
   shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-rollsite
 - name: restart {{pname}}-rollsite
   shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-rollsite
+- name: stop {{pname}}-rollsite
+  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-rollsite
 - name: reload {{pname}}-clustermanager
   shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-clustermanager
 - name: restart {{pname}}-clustermanager
@@ -10,3 +12,7 @@
   shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-nodemanager
 - name: restart {{pname}}-nodemanager
   shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-nodemanager
+- name: reload {{pname}}-osx
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-osx
+- name: restart {{pname}}-osx
+  shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-osx

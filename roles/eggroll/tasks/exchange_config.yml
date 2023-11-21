@@ -66,4 +66,56 @@
   debug: msg="******start rollsite successfully******"
   when: "waitfor_rollsite_exchange.get('state') == 'started' and waitfor_rollsite_secure_exchange.get('state') == 'started'"
 
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/fate/proxy(exchange)"
+  file:
+    path: "{{pbase}}/{{pname}}/fate/proxy"
+    state: directory
+    mode: 0750
+  
+- name: "untar({{deploy_mode}}): osx.tar.gz(exchange)"
+  unarchive:
+    src: "osx.tar.gz"
+    dest: "{{pbase}}/{{pname}}/fate/proxy"
 
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{pname}}/proxy/osx/conf/broker/route_tebale.json"
+  template: src=route_table.json.jinja dest={{pbase}}/{{pname}}/{{pname}}/proxy/osx/conf/broker/route_table.json
+ 
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{pname}}/proxy/osx/conf/broker/broker.properties(exchange)"
+  template: src=broker.properties.jinja dest={{pbase}}/{{pname}}/{{pname}}/proxy/osx/conf/broker/broker.properties
+
+- name: "update({{deploy_mode}}): {{cbase}}/supervisord/supervisord.d/{{pname}}-osx.conf(exchange)"
+  template: src=supervisor.d/osx.conf.jinja dest={{cbase}}/supervisord/supervisord.d/{{pname}}-osx.conf
+  vars:
+    role: osx
+    service: "{{supervisord['service']}}"
+  notify:
+  - stop {{pname}}-rollsite
+  - reload {{pname}}-osx
+  - restart {{pname}}-osx
+  when: ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True
+
+- name: "flush_handlers" 
+  meta: flush_handlers
+
+- name: stop {{pname}}-rollsite
+  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-rollsite
+
+- name: reload {{pname}}-osx
+  shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-osx
+
+- name: restart {{pname}}-osx
+  shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-osx
+
+- name: "wait({{deploy_mode}})): open port {{osx.get('httpPort',9370)}}( {{deploy_role}} )(exchange)"
+  wait_for:
+    host: "{{ansible_ssh_host}}"
+    port: "9370"
+    delay: 0
+    state: started
+    timeout: 120
+  register: waitfor_fate_osx_http_host
+  when: ansible_ssh_host in rollsite.get('ips',[]) 
+
+- name: "check({{deploy_mode}})): check fate_osx service( {{deploy_role}} )(exchange)"
+  debug: msg="******start fate_osx successfully******"
+  when: "waitfor_fate_osx_http_host.get('state') == 'started'"

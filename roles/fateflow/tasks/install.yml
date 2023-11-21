@@ -5,16 +5,15 @@
     mode: 0750
   with_items:
   - bin
-  - conf
 
-- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/{{role_name}}/python/fate_flow/fate_flow_server.py"
+- name: "check({{deploy_mode}}): {{pbase}}/{{pname}}/fate_flow/python/fate_flow/fate_flow_server.py"
   stat:
-    path: "{{pbase}}/{{pname}}/{{role_name}}/python/fate_flow/fate_flow_server.py"
+    path: "{{pbase}}/{{pname}}/fate_flow/python/fate_flow/fate_flow_server.py"
   register: flow_stat
 
-- name: "untar({{deploy_mode}}): fateflow.tar.gz"
+- name: "untar({{deploy_mode}}): fate_flow.tar.gz"
   unarchive:
-    src: "fateflow.tar.gz"
+    src: "fate_flow.tar.gz"
     dest: "{{pbase}}/{{pname}}"
   when: flow_stat.stat.exists == False
 
@@ -44,7 +43,7 @@
 - name: "link({{deploy_mode}}): {{lbase}}/{{pname}}/{{role_name}}"
   file:
     src: "{{lbase}}/{{pname}}/{{role_name}}"
-    dest: "{{pbase}}/{{pname}}/{{role_name}}/logs"
+    dest: "{{pbase}}/{{pname}}/fate_flow/logs"
     state: link
   when: flow_stat.stat.exists == False
 
@@ -57,7 +56,7 @@
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/bin/init_env.sh"
   template:
     src: init_env.sh.jinja
-    dest: "{{pbase}}/{{pname}}/bin/init_env.sh"
+    dest: "{{pbase}}/{{pname}}/fate_flow/bin/init_env.sh"
     mode: 0755
 
 - name: "link({{deploy_mode}}): {{pbase}}/{{pname}}/{RELEASE.md,fate.env,examples}"

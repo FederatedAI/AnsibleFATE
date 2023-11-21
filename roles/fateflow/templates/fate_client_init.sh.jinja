@@ -1,21 +1,18 @@
 #!/bin/bash
 
-source {{pbase}}/{{pname}}/bin/init_env.sh
+source {{pbase}}/{{pname}}/fate_flow/bin/init_env.sh
 
-cd {{pbase}}/{{pname}}/fate/python/fate_client
+mv {{pbase}}/{{pname}}/fate/fate_client {{pbase}}/{{pname}}
+cd {{pbase}}/{{pname}}/fate_client/python
 python setup.py install
 
-cd {{pbase}}/{{pname}}/fate/python/fate_test
-python setup.py install
-
-cd {{pbase}}/{{pname}}/eggroll/python/client
+mv {{pbase}}/{{pname}}/fate/fate_test {{pbase}}/{{pname}}
+cd {{pbase}}/{{pname}}/fate_test/python
 python setup.py install
 
 cd {{pbase}}/{{pname}}
 
-eggroll init --ip {{ansible_ssh_host}} --port 4670
-
-flow init -c '{{pbase}}/{{pname}}/conf/service_conf.yaml'
-pipeline init --ip '{{ansible_ssh_host}}' --port '{{fate_flow.get("httpPort", 9380)}}' --app-key '{{fate_flow.get("http_app_key", "")}}' --secret-key '{{fate_flow.get("http_secret_key", "")}}'
+flow init --ip '{{ansible_ssh_host}}' --port '{{fate_flow.get("httpPort", 9380)}}'
+#pipeline init --ip '{{ansible_ssh_host}}' --port '{{fate_flow.get("httpPort", 9380)}}' --app-key '{{fate_flow.get("http_app_key", "")}}' --secret-key '{{fate_flow.get("http_secret_key", "")}}'
 
 fate_test data upload -t min_test -y

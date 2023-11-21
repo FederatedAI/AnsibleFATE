@@ -11,8 +11,9 @@ guest:
     http_secret_key:
     use_deserialize_safe_module: false
     default_engines: spark
-    federation: rabbitmq
-    storage: hdfs
+    computing: eggroll
+    federation: rollsite
+    storage: eggroll
   fateboard:
     enable: false
     ips: []
@@ -64,6 +65,8 @@ guest:
     user: fate
     password: fate
     route_table: []
+    mode: replication
+    max_message_size: 1048576
   pulsar:
     enable: False
     host: 192.168.0.2
@@ -71,8 +74,19 @@ guest:
     mng_port: 8080
     topic_ttl: 5
     route_table: []
+    cluster: standalone
+    tenant: fl-tenant
+    mode: replication
+    max_message_size: 1048576
   nginx:
     enable: False
     host: 127.0.0.1
     http_port: 9300
     grpc_port: 9310
+    protocol: http
+  rollsite    #new
+    host: 127.0.0.1
+    port: 9370
+  osx:      #new
+    host: 127.0.0.1
+    port: 9370

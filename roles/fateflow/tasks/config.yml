@@ -1,20 +1,20 @@
-- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/bin/init_env.sh"
-  template: src=init_env.sh.jinja dest={{pbase}}/{{pname}}/bin/init_env.sh
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/fate_flow/bin/init_env.sh"
+  template: src=init_env.sh.jinja dest={{pbase}}/{{pname}}/fate_flow/bin/init_env.sh
 
 #- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/service_conf.yaml(not fate_flow)"
 #  template: src=service_conf.yaml.jinja dest={{pbase}}/{{pname}}/conf/service_conf.yaml
 #  when: " ( 'host' in deploy_roles and deploy_role == 'host' and ansible_ssh_host not in fate_flow['ips'] ) or ( 'guest' in deploy_roles and deploy_role == 'guest' and ansible_ssh_host not in fate_flow['ips'] )"
 
-- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/rabbitmq_route_table.yaml"
-  template: src=rabbitmq_route_table.yaml.jinja dest={{pbase}}/{{pname}}/conf/rabbitmq_route_table.yaml
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/fate_flow/conf/rabbitmq_route_table.yaml"
+  template: src=rabbitmq_route_table.yaml.jinja dest={{pbase}}/{{pname}}/fate_flow/conf/rabbitmq_route_table.yaml
   when: ( ansible_ssh_host in fate_flow["ips"] and fate_flow['default_engines'] == 'spark' and rabbit['enable'] == True )
 
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/pulsar_route_table.yaml"
-  template: src=pulsar_route_table.yaml.jinja dest={{pbase}}/{{pname}}/conf/pulsar_route_table.yaml
+  template: src=pulsar_route_table.yaml.jinja dest={{pbase}}/{{pname}}/fate_flow/conf/pulsar_route_table.yaml
   when: ( ansible_ssh_host in fate_flow["ips"] and fate_flow['default_engines'] == 'spark' and pulsar['enable'] == True )
 
-- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/conf/service_conf.yaml"
-  template: src=service_conf.yaml.jinja dest={{pbase}}/{{pname}}/conf/service_conf.yaml
+- name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/fate_flow/conf/service_conf.yaml"
+  template: src=service_conf.yaml.jinja dest={{pbase}}/{{pname}}/fate_flow/conf/service_conf.yaml
   notify:
   - reload {{pname}}-{{role_name}}
   - restart {{pname}}-{{role_name}}
@@ -54,18 +54,18 @@
   when: "waitfor_fate_flow_grpc_host.get('state') == 'started' and waitfor_fate_flow_http_host.get('state') == 'started'"
 
 - name: "update({{deploy_mode}}): {{pbase}}/{{pname}}/{{pname}}/python/fate_test/fate_test/fate_test_config.yaml"
-  template: src=fate_test_config.yaml.jinja dest={{pbase}}/{{pname}}/{{pname}}/python/fate_test/fate_test/fate_test_config.yaml
+  template: src=fate_test_config.yaml.jinja dest={{pbase}}/{{pname}}/{{pname}}/fate_test/python/fate_test/fate_test_config.yaml
 
 - name: "check({{deploy_mode}}): fate_client Install"
-  shell: "source {{pbase}}/{{pname}}/bin/init_env.sh;flow --help >/dev/null 2>&1;[ $? -eq 0 ] && echo 0 || echo 1"
+  shell: "source {{pbase}}/{{pname}}/fate_flow/bin/init_env.sh;flow --help >/dev/null 2>&1;[ $? -eq 0 ] && echo 0 || echo 1"
   register: client_check
 
-#- debug: var=client_check
+- debug: var=client_check
 
 - name: "update({{deploy_mode}}): {{tbase}}/{{pname}}/fate_client_init.sh"
   template: src=fate_client_init.sh.jinja dest={{tbase}}/{{pname}}/fate_client_init.sh
   when: client_check['stdout'] == "1"
 
-- name: "commit({{deploy_mode}}): Install and Initial Configuration FATE Client&FATE TEST&EGGROLL Client"
+- name: "commit({{deploy_mode}}): Install and Initial Configuration FATE Client"
   shell: "/bin/bash {{tbase}}/{{pname}}/fate_client_init.sh"
   when: client_check['stdout'] == "1"

@@ -11,5 +11,9 @@ exchange:
       enable: false
       ids: []
     route_tables: []
+  osx:
+    ips: 
+    - 127.0.0.1
+    port: 9370
 
 

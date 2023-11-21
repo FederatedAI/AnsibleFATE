@@ -1,8 +1,22 @@
 ---
 - name: "mkdir({{deploy_mode}}): {{tbase}}/{{pname}}"
-  shell: "rm -fr {{tbase}}/{{pname}}/pypi && mkdir -p {{tbase}}/{{pname}}/pypi"
+  shell: "rm -fr {{tbase}}/{{pname}}/pypi && mkdir -p {{tbase}}/{{pname}}/pypi && mkdir -p {{tbase}}/{{pname}}/fate_test && mkdir -p {{tbase}}/{{pname}}/fate_client"
   args:
     warn: False
+
+- name: "copy({{deploy_mode}}): fate_client requirements.txt"
+  copy:
+    src: "fate_client/{{item}}"
+    dest: "{{tbase}}/{{pname}}/fate_client/{{item}}"
+  with_items:
+  - "requirements.txt"
+
+- name: "copy({{deploy_mode}}): fate_test requirements.txt"
+  copy:
+    src: "fate_test/{{item}}"
+    dest: "{{tbase}}/{{pname}}/fate_test/{{item}}"
+  with_items:
+  - "requirements.txt"
 
 - name: "copy({{deploy_mode}}): requirements.txt"
   copy:
@@ -11,12 +25,54 @@
   with_items:
   - "requirements.txt"
 
-- name: "copy({{deploy_mode}}): requirementsi-fate-llm.txt"
+- name: "copy({{deploy_mode}}): requirements-container.txt"
   copy:
     src: "{{item}}"
     dest: "{{tbase}}/{{pname}}/{{item}}"
   with_items:
-  - "requirements-fate-llm.txt"
+  - "requirements-container.txt"
+
+- name: "copy({{deploy_mode}}): requirements-fate.txt"
+  copy:
+    src: "{{item}}"
+    dest: "{{tbase}}/{{pname}}/{{item}}"
+  with_items:
+  - "requirements-fate.txt"
+
+- name: "copy({{deploy_mode}}): requirements-flow.txt"
+  copy:
+    src: "{{item}}"
+    dest: "{{tbase}}/{{pname}}/{{item}}"
+  with_items:
+  - "requirements-flow.txt"
+
+- name: "copy({{deploy_mode}}): requirements-eggroll.txt"
+  copy: 
+    src: "{{item}}"
+    dest: "{{tbase}}/{{pname}}/{{item}}"
+  with_items:
+  - "requirements-eggroll.txt"
+
+- name: "copy({{deploy_mode}}): requirements-pulsar.txt"
+  copy:
+    src: "{{item}}"
+    dest: "{{tbase}}/{{pname}}/{{item}}"
+  with_items:
+  - "requirements-pulsar.txt"
+
+- name: "copy({{deploy_mode}}): requirements-rabbitmq.txt"
+  copy:
+    src: "{{item}}"
+    dest: "{{tbase}}/{{pname}}/{{item}}"
+  with_items:
+  - "requirements-rabbitmq.txt"
+
+- name: "copy({{deploy_mode}}): requirements-spark.txt"
+  copy:
+    src: "{{item}}"
+    dest: "{{tbase}}/{{pname}}/{{item}}"
+  with_items:
+  - "requirements-spark.txt"
 
 - name: "check({{deploy_mode}}): python"
   stat: path="{{cbase}}/{{python['dest']}}/bin/python"
@@ -85,10 +141,24 @@
     virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
   when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
 
-- name: "pip({{deploy_mode}}): venv install packages"
+- name: "pip({{deploy_mode}}): venv install packages(req-fate)"
   pip:
     extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
-    requirements: "{{tbase}}/{{pname}}/requirements-fate-llm.txt"
+    requirements: "{{tbase}}/{{pname}}/requirements-fate.txt"
+    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
+  when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
+
+- name: "pip({{deploy_mode}}): venv install packages(req-fatetest)"
+  pip:
+    extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
+    requirements: "{{tbase}}/{{pname}}/fate_test/requirements.txt"
+    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
+  when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
+
+- name: "pip({{deploy_mode}}): venv install packages(req-fateclient)"
+  pip:
+    extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
+    requirements: "{{tbase}}/{{pname}}/fate_client/requirements.txt"
     virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
   when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
 
@@ -103,13 +173,6 @@
   pip:
     extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
     requirements: "{{tbase}}/{{pname}}/requirements.txt"
-    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
-  when: pip_check.stdout.find("fate_pip_check_pass") != -1
-
-- name: "pip({{deploy_mode}}): venv reinstall packages"
-  pip:
-    extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
-    requirements: "{{tbase}}/{{pname}}/requirements-fate-llm.txt"
     virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
   when: pip_check.stdout.find("fate_pip_check_pass") != -1
 

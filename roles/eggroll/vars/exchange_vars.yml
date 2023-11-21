@@ -1,3 +1,4 @@
 ---
 deploy_role: "exchange"
 rollsite: "{{ exchange.get('rollsite',{}) }}"
+osx: "{{ host.get('osx',{}) }}"
