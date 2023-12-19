@@ -11,36 +11,36 @@ fate_base: {{pbase}}/{{pname}}/{{pname}}
 clean_data: true
 {% if deploy_roles|length == 1 %}
 parties:
-  guest: [{{partyid}}]
-  host: [{{partyid}}]
-  arbiter: [{{partyid}}]
+  guest: ['{{partyid}}']
+  host: ['{{partyid}}']
+  arbiter: ['{{partyid}}']
 services:
   - flow_services:
-      - {address: {{ansible_ssh_host}}:{{fate_flow.get('httpPort',9380)}}, parties: [{{partyid}}]}
+      - {address: {{ansible_ssh_host}}:{{fate_flow.get('httpPort',9380)}}, parties: ['{{partyid}}']}
 {% else %}
 parties:
 {% if 'host' in deploy_roles and 'guest' in deploy_roles %}
 {% if 'host' == deploy_role %}
-  guest: [{{host.get('partyid',10000)}}]
-  host: [{{guest.get('partyid',9999)}},{{host.get('partyid',10000)}}]
-  arbiter: [{{guest.get('partyid',9999)}}]
+  guest: ['{{host.get('partyid',10000)}}']
+  host: ['{{guest.get('partyid',9999)}}','{{host.get('partyid',10000)}}']
+  arbiter: ['{{guest.get('partyid',9999)}}']
 {% else %}
-  guest: [{{guest.get('partyid',9999)}}]
-  host: [{{host.get('partyid',10000)}},{{guest.get('partyid',9999)}}]
-  arbiter: [{{host.get('partyid',10000)}}]
+  guest: ['{{guest.get('partyid',9999)}}']
+  host: ['{{host.get('partyid',10000)}}','{{guest.get('partyid',9999)}}']
+  arbiter: ['{{host.get('partyid',10000)}}']
 {% endif %}
 {% else %}
-  guest: [{{partyid}}]
-  host: [{{partyid}}]
-  arbiter: [{{partyid}}]
+  guest: ['{{partyid}}']
+  host: ['{{partyid}}']
+  arbiter: ['{{partyid}}']
 {% endif %}
 services:
   - flow_services:
 {% if 'host' in deploy_roles %}
-      - {address: {{host['fate_flow'].get('ips',['127.0.0.1'])[0]}}:{{host['fate_flow'].get('httpPort',9380)}}, parties: [{{host.get('partyid',10000)}}]}
+      - {address: {{host['fate_flow'].get('ips',['127.0.0.1'])[0]}}:{{host['fate_flow'].get('httpPort',9380)}}, parties: ['{{host.get('partyid',10000)}}']}
 {% endif %}
 {% if 'guest' in deploy_roles %}
-      - {address: {{guest['fate_flow'].get('ips',['127.0.0.1'])[0]}}:{{guest['fate_flow'].get('httpPort',9380)}}, parties: [{{guest.get('partyid',9999)}}]}
+      - {address: {{guest['fate_flow'].get('ips',['127.0.0.1'])[0]}}:{{guest['fate_flow'].get('httpPort',9380)}}, parties: ['{{guest.get('partyid',9999)}}']}
 {% endif %}
 {% endif %}
     serving_setting:

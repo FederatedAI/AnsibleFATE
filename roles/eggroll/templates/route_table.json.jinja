@@ -7,12 +7,6 @@
 {% for item in party.get('routes',{}) %}
       "{{item['name']}}":[
         {
-{% if rollsite.get('polling',{}).get('enable',false)  in [ True, true ] and party['id'] in rollsite.get('polling',{}).get('ids',[]) %}
-          "is_polling": true,
-{% endif %}
-{% if item.get('is_secure',false) in [ True, true ] %}
-          "is_secure": true,
-{% endif %}
           "ip": "{{item['ip']}}",
           "port": {{item['port']}}
         }
@@ -29,9 +23,8 @@
 {% endif %}
 {% endfor %}
   },
-  "permission":
-  {
-    "default_allow": true
-  }
+  "self_party":[
+		"{{partyid}}"
+	]
 }
 
