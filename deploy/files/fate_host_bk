@@ -20,10 +20,6 @@ host:
     enable: false
     ips: []
     port: 4671
-  dashboard:
-    enable: false
-    ips: []
-    port: 8083
   eggroll:
     dbname: "eggroll_meta"
     egg: 4

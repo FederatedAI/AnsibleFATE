@@ -96,7 +96,7 @@ def_get_role_ips() {
     eval ${role}_default_ips\=\( \${${role}_rollsite_ips[0]} \)
   fi
 
-  local role_modules=( "rollsite" "clustermanager" "nodemanager" "fate_flow" "fateboard" "mysql" )
+  local role_modules=( "rollsite" "clustermanager" "nodemanager" "dashboard" "fate_flow" "fateboard" "mysql" "osx")
   for role_module in ${role_modules[*]}
   do
     if [ "$role" == "host" -o "$role" == "guest" ]
@@ -113,6 +113,7 @@ def_get_role_ips() {
         if [ "${#tips[*]}" == 0 ]
         then
           exchange_rollsite_ips=( ${exchange_default_ips[*]} )
+          exchange_osx_ips=( ${exchange_default_ips[*]} )
         fi
       fi
     fi
@@ -439,7 +440,7 @@ def_render_hosts() {
     do
       if [ "$module" == "eggroll" ]
       then
-        for role_module in rollsite nodemanager clustermanager;
+        for role_module in rollsite nodemanager clustermanager dashboard osx;
         do
           eval tips\=\(\${${role}_${role_module}_ips[*]}\)
           for tip in ${tips[*]};
@@ -648,7 +649,7 @@ def_render_roles_core() {
       myvars=""
       local role_enable="true"
       eval local trole_ips=( \${${role}_ips[*]} )
-      local role_modules=( "rollsite" "clustermanager" "nodemanager" "fate_flow" "fateboard" "mysql" )
+      local role_modules=( "rollsite" "clustermanager" "nodemanager" "dashboard" "fate_flow" "fateboard" "mysql" "osx")
       for role_module in ${role_modules[*]};
       do
         eval local i=\${#${role}_${role_module}_ips[*]}
@@ -660,7 +661,7 @@ def_render_roles_core() {
         else
           eval local ${role_module}_ips\="[$( echo \${${role}_${role_module}_ips[*]} | tr -s ' ' ',' )]"
         fi
-        if [ "${role_module}" == "rollsite" -o "${role_module}" == "clustermanager" -o "${role_module}" == "nodemanager" ]
+        if [ "${role_module}" == "rollsite" -o "${role_module}" == "clustermanager" -o "${role_module}" == "nodemanager" -o "${role_module}" == "dashboard" -o "${role_module}" == "osx" ]
         then
           code=$( echo ${modules[*]} | grep -wq "eggroll" && echo 0 || echo 1 )
         else
@@ -803,6 +804,9 @@ def_render_roles_core() {
               fate_flow_ips\=${fate_flow_ips}  \
               clustermanager_enable\=\${clustermanager_enable}  \
               clustermanager_ips\=${clustermanager_ips}  \
+              osx_ips\=${osx_ips}  \
+              dashboard_enable\=\${dashboard_enable}  \
+              dashboard_ips\=${dashboard_ips}  \
               nodemanager_enable\=\${nodemanager_enable}  \
               nodemanager_ips\=${nodemanager_ips}  \
               polling_enable\=\${polling_enable} \
@@ -827,6 +831,9 @@ def_render_roles_core() {
               " .${role}.nodemanager.ips\|\=env\(nodemanager_ips\) \| "\
               " .${role}.clustermanager.enable\=env\(clustermanager_enable\) \| "\
               " .${role}.clustermanager.ips\|\=env\(clustermanager_ips\) \| "\
+              " .${role}.osx.ips\|\=env\(osx_ips\) \| "\
+              " .${role}.dashboard.enable\=env\(dashboard_enable\) \| "\
+              " .${role}.dashboard.ips\|\=env\(dashboard_ips\) \| "\
               " .${role}.rollsite.polling.enable\=env\(polling_enable\) \| "\
               " .${role}.rollsite.enable\=env\(rollsite_enable\) \| "\
               " .${role}.rollsite.route_tables\|\=env\(special_routes\) \| "\
@@ -865,6 +872,7 @@ def_render_roles_core() {
     rollsite_polling_ids=${polling_ids} \
     special_route_tables=${exchange_special_routes} \
     default_route_tables="${exchange_default_routes}" \
+    osx_ips="${exchange_osx_ips}" \
     rollsite_ips="[$(echo ${exchange_rollsite_ips[*]}|tr -s ' ' ',')]"  ${workdir}/bin/yq  e '
       .exchange.rollsite.client_secure|=env(client_secure) |
       .exchange.rollsite.server_secure|=env(server_secure) |
@@ -873,6 +881,7 @@ def_render_roles_core() {
       .exchange.rollsite.polling.enable|=env(rollsite_polling_enable) |
       .exchange.rollsite.polling.ids|=env(rollsite_polling_ids) |
       .exchange.rollsite.ips|=env(rollsite_ips) |
+      .exchange.osx.ips|=env(osx_ips) |
       .exchange.rollsite.enable=env(rollsite_enable)
     ' ${workdir}/files/fate_$role -I 2 -P   > ${base}/${pname:-fate}_$role
 
@@ -1000,18 +1009,19 @@ def_simple_mode() {
   echo ${info_host_ips[*]}
   echo ${info_guest_ips[*]}
   echo ${info_exchange_ips[*]}
-  echo "exchange: ${exchange_rollsite_ips[*]}"
+  echo "exchange: ${exchange_osx_ips[*]}"
 
 
   echo "-----node ips-----"
-  for tt in  "rollsite" "clustermanager" "nodemanager" "fate_flow" "fateboard" "mysql";
+  for tt in  "rollsite" "clustermanager" "nodemanager" "dashboard" "fate_flow" "fateboard" "mysql" "osx";
   do
     eval echo "host_${tt}_ips: \${host_${tt}_ips[*]}"
     eval echo "guest_${tt}_ips: \${guest_${tt}_ips[*]}"
   done
   echo "exchange_rollsite_ips: ${exchange_rollsite_ips[*]}"
   echo "exchange_rollsite_ips: ${exchange_default_ips[*]}"
-
+  echo "exchange_osx_ips: ${exchange_osx_ips[*]}"
+  echo "exchange_osx_ips: ${exchange_default_ips[*]}"
 
 
   echo "-------------------5 deal with route data--------------------------"

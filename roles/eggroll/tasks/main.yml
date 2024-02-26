@@ -20,8 +20,8 @@
 - include_tasks: guest_config.yml
   when: "deploy_mode in [ 'deploy', 'config' ] and 'guest' in deploy_roles and deploy_role == 'guest'"
 
-- include_vars: "exchange_vars.yml"
-  when: deploy_mode in [ 'deploy', 'config' ] and 'exchange' in deploy_roles
-
-- include_tasks: exchange_config.yml
-  when: "deploy_mode in [ 'deploy', 'config' ] and 'exchange' in deploy_roles and deploy_role == 'exchange' and ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True"
+#- include_vars: "exchange_vars.yml"
+#  when: deploy_mode in [ 'deploy', 'config' ] and 'exchange' in deploy_roles
+#
+#- include_tasks: exchange_config.yml
+#  when: "deploy_mode in [ 'deploy', 'config' ] and 'exchange' in deploy_roles and deploy_role == 'exchange' and ansible_ssh_host in rollsite.get('ips',[]) and rollsite.get('enable', False) == True"

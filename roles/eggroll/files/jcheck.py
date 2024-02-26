@@ -27,7 +27,7 @@ with open(fname,'r') as f:
     temp=json.load(f)
     print("data",temp)
     bcode=check(temp.get('route_table',{}))
-    if temp.get('permission',{}).get('default_allow', False ) and bcode == 0:
+    if  bcode == 0:
       sys.exit(0)
       #print('json_syntax_check_pass')
     else:

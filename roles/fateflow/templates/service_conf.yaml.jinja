@@ -1,5 +1,7 @@
 party_id: "{{partyid}}"
 use_registry: false
+# DEBUG 10/INFO 20
+log_level: 20
 encrypt:
   key_0:
     module: fate_flow.hub.encrypt.password_encrypt#pwdecrypt
@@ -9,13 +11,14 @@ fateflow:
   host: {{fate_flow.get('ips',['127.0.0.1'])[0]}}
   http_port: {{fate_flow.get('httpPort',9380)}}
   grpc_port: {{fate_flow.get('grpcPort',9360)}}
-  proxy_name: rollsite
-  nginx:
-    host:
-    http_port:
-    grpc_port:
+  proxy_name: osx
+#  nginx:
+#    host:
+#    http_port:
+#    grpc_port:
 database:
   engine: mysql
+  # encrypt passwd key
   decrypt_key:
   mysql:
     name: {{db.get('name','fate_flow')}}
@@ -31,59 +34,57 @@ database:
     path:
 default_engines:
   computing: eggroll
-  federation: rollsite
+  federation: osx
   storage: eggroll
 default_provider:
   name: fate
   # version default: fateflow.env
   version:
   device: local
-federation:
-  pulsar:
-    host: 192.168.0.5
-    port: 6650
-    mng_port: 8080
-    cluster: standalone
-    tenant: fl-tenant
-    topic_ttl: 5
-    # default conf/pulsar_route_table.yaml
-    route_table:
-    # mode: replication / client, default: replication
-    mode: replication
-    max_message_size: 1048576
-  nginx:
-    host: 127.0.0.1
-    http_port: 9300
-    grpc_port: 9310
-    # http or grpc
-    protocol: http
-  rabbitmq:
-    host: 192.168.0.4
-    mng_port: 12345
-    port: 5672
-    user: fate
-    password: fate
-    # default conf/rabbitmq_route_table.yaml
-    route_table:
-    # mode: replication / client, default: replication
-    mode: replication
-    max_message_size: 1048576
-  rollsite:
-    host: {{rollsite.get('ips',['127.0.0.1'])[0]}}
-    port: {{rollsite.get('port',9370)}}
-  osx:
-    host: {{osx.get('ips',['127.0.0.1'])[0]}}
-    port: {{osx.get('port',9370)}}
 computing:
   standalone:
     cores: 32
+  {% set nodes = nodemanager.get('ips',[])|length %}
+  {% set cores_per_nodes = clustermanager.get('cores_per_node',16) %}
   eggroll:
-    cores: 32
-    nodes: 2
+    cores: {{cores_per_nodes*nodes}}
+    nodes: {{nodemanager.get('ips',[])|length}}
+    # cluster manager host and port
+    host: {{clustermanager.get('ips',['127.0.0.1'])[0]}}
+    port: {{clustermanager.get('port',4670)}}
   spark:
     # default use SPARK_HOME environment variable
     home:
     cores: 32
+federation:
+  osx:
+    host: {{osx.get('ips',['127.0.0.1'])[0]}}
+    port: {{osx.get('port',9370)}}
+    # stream or queue
+    mode: stream
+#  pulsar:
+#    host: 192.168.0.5
+#    port: 6650
+#    mng_port: 8080
+#    cluster: standalone
+#    tenant: fl-tenant
+#    topic_ttl: 5
+#    # default conf/pulsar_route_table.yaml
+#    route_table:
+#    # mode: replication / client, default: replication
+#    mode: replication
+#    max_message_size: 1048576
+#  rabbitmq:
+#    host: 192.168.0.4
+#    mng_port: 12345
+#    port: 5672
+#    user: fate
+#    password: fate
+#    # default conf/rabbitmq_route_table.yaml
+#    route_table:
+#    # mode: replication / client, default: replication
+#    mode: replication
+#    max_message_size: 1048576
 storage:
   hdfs:
     name_node: hdfs://fate-cluster
@@ -97,15 +98,17 @@ authentication:
   permission: false
 model_store:
   engine: file
+  # encrypt passwd key
+  decrypt_key:
   file:
     # default fate_flow/runtime/system_settings: MODEL_STORE_PATH
     path:
   mysql:
-    name: 
-    user: 
-    passwd: 
-    host: 
-    port: 
+    name: {{fate_flow.get('dbname','fate_flow')}}
+    user: {{db.get('dbuser','fate')}}
+    passwd: {{db.get('dbpasswd','fate_dev')}}
+    host: {{db['ips'][0]}}
+    port: {{db.get('port',3306)}}
     max_connections: 10
     stale_timeout: 10
   tencent_cos:
