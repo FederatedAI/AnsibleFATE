@@ -2,7 +2,8 @@
 #command={{jbase}}/bin/java  -Dspring.config.location={{pbase}}/{{pname}}/{{role_name}}/conf/application.properties -DFATE_DEPLOY_PREFIX={{pbase}}/{{pname}}/logs/  -Dssh_config_file={{pbase}}/{{pname}}/{{role_name}}/ssh/  -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -jar {{pbase}}/{{pname}}/{{role_name}}/{{role_name}}-{{version}}.jar
 command=/bin/bash {{pbase}}/{{pname}}/fateboard/service.sh starting
 #environment=JAVA_HOME="{{jbase}}/",PATH="{{jbase}}/bin:$PATH:/bin/:/usr/bin",CLASSPATH="$CLASSPATH:$CLASSPATH"
-environment=PATH="%(ENV_PATH)s",CLASSPATH="$CLASSPATH:$CLASSPATH"
+#environment=PATH="%(ENV_PATH)s",CLASSPATH="$CLASSPATH:$CLASSPATH"
+environment=JAVA_HOME="{{jbase}}/",PYTHONPATH={{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fate_flow/python:{{pbase}}/{{pname}}/eggroll/python,EGGROLL_HOME="{{pbase}}/{{pname}}/eggroll",PATH="{{jbase}}/bin:{{pbase}}/{{pname}}/common/python/venv/bin:%(ENV_PATH)s",LOG_BASE={{lbase}}/{{pname}},CLASSPATH="$CLASSPATH:$CLASSPATH"
 directory={{pbase}}/{{pname}}/{{role_name}}
 user={{service['owner']}}
 autorestart=true

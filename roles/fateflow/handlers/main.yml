@@ -2,8 +2,6 @@
   shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-{{role_name}}
 - name: restart {{pname}}-{{role_name}}
   shell: /bin/bash {{cbase}}/supervisord/service.sh restart {{pname}}-{{role_name}}
-- name: stop {{pname}}-rollsite
-  shell: /bin/bash {{cbase}}/supervisord/service.sh stop {{pname}}-rollsite
 - name: reload {{pname}}-osx
   shell: /bin/bash {{cbase}}/supervisord/service.sh update {{pname}}-osx
 - name: restart {{pname}}-osx

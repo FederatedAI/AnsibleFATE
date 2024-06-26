@@ -2,7 +2,7 @@
 
 base="{{cbase}}/supervisord"
 key="{{cbase}}/supervisord/supervisord.conf"
-ctl="{{cbase}}/miniconda3/bin/supervisord"
+ctl="{{cbase}}/miniforge3/bin/supervisord"
 
 getpid() {
   pid=`ps aux | grep -v grep | grep $key | awk '{print $2}'`

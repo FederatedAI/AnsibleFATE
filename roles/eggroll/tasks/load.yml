@@ -15,7 +15,7 @@
       db_port: "{{db.get('port',3306)}}"
 
   - name: "commit({{deploy_mode}}): check.py"
-    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/check.py"
+    shell: "{{cbase}}/miniforge3/bin/python {{tbase}}/check.py"
     register: mysql_load
 
   - debug: var=mysql_load.get('stdout_lines')
@@ -50,7 +50,7 @@
       db_passwd: "{{db.get('dbpasswd','fate')}}"
 
   - name: "commit({{deploy_mode}}): cluster_conn.py"
-    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/cluster_conn.py"
+    shell: "{{cbase}}/miniforge3/bin/python {{tbase}}/cluster_conn.py"
     register: mysql_load
 
   - debug: var=mysql_load.get('stderr_lines')
@@ -75,7 +75,7 @@
     - "{{nodemanager.get('ips',[])}}"
 
   - name: "commit({{deploy_mode}}): node_conn.py"
-    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/node_conn_{{item}}.py"
+    shell: "{{cbase}}/miniforge3/bin/python {{tbase}}/node_conn_{{item}}.py"
     register: mysql_load
     with_items:
     - "{{nodemanager.get('ips',[])}}"

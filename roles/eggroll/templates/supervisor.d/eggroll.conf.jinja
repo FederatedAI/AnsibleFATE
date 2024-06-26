@@ -1,7 +1,7 @@
 [program:{{pname}}-{{role}}]
-command=/bin/bash {{pbase}}/{{pname}}/eggroll/bin/fate-eggroll.sh {{role}} starting
-#environment=JAVA_HOME="{{jbase}}/",PYTHONPATH={{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fateflow/python:{{pbase}}/{{pname}}/eggroll/python,EGGROLL_HOME="{{pbase}}/{{pname}}/eggroll",PATH="{{jbase}}/bin:{{pbase}}/{{pname}}/common/python/venv/bin:%(ENV_PATH)s",LOG_BASE={{lbase}}/{{pname}},CLASSPATH="$CLASSPATH:$CLASSPATH"
-environment=PATH="{{jbase}}/bin:{{pbase}}/{{pname}}/common/python/venv/bin:%(ENV_PATH)s",CLASSPATH="$CLASSPATH:$CLASSPATH"
+command=/bin/bash  {{pbase}}/{{pname}}/eggroll/bin/eggroll.sh {{role}} starting
+environment=JAVA_HOME="{{jbase}}/",PYTHONPATH={{pbase}}/{{pname}}/fate/python:{{pbase}}/{{pname}}/fate_flow/python:{{pbase}}/{{pname}}/eggroll/python,EGGROLL_HOME="{{pbase}}/{{pname}}/eggroll",PATH="{{jbase}}/bin:{{pbase}}/{{pname}}/common/python/venv/bin:%(ENV_PATH)s",LOG_BASE={{lbase}}/{{pname}},CLASSPATH="$CLASSPATH:$CLASSPATH"
+#environment=PATH="{{jbase}}/bin:{{pbase}}/{{pname}}/common/python/venv/bin:%(ENV_PATH)s",CLASSPATH="$CLASSPATH:$CLASSPATH"
 directory={{pbase}}/{{pname}}/eggroll/
 user={{service['owner']}}
 autorestart=true
@@ -11,5 +11,6 @@ logfile_backups=10
 stdout_logfile={{lbase}}/{{pname}}/eggroll/bootstrap.{{role}}.out
 stderr_logfile={{lbase}}/{{pname}}/eggroll/bootstrap.{{role}}.err
 loglevel=info
-
+killasgroup=true
+stopasgroup=true
 

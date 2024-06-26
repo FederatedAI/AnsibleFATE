@@ -1,4 +1,4 @@
-- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/{bin,conf}"
+- name: "mkdir({{deploy_mode}}): {{pbase}}/{{pname}}/bin"
   file:
     path: "{{pbase}}/{{pname}}/{{item}}"
     state: directory
@@ -59,8 +59,8 @@
     dest: "{{pbase}}/{{pname}}/fate_flow/bin/init_env.sh"
     mode: 0755
 
-- name: "link({{deploy_mode}}): {{pbase}}/{{pname}}/{RELEASE.md,fate.env,examples}"
-  shell: "ln -frs '{{pbase}}/{{pname}}/{{pname}}/'{RELEASE.md,fate.env,examples} '{{pbase}}/{{pname}}'"
+- name: "link({{deploy_mode}}): {{pbase}}/{{pname}}/{RELEASE.md,examples}"
+  shell: "ln -frs '{{pbase}}/{{pname}}/{{pname}}/'{RELEASE.md,examples} '{{pbase}}/{{pname}}'"
   args:
     executable: /bin/bash
     warn: False

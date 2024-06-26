@@ -20,14 +20,17 @@ fate_project_base=$(cd `dirname "$(realpath "${BASH_SOURCE[0]:-${(%):-%x}}")"`; 
 export FATE_PROJECT_BASE={{pbase}}/{{pname}}
 export FATE_DEPLOY_BASE={{pbase}}/{{pname}}
 venv={{pbase}}/{{pname}}/common/python/venv
-source ${venv}/bin/activate
-export PYTHONPATH={{pbase}}/{{pname}}/{{pname}}/python:{{pbase}}/{{pname}}/fate_flow/python:{{pbase}}/{{pname}}/eggroll/python
 export EGGROLL_HOME={{pbase}}/{{pname}}/eggroll
-export FATE_LOG_LEVEL=DEBUG
-export FATE_PROFILE_LOG_ENABLED=0
+export PYTHONPATH={{pbase}}/{{pname}}/{{pname}}/python:{{pbase}}/{{pname}}/fate_flow/python:{{pbase}}/{{pname}}/eggroll/python
+export SPARK_HOME=
+
+export FATE_LOG_LEVEL=INFO
+
 export JAVA_HOME={{jbase}}
 export PATH=$JAVA_HOME/bin:$PATH
 export EGGROLL_LOG_LEVEL=INFO
+source ${venv}/bin/activate
+
 {% if default_engines == 'spark' %}
 export HADOOP_HOME={{spark.get('hadoop_home','')}}
 {% endif %}

@@ -20,6 +20,10 @@ guest:
     enable: false
     ips: []
     port: 4671
+  dashboard:
+    enable: false
+    ips: []
+    port: 8083
   eggroll:
     dbname: "eggroll_meta"
     egg: 4
@@ -29,13 +33,13 @@ guest:
     grpcPort: 9360
     httpPort: 9380
     dbname: "fate_flow"
-    proxy: rollsite
+    proxy: osx
     http_app_key:
     http_secret_key:
     use_deserialize_safe_module: false
     default_engines: eggroll
     computing: eggroll
-    federation: rollsite
+    federation: osx
     storage: eggroll
   fateboard:
     enable: false

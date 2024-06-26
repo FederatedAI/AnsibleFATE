@@ -7,7 +7,7 @@
   - "{{cbase}}"
   - "{{tbase}}/{{pname}}"
 
-- set_fact: supervisord_path="{{cbase}}/miniconda3/bin"
+- set_fact: supervisord_path="{{cbase}}/miniforge3/bin"
 
 - debug: var=supervisord_path
 
@@ -15,26 +15,26 @@
   stat: path="{{supervisord_path}}/supervisord"
   register: supervisord_self_reg
 
-- name: "check({{deploy_mode}}): miniconda conf file"
+- name: "check({{deploy_mode}}): miniforge conf file"
   stat: path="{{supervisord_path}}/pip"
-  register: miniconda_self_reg
+  register: miniforge_self_reg
 
-- name: "check({{deploy_mode}}): miniconda3 package"
-  stat: path="{{tbase}}/{{pname}}/Miniconda3-{{python['version']}}-Linux-x86_64.sh"
-  register: miniconda_package_reg
+- name: "check({{deploy_mode}}): miniforge3 package"
+  stat: path="{{tbase}}/{{pname}}/Miniforge3-{{python['version']}}-Linux-x86_64.sh"
+  register: miniforge_package_reg
 
-- name: "copy({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+- name: "copy({{deploy_mode}}): Miniforge3-{{python['version']}}-Linux-x86_64.sh"
   copy:
-    src: "Miniconda3-{{python['version']}}-Linux-x86_64.sh"
-    dest: "{{tbase}}/{{pname}}/Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+    src: "Miniforge3-{{python['version']}}-Linux-x86_64.sh"
+    dest: "{{tbase}}/{{pname}}/Miniforge3-{{python['version']}}-Linux-x86_64.sh"
     mode: 0755
-  when: miniconda_self_reg.stat.exists == False and miniconda_package_reg.stat.exists == False
+  when: miniforge_self_reg.stat.exists == False and miniforge_package_reg.stat.exists == False
 
-- name: "commit({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
-  shell: "/bin/bash ./Miniconda3-{{python['version']}}-Linux-x86_64.sh -b -f -p {{cbase}}/{{python['dest']}}"
+- name: "commit({{deploy_mode}}): Miniforge3-{{python['version']}}-Linux-x86_64.sh"
+  shell: "/bin/bash ./Miniforge3-{{python['version']}}-Linux-x86_64.sh -b -f -p {{cbase}}/{{python['dest']}}"
   args:
     chdir: "{{tbase}}/{{pname}}"
-  when: miniconda_self_reg.stat.exists == False
+  when: miniforge_self_reg.stat.exists == False
 
 - name: "copy({{deploy_mode}}): supervisor-4.2.4-py2.py3-none-any.whl"
   copy:
@@ -43,7 +43,7 @@
   when: supervisord_self_reg.stat.exists == False
 
 - name: "check({{deploy_mode}}): pymysql"
-  shell: "{{cbase}}/miniconda3/bin/pip list |grep -wq PyMySQL && echo 0 || echo 1"
+  shell: "{{cbase}}/miniforge3/bin/pip list |grep -wq PyMySQL && echo 0 || echo 1"
   register: pymysql_reg
 
 - name: "copy({{deploy_mode}}): PyMySQL-1.0.2-py3-none-any.whl"

@@ -10,7 +10,7 @@
       db_port: "{{db.get('port',3306)}}"
 
   - name: "commit({{deploy_mode}}): check.py"
-    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/check.py"
+    shell: "{{cbase}}/miniforge3/bin/python {{tbase}}/check.py"
     register: mysql_load
 
   - debug: var=mysql_load.get('stdout_lines')
@@ -28,7 +28,7 @@
       rip: "{{fate_flow.get('ips',[])[0]}}"
 
   - name: "commit({{deploy_mode}}): flow_conn.py"
-    shell: "{{cbase}}/miniconda3/bin/python {{tbase}}/flow_conn.py"
+    shell: "{{cbase}}/miniforge3/bin/python {{tbase}}/flow_conn.py"
     register: mysql_load
 
   - debug: var=mysql_load.get('stderr_lines')

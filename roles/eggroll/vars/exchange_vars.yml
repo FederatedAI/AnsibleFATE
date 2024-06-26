@@ -1,4 +1,6 @@
 ---
 deploy_role: "exchange"
 rollsite: "{{ exchange.get('rollsite',{}) }}"
-osx: "{{ host.get('osx',{}) }}"
+osx: "{{ exchange.get('osx',{}) }}"
+partyid: "{{ exchange.get('partyid','default') }}"
+clustermanager: "{{ exchange.get('clustermanager',{}) }}"

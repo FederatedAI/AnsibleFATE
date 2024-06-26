@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source {{pbase}}/{{pname}}/fate_flow/bin/init_env.sh
+source {{pbase}}/{{pname}}/bin/init_env.sh
 
 mv {{pbase}}/{{pname}}/fate/fate_client {{pbase}}/{{pname}}
 cd {{pbase}}/{{pname}}/fate_client/python
@@ -15,4 +15,4 @@ cd {{pbase}}/{{pname}}
 flow init --ip '{{ansible_ssh_host}}' --port '{{fate_flow.get("httpPort", 9380)}}'
 #pipeline init --ip '{{ansible_ssh_host}}' --port '{{fate_flow.get("httpPort", 9380)}}' --app-key '{{fate_flow.get("http_app_key", "")}}' --secret-key '{{fate_flow.get("http_secret_key", "")}}'
 
-fate_test data upload -t min_test -y
+#fate_test data upload -t min_test -y

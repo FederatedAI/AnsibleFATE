@@ -1,5 +1,5 @@
 [program:{{pname}}-{{role_name}}]
-command={{cbase}}/miniconda3/bin/pidproxy {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/run/mysqld.pid {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/bin/mysqld_safe --defaults-file={{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conf/my.cnf --user={{service['owner']}}
+command={{cbase}}/miniforge3/bin/pidproxy {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/run/mysqld.pid {{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/bin/mysqld_safe --defaults-file={{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}/conf/my.cnf --user={{service['owner']}}
 directory={{pbase}}/{{pname}}/{{mysql['path']}}/{{role_name}}-{{mysql['version']}}
 user={{service['owner']}}
 autorestart=true

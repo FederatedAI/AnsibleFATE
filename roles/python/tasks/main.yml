@@ -78,18 +78,18 @@
   stat: path="{{cbase}}/{{python['dest']}}/bin/python"
   register: py_reg
 
-- name: "check({{deploy_mode}}): miniconda3 package"
-  stat: path="{{tbase}}/{{pname}}/Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+- name: "check({{deploy_mode}}): miniforge3 package"
+  stat: path="{{tbase}}/{{pname}}/Miniforge3-{{python['version']}}-Linux-x86_64.sh"
   register: mc_reg
 
-- name: "copy({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+- name: "copy({{deploy_mode}}): Miniforge3-{{python['version']}}-Linux-x86_64.sh"
   copy:
-    src: "Miniconda3-{{python['version']}}-Linux-x86_64.sh"
-    dest: "{{tbase}}/{{pname}}/Miniconda3-{{python['version']}}-Linux-x86_64.sh"
+    src: "Miniforge3-{{python['version']}}-Linux-x86_64.sh"
+    dest: "{{tbase}}/{{pname}}/Miniforge3-{{python['version']}}-Linux-x86_64.sh"
   when: py_reg.stat.exists == False and mc_reg.stat.exists == False
 
-- name: "commit({{deploy_mode}}): Miniconda3-{{python['version']}}-Linux-x86_64.sh"
-  shell: "/bin/bash ./Miniconda3-{{python['version']}}-Linux-x86_64.sh -b -f -p {{cbase}}/{{python['dest']}}"
+- name: "commit({{deploy_mode}}): Miniforge3-{{python['version']}}-Linux-x86_64.sh"
+  shell: "/bin/bash ./Miniforge3-{{python['version']}}-Linux-x86_64.sh -b -f -p {{cbase}}/{{python['dest']}}"
   args:
     chdir: "{{tbase}}/{{pname}}"
   when: py_reg.stat.exists == False
