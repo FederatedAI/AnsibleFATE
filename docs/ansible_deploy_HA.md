@@ -220,7 +220,6 @@ roles:
 #ssl role list: host && guest | host&&exchange | guest&&exchange 
 ssl_roles: []
 #
-polling: {}
 #host ip lists
 #host_ips: [ "default:192.168.0.1", "rollsite:192.168.0.1", "nodemanager:192.168.0.1|192.168.0.2", "clustermanager:192.168.0.1", "fate_flow:192.168.0.1", "fateboard:192.168.0.1" ]
 host_ips:
@@ -291,7 +290,7 @@ host:
     grpcPort: 9360
     httpPort: 9380
     dbname: fate_flow
-    proxy: rollsite
+    proxy: osx
     http_app_key:
     http_secret_key:
     use_deserialize_safe_module: false
@@ -402,13 +401,13 @@ model_store_address
   max_connections: 10
 ~~~
 
-##### 3.4 eggroll配置
+##### 3.4 eggroll&osx配置
 
 如果一直按上文执行， eggroll路由配置可不修改， 参考配置如下（2边高可用的都一致）
 
 ###### 3.4.1路由表配置参考
 
-eggroll/conf/route_table.json
+osx/conf/broker/route_table.json
 
 ~~~
 # route_table.json
@@ -443,28 +442,17 @@ eggroll/conf/route_table.json
   },
   "permission":
   {
-    "default_allow": true
+    "self_party": 9999
   }
 }
 
 ~~~
 
-###### 3.4.2 eggroll.properties配置参考
-eggroll/conf/eggroll.properties   需修改eggroll.rollsite.host 为完整FATE服务的ip
-
-~~~
-# eggroll.properties
-
-# for roll site. rename in the next round
-eggroll.rollsite.coordinator=fate
-eggroll.rollsite.host=192.168.0.1     # 注意修改
-~~~
-
-关闭fate_rollsite服务并重启 fate_flow 服务即可
+关闭fate_osx服务并重启 fate_flow 服务即可
 
 ~~~
 # 关闭fate_rollsite服务
-sh /data/projects/common/supervisord/service.sh stop fate-rollsite
+sh /data/projects/common/supervisord/service.sh stop fate-osx
 
 # 重启 fate_flow 服务
 sh /data/projects/common/supervisord/service.sh restart fate-fateflow

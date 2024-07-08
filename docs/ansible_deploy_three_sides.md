@@ -16,8 +16,9 @@ Party Id: 10000
 
 | 角色           | IP          | 端口      | 介绍                                   |
 | -------------- | ----------- | --------- | -------------------------------------- |
-| rollsite       | 192.168.0.1 | 9370      | 跨站点或者说跨party通讯组件            |
+| osx       | 192.168.0.1 | 9370      | 通信/数据传输模块            |
 | fate_flow      | 192.168.0.1 | 9360;9380 | 联合学习任务流水线管理模块             |
+| dashboard | 192.168.0.1 | 8083 | 联合学习集群管理可视化模块 |
 | clustermanager | 192.168.0.1 | 4670      | cluster manager管理集群                |
 | nodemanager     | 192.168.0.1 | 4671      | node manager管理每台机器资源           |
 | fateboard      | 192.168.0.1 | 8080      | 联合学习过程可视化模块                 |
@@ -29,8 +30,9 @@ Party Id: 9999
 
 | 角色           | IP          | 端口      | 介绍                                   |
 | -------------- | ----------- | --------- | -------------------------------------- |
-| rollsite       | 192.168.1.1 | 9370      | 跨站点或者说跨party通讯组件            |
+| osx       | 192.168.1.1 | 9370      | 通信/数据传输模块            |
 | fate_flow      | 192.168.1.1 | 9360;9380 | 联合学习任务流水线管理模块             |
+| dashboard | 192.168.1.1 | 8083 | 联合学习集群管理可视化模块 |
 | clustermanager | 192.168.1.1 | 4670      | cluster manager管理集群                |
 | nodemanager     | 192.168.1.1 | 4671      | node manager管理每台机器资源           |
 | fateboard      | 192.168.1.1 | 8080      | 联合学习过程可视化模块                 |
@@ -40,31 +42,30 @@ Party Id: 9999
 
 | 角色     | IP           | 端口 | 介绍                        |
 | -------- | ------------ | ---- | --------------------------- |
-| rollsite | 192.168.0.88 | 9370 | 跨站点或者说跨party通讯组件 |
-
-### 3 进入部署包根目录
-
- 请按需使用合适的方式获取部署包，并解压，然后进入【部署包根目录】。具体操作指引请参考<<[部署手册](ansible_deploy_FATE_manual.md)>> 2.4.1和2.6.1等章节。
-
-```
-cd 【部署包根目录】
-```
+| osx | 192.168.0.88 | 9370 | 通信/数据传输模块 |
 
 
+
+### 3 部署三边guest-exchange-host
+
+#### 3.1 概述
+
+​      本章是通过ansible 部署FATE集群，部署guest-exchange-host。在进行部署之前请确认已经执行前置操作,前置操作请参考： <<[部署fate集群的前置操作](action_before_deploy_fate_cluster.md)>> 一文。
 
 
 
 ### 4 配置
 
 #### 4.1 初始化配置
+- 步骤1：下载部署包，请参考本文 **1.1**
 
-- 步骤1：使用辅助脚本产生初始化配置
+- 步骤2：使用辅助脚本产生初始化配置
 
 ```
-bash deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1" -e="192.168.0.88" -k="host|exchange"
+bash deploy/deploy.sh init -h="10000:192.168.0.1" -g="9999:192.168.1.1" -e="192.168.0.88" 
 ```
 
-- 步骤2： 修改配置
+- 步骤3： 修改配置
 
 ```
 vim deploy/conf/setup.conf
@@ -102,13 +103,7 @@ exchange_special_routes: []
 default_engines: eggroll
 ```
 
-如果部署需要证书验证，则执行命令：
-
-```
-bash deploy/deploy.sh keys
-```
-
-- 步骤3：执行辅助脚本产生配置
+- 步骤4：执行辅助脚本产生配置
 
 ```
 bash deploy/deploy.sh render
@@ -167,6 +162,11 @@ host:
     ips:
     - 192.168.0.1
     port: 4671
+  dashboard:
+    enable: true
+    ips:
+    - 192.168.0.1
+    port: 8083
   eggroll:
     dbname: "eggroll_meta"
     egg: 4
@@ -177,7 +177,7 @@ host:
     grpcPort: 9360
     httpPort: 9380
     dbname: "fate_flow"
-    proxy: rollsite
+    proxy: osx
     http_app_key:
     http_secret_key:
     use_deserialize_safe_module: false
@@ -208,6 +208,10 @@ host:
     ips:
     - 192.168.0.1
     port: 8000
+  osx:
+    ips:
+      - 192.168.0.1
+    port: 9370
 ```
 
 #### 4.3 配置guest信息
@@ -261,6 +265,11 @@ guest:
     ips:
     - 192.168.1.1
     port: 4671
+  dashboard:
+    enable: true
+    ips:
+    - 192.168.0.2
+    port: 8083
   eggroll:
     dbname: "eggroll_meta"
     egg: 4
@@ -271,7 +280,7 @@ guest:
     grpcPort: 9360
     httpPort: 9380
     dbname: "fate_flow"
-    proxy: rollsite
+    proxy: osx
     http_app_key:
     http_secret_key:
     use_deserialize_safe_module: false
@@ -302,6 +311,10 @@ guest:
     ips:
     - 192.168.1.1
     port: 8000
+  osx:
+    ips:
+      - 192.168.1.1
+    port: 9370
 ```
 
 #### 4.4 配置exchange信息
@@ -342,6 +355,11 @@ exchange:
         ip: 192.168.1.1
         port: 9370
         is_secure: False
+  osx:
+    ips:
+      - 192.168.0.88
+    port: 9370
+    
 ```
 
 
