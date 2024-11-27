@@ -1,0 +1,21 @@
+
+
+- hosts: {{data.get('pname','fate')}}
+  any_errors_fatal: True
+  roles:
+{%- for module in data.get('modules',[]) %}
+{%- if module == 'mysql' %} 
+  - { role: "mysql_uninstall", when: "( ansible_ssh_host in host['mysql']['ips'] and host['mysql']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in guest['mysql']['ips'] and guest['mysql']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') )" }
+{%- endif %}
+{%- if module == 'eggroll' %}
+  - { role: "eggroll_uninstall", when: "( ( ansible_ssh_host in exchange['rollsite']['ips'] and exchange['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in host['rollsite']['ips'] and host['rollsite']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in guest['rollsite']['ips'] and guest['rollsite']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') ) or  ( ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') ) or  ( ansible_ssh_host in guest['clustermanager']['ips'] and guest['clustermanager']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') )  or  ( ansible_ssh_host in host['clustermanager']['ips'] and host['clustermanager']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode == data.get('deploy_mode','uninstall') ) )" }
+{%- endif %}
+{%- if module == 'fate_flow' %}
+  - { role: "fate_flow_uninstall", when: "( ansible_ssh_host in host['fate_flow']['ips'] and host['fate_flow']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in guest['fate_flow']['ips'] and guest['fate_flow']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in host['rollsite']['ips'] and host['rollsite']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in guest['rollsite']['ips'] and guest['rollsite']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in host['nodemanager']['ips'] and host['nodemanager']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall') ) or ( ansible_ssh_host in guest['nodemanager']['ips'] and guest['nodemanager']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall')) or ( ansible_ssh_host in host['clustermanager']['ips'] and host['clustermanager']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall'))  or ( ansible_ssh_host in guest['clustermanager']['ips'] and guest['clustermanager']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall'))" }
+{%- endif %}
+{%- if module == 'fateboard' %}
+  - { role: "fateboard_uninstall", when: "( ansible_ssh_host in host['fateboard']['ips'] and host['fateboard']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall')) or ( ansible_ssh_host in guest['fateboard']['ips'] and guest['fateboard']['enable'] == True and deploy_mode  == data.get('deploy_mode','uninstall') )" }
+{%- endif %}
+{%- endfor %}
+
+

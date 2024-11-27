@@ -1,0 +1,19 @@
+exchange:
+  rollsite:
+    enable: False
+    coordinator: fate
+    ips: []
+    port: 9370
+    secure_port: 9371
+    server_secure: false
+    client_secure: false
+    polling:
+      enable: false
+      ids: []
+    route_tables: []
+  osx:
+    ips: 
+    - 127.0.0.1
+    port: 9370
+
+
