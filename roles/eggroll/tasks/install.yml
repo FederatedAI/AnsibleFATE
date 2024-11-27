@@ -73,3 +73,8 @@
     src: "eggroll.sh"
     dest: "{{pbase}}/{{pname}}/eggroll/bin/fate-eggroll.sh"
     mode: 0755
+
+- name: "untar({{deploy_mode}}): osx.tar.gz"
+  unarchive:
+    src: "osx.tar.gz"
+    dest: "{{pbase}}/{{pname}}"

@@ -3,6 +3,7 @@
 fname="{{pbase}}/{{pname}}/eggroll/conf/route_table_tmp.json"
 #cat $fname | jq .
 
+source {{pbase}}/{{pname}}/bin/init_env.sh
 python {{pbase}}/{{pname}}/tools/jcheck.py $fname
 if [ $? -eq 0 ]
 then

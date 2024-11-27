@@ -1,0 +1,7 @@
+use mysql;
+update user set host = '%' where user = 'fate';
+create user if not exists 'fate'@'%';
+flush privileges;
+grant all on *.* to 'fate'@'%';
+
+flush privileges;
