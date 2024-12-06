@@ -1,6 +1,6 @@
 ---
 - name: "mkdir({{deploy_mode}}): {{tbase}}/{{pname}}"
-  shell: "rm -fr {{tbase}}/{{pname}}/pypi && mkdir -p {{tbase}}/{{pname}}/pypi && mkdir -p {{tbase}}/{{pname}}/fate_test && mkdir -p {{tbase}}/{{pname}}/fate_client && mkdir -p {{tbase}}/{{pname}}/fate_llm"
+  shell: "rm -fr {{tbase}}/{{pname}}/pypi && mkdir -p {{tbase}}/{{pname}}/pypi && mkdir -p {{tbase}}/{{pname}}/fate_test && mkdir -p {{tbase}}/{{pname}}/fate_client"
   args:
     warn: False
 
@@ -9,13 +9,6 @@
     src: "fate_client/{{item}}"
     dest: "{{tbase}}/{{pname}}/fate_client/{{item}}"
   with_items:
-  - "requirements.txt"
-
-- name: "copy({{deploy_mode}}): fate_llm requirements.txt"
-  copy:
-    src: "fate_llm/{{item}}"
-    dest: "{{tbase}}/{{pname}}/fate_llm/{{item}}"
-  with_items:    
   - "requirements.txt"
 
 - name: "copy({{deploy_mode}}): fate_test requirements.txt"
@@ -166,13 +159,6 @@
   pip:
     extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
     requirements: "{{tbase}}/{{pname}}/fate_client/requirements.txt"
-    virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
-  when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
-
-- name: "pip({{deploy_mode}}): venv install packages(req-fatellm)"
-  pip:
-    extra_args: "-U -f {{tbase}}/{{pname}}/pypi --no-index"
-    requirements: "{{tbase}}/{{pname}}/fate_llm/requirements.txt"
     virtualenv: "{{pbase}}/{{pname}}/{{python['venv']}}"
   when: venv_reg.stat.exists == False and venv2_reg.stat.exists == True
 

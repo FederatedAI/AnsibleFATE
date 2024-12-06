@@ -8,7 +8,7 @@ default_engines: eggroll
 version: "#VERSION#"
 
 python:
-  version: py310_24.5.0-0
+  version: py38_4.12.0
   dest: "miniconda3"
   venv: "common/python/venv"
 java:
